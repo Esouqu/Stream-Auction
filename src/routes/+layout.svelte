@@ -106,9 +106,9 @@
 {#if isLoggedIn}
 	<div class="layout" transition:fade>
 		<div class="layout-section layout-section_left">
-			<h1>Правила Аукциона</h1>
-			<h2>Аук на Все</h2>
-			<h3 style="white-space: break-spaces;">
+			<h1 style="font-size: 24px;">Правила Аукциона</h1>
+			<h2 style="font-size: 28px;">По умолчанию</h2>
+			<h3 style="white-space: break-spaces; font-size: 20px;">
 				{JSON.parse(JSON.stringify($textRules))}
 			</h3>
 		</div>

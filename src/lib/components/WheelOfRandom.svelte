@@ -40,7 +40,8 @@
 
 	$: pie = createPie(items, radius);
 	$: spinDurationInMs = +spinDuration * 1000;
-	$: handleDonation($donations, $lots);
+	$: handleLots($lots);
+	$: handleDonation($donations);
 
 	onMount(() => {
 		onResize();
@@ -116,38 +117,27 @@
 		requestAnimationFrame(giveMoment);
 	}
 
-	function handleDonation(_donations: IDonationData[], _lots: ILot[]) {
-		if (!isSpinning || (!$stopWheelOnDonation.isToggled && !$addWheelSpinTimeOnDonation.isToggled))
-			return;
+	function handleLots(_lots: ILot[]) {
+		if (!isSpinning || !$addWheelSpinTimeOnDonation.isToggled) return;
 
-		const newDonationTime = $addWheelSpinTimeOnDonation.value;
+		const addDonationTime = $addWheelSpinTimeOnDonation.value;
 
-		if ($addWheelSpinTimeOnDonation.isToggled) {
-			lots.onNewItem(() => {
-				spinDuration = String(+spinDuration + +newDonationTime);
-			});
-		}
+		lots.onNewItem(() => {
+			spinDuration = String(+spinDuration + +addDonationTime);
+		});
+	}
 
-		if ($addWheelSpinTimeOnDonation.isToggled) {
-			donations.onNewDonation((donationCreateTime, donationValue) => {
-				const isDonationSendAfter = donationCreateTime > spinStartDateTime;
-				const isDonationValueEnough = donationValue > Number($stopWheelOnDonation.value);
+	function handleDonation(_donations: IDonationData[]) {
+		if (!isSpinning || !$stopWheelOnDonation.isToggled) return;
 
-				if (!isDonationValueEnough || !isDonationSendAfter) {
-					spinDuration = String(+spinDuration + +newDonationTime);
-				}
-			});
-		}
-		if ($stopWheelOnDonation.isToggled) {
-			donations.onNewDonation((donationCreateTime, donationValue) => {
-				const isDonationSendAfter = donationCreateTime > spinStartDateTime;
-				const isDonationValueEnough = donationValue > Number($stopWheelOnDonation.value);
+		donations.onNewDonation((donationCreateTime, donationValue) => {
+			const isDonationSendAfter = donationCreateTime > spinStartDateTime;
+			const isDonationValueEnough = donationValue > Number($stopWheelOnDonation.value);
 
-				if (!isDonationValueEnough || !isDonationSendAfter) {
-					isSpinning = false;
-				}
-			});
-		}
+			if (!isDonationValueEnough || !isDonationSendAfter) {
+				isSpinning = false;
+			}
+		});
 	}
 
 	function onRelease() {

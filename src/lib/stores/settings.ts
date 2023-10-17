@@ -8,7 +8,7 @@ interface ISetting {
   valueAttribute: string;
 }
 
-export const textRules = writable('');
+export const textRules = writable('Мои правила аукциона');
 export const stopWheelOnDonation = writable({
   isToggled: false,
   description: 'Останавливать колесо при донате',
@@ -17,8 +17,8 @@ export const stopWheelOnDonation = writable({
 });
 export const addWheelSpinTimeOnDonation = writable({
   isToggled: true,
-  description: 'Добавлять время прокрутки колеса при донате',
-  value: '100',
+  description: 'Добавлять время прокрутки колеса за новый/обновленный лот',
+  value: '60',
   valueAttribute: 'сек.',
 });
 export const addTimeOnNewItem = writable({

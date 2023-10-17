@@ -7,7 +7,8 @@
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
 		textRules,
-		timerStarterTime
+		timerStarterTime,
+		addWheelSpinTimeOnDonation
 	} from '$lib/stores/settings';
 	import timer from '$lib/stores/timer';
 
@@ -38,20 +39,27 @@
 		/>
 		<Setting
 			id={2}
+			bind:isToggled={$addWheelSpinTimeOnDonation.isToggled}
+			bind:value={$addWheelSpinTimeOnDonation.value}
+			description={$addWheelSpinTimeOnDonation.description}
+			valueKey={$addWheelSpinTimeOnDonation.valueAttribute}
+		/>
+		<Setting
+			id={3}
 			bind:isToggled={$addTimeOnNewItem.isToggled}
 			bind:value={$addTimeOnNewItem.value}
 			description={$addTimeOnNewItem.description}
 			valueKey={$addTimeOnNewItem.valueAttribute}
 		/>
 		<Setting
-			id={3}
+			id={4}
 			bind:isToggled={$addTimeOnNewLeader.isToggled}
 			bind:value={$addTimeOnNewLeader.value}
 			description={$addTimeOnNewLeader.description}
 			valueKey={$addTimeOnNewLeader.valueAttribute}
 		/>
 		<Setting
-			id={4}
+			id={5}
 			bind:isToggled={$timerStarterTime.isToggled}
 			bind:value={$timerStarterTime.value}
 			description={$timerStarterTime.description}
