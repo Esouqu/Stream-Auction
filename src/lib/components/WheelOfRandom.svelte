@@ -1,25 +1,33 @@
 <script lang="ts">
 	import { radiansToDegrees } from '$lib/constants';
-	import type { IDonationData, IPieItem } from '$lib/interfaces';
+	import type { IDonationData, ILot, IPieItem } from '$lib/interfaces';
 	import { createPie } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Input from './Input.svelte';
 	import donations from '$lib/stores/donations';
-	import { stopWheelOnDonation } from '$lib/stores/settings';
+	import {
+		addTimeOnNewItem,
+		addTimeOnNewLeader,
+		addWheelSpinTimeOnDonation,
+		stopWheelOnDonation
+	} from '$lib/stores/settings';
+	import lots from '$lib/stores/lots';
 
 	export let items: IPieItem[] = [];
 	export let winner: number | null = null;
 
-	const radius = 400;
+	const radius = 350;
 	const width = radius * 2;
 	const offset = 50;
-	const maxSpeed = 20;
+	const maxSpeed = 5;
 	const accelerationTime = 0.2;
 	const slowDownTime = 0.5;
 	const generalTime = accelerationTime + slowDownTime;
 	const decelerationTime = 0.3;
 	const degreeCapForTextDisplay = Number(((400 / 100) * 1.75).toFixed(2));
+
+	let previousLotsAmount = $lots.length;
 
 	let spinDuration = '10';
 	let wheelStartAngle = 0;
@@ -38,8 +46,8 @@
 	let wheelY: number;
 
 	$: pie = createPie(items, radius);
-	$: spinDurationInMs = Number(spinDuration) * 1000;
-	$: stopWheel($donations);
+	$: spinDurationInMs = +spinDuration * 1000;
+	$: handleDonation($donations, $lots);
 
 	onMount(() => {
 		onResize();
@@ -69,6 +77,10 @@
 	function giveMoment(currentTime: number) {
 		if (!spinStartTime) spinStartTime = currentTime;
 
+		if (spinDurationInMs !== +spinDuration * 1000) {
+			spinDurationInMs = +spinDuration * 1000;
+		}
+
 		const elapsedTime = currentTime - spinStartTime;
 		const progress = Math.min(elapsedTime / spinDurationInMs, 1);
 
@@ -81,7 +93,6 @@
 		if (progress >= 1) {
 			isSpinning = false;
 			spinStartTime = 0;
-			getWinner();
 
 			return;
 		} else if (progress <= accelerationTime) {
@@ -96,6 +107,7 @@
 		}
 
 		oldAngle += speed;
+		getWinner();
 		animationId = requestAnimationFrame(giveMoment);
 	}
 
@@ -111,8 +123,18 @@
 		requestAnimationFrame(giveMoment);
 	}
 
-	function stopWheel(donations: IDonationData[]) {
-		if (!isSpinning || !$stopWheelOnDonation.isToggled) return;
+	function handleDonation(donations: IDonationData[], items: ILot[]) {
+		if (!isSpinning || (!$stopWheelOnDonation.isToggled && !$addWheelSpinTimeOnDonation.isToggled))
+			return;
+
+		const newDonationTime = $addWheelSpinTimeOnDonation.value;
+
+		if ($addWheelSpinTimeOnDonation.isToggled) {
+			if (items.length > previousLotsAmount) {
+				previousLotsAmount = items.length;
+				spinDuration = String(+spinDuration + +newDonationTime);
+			}
+		}
 
 		for (let i = 0; i < donations.length; i++) {
 			const donation = donations[i];
@@ -123,7 +145,12 @@
 
 			if (!isDonationValueEnough || !isDonationSendAfter) continue;
 
-			isSpinning = false;
+			if ($addWheelSpinTimeOnDonation.isToggled) {
+				spinDuration = String(+spinDuration + +newDonationTime);
+			}
+			if ($stopWheelOnDonation.isToggled) {
+				isSpinning = false;
+			}
 		}
 	}
 
@@ -214,7 +241,7 @@
 						<path
 							id="{idx}slice"
 							class="wheel__slice"
-							class:selected={winner === null || winner === idx}
+							class:selected={isSpinning || winner === null || winner === idx}
 							d="M {startPoint.x} {startPoint.y} A {radius} {radius} 0 {largeArcFlag} 1 {endPoint.x} {endPoint.y} L {radius} {radius} Z"
 							fill={color}
 							stroke={color}
@@ -283,6 +310,7 @@
 	.wheel {
 		position: relative;
 		display: flex;
+		flex: 1 1 0;
 
 		&__button {
 			position: absolute;

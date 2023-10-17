@@ -96,7 +96,6 @@
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		padding: 0 5px;
 		border-radius: 10px;
 		animation: an 1s ease-in-out forwards;
 

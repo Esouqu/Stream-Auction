@@ -3,7 +3,7 @@
 	import Switch from './Switch.svelte';
 
 	export let id: number;
-	export let isToggled: boolean = false;
+	export let isToggled: boolean | null;
 	export let description: string;
 	export let value: string;
 	export let valueKey: string;
@@ -13,7 +13,7 @@
 <div class="setting">
 	<p>{description}</p>
 	<div class="setting-inputs">
-		{#if isToggled}
+		{#if isToggled || isToggled === null}
 			<Input
 				--input-w="100px"
 				--input-text-al="center"
@@ -25,7 +25,9 @@
 				{valueKey}
 			/>
 		{/if}
-		<Switch on={() => (isToggled = true)} off={() => (isToggled = false)} bind:isToggled />
+		{#if isToggled !== null}
+			<Switch on={() => (isToggled = true)} off={() => (isToggled = false)} bind:isToggled />
+		{/if}
 	</div>
 </div>
 

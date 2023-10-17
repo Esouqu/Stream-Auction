@@ -90,6 +90,7 @@ export function createPie(items: IPieItem[], radius: number) {
     const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
     const middleAngle = (startAngle + endAngle) / 2;
     const middle = polarToCartesian(radius, middleAngle);
+    // const color = colors[3][Math.floor(Math.random() * colors[3].length)];
     const color = colors[3][idx % colors[3].length];
 
     return {

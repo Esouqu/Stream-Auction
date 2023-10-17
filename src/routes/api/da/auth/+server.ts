@@ -26,8 +26,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 
     if (Date.now() < expirationTime) {
       // console.log(parsedSession.refreshToken)
-      const oauthTokenUrl = 'https://www.donationalerts.com/oauth/token';
-
+      throw redirect(302, '/redirect')
     }
   }
 

@@ -1,13 +1,28 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
 	import Button from './Button.svelte';
+	import Input from './Input.svelte';
 
 	export let options: string[] = [];
-	export let selectedOption: string = options[0];
+	export let selectedOption: string = options.length > 0 ? options[0] : 'Нет доступных пресетов';
 	export let isActive = false;
 
 	let selectedElement: HTMLElement;
 	let listElement: HTMLElement;
+	let presetNameInput: HTMLInputElement;
+	let newPresetName: string;
+	let isEditMode = false;
+
+	$: console.log(newPresetName);
+
+	function handlePresetCreation() {
+		if (presetNameInput) {
+			// console.log('ok');
+			// presets.create(presetNameInput)
+		}
+
+		isEditMode = false;
+	}
 
 	function handleOptionClick(option: string) {
 		selectedOption = option;
@@ -33,9 +48,25 @@
 			on:click={() => (isActive = !isActive)}
 			aria-hidden
 		>
-			{selectedOption !== '' ? selectedOption : 'Нет доступных пресетов'}
+			{#if isEditMode}
+				<Input
+					--input-w="90%"
+					id="presets-edit"
+					type="text"
+					isDefault={false}
+					placeholder="Название пресета"
+					bind:value={newPresetName}
+					callback={handlePresetCreation}
+				/>
+			{:else}
+				{selectedOption !== '' ? selectedOption : 'Нет доступных пресетов'}
+			{/if}
 		</div>
-		<Button icon="plus" on:click={() => (options = [...options])} />
+		<div class="dropdown-buttons-wrapper">
+			<Button icon="plus" on:click={() => (isEditMode = !isEditMode)} />
+			<Button icon="reset" />
+			<Button icon="delete" />
+		</div>
 	</div>
 	{#if isActive}
 		<ul
@@ -51,6 +82,9 @@
 					aria-hidden
 				>
 					{option}
+					<div style="position: absolute; top: 50%; right: 10px; translate: 0 -50%;">
+						<Button icon="delete" color="white" />
+					</div>
 				</li>
 			{/each}
 		</ul>
@@ -61,12 +95,16 @@
 	.dropdown {
 		position: relative;
 
+		&-buttons-wrapper {
+			display: flex;
+		}
 		&-selected-wrapper {
 			display: flex;
 			align-items: center;
 			gap: 10px;
 		}
 		&__item {
+			position: relative;
 			padding: 5px 10px;
 			font-size: 20px;
 			font-weight: 700;

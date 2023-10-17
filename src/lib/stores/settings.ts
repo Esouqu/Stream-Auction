@@ -1,34 +1,40 @@
 import createStoreWithLocalStorage from './localStorage';
 
 interface ISetting {
-  isToggled: boolean;
+  isToggled: boolean | null;
   description: string;
   value: string | null;
+  valueAttribute: string;
 }
 
 export const textRules = createStoreWithLocalStorage('', 'textRules');
 export const stopWheelOnDonation = createStoreWithLocalStorage({
   isToggled: false,
   description: 'Останавливать колесо при донате',
-  value: '',
+  value: '30',
   valueAttribute: 'руб.',
 }, 'stopWheelOnDonation');
+export const addWheelSpinTimeOnDonation = createStoreWithLocalStorage({
+  isToggled: true,
+  description: 'Добавлять время прокрутки колеса при донате',
+  value: '100',
+  valueAttribute: 'сек.',
+}, 'addWheelSpinTimeOnDonation');
 export const addTimeOnNewItem = createStoreWithLocalStorage({
   isToggled: false,
   description: 'Добавлять время за новый лот',
-  value: '',
+  value: '60',
   valueAttribute: 'сек.',
 }, 'addTimeOnNewItem');
 export const addTimeOnNewLeader = createStoreWithLocalStorage({
   isToggled: false,
   description: 'Добавлять время за нового лидера',
-  value: '',
+  value: '120',
   valueAttribute: 'сек.',
 }, 'addTimeOnNewLeader');
 export const timerStarterTime = createStoreWithLocalStorage({
-  isToggled: false,
+  isToggled: null,
   description: 'Стартовое время таймера',
-  value: '',
+  value: '10',
   valueAttribute: 'мин.',
 }, 'timerStarterTime');
-

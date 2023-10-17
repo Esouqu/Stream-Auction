@@ -1,29 +1,11 @@
 <script lang="ts">
 	import Lot from '$lib/components/Lot.svelte';
-	import Input from '$lib/components/Input.svelte';
 	import lots from '$lib/stores/lots';
-	import Button from '$lib/components/Button.svelte';
 	import { flip } from 'svelte/animate';
 	import { fade, fly } from 'svelte/transition';
 	import { getTotal } from '$lib/utils';
 	import Popup from '$lib/components/Popup.svelte';
-
-	let newLotText: string;
-	let newLotValue: string;
-
-	function addItemOrValue() {
-		if (!newLotText || !newLotValue) return;
-		const lot = $lots.find(({ title }) => title.toLowerCase() === newLotText.toLowerCase());
-
-		if (lot) {
-			lots.addValue(lot.id, Number(newLotValue));
-		} else {
-			lots.addItem(newLotText, Number(newLotValue));
-		}
-
-		newLotText = '';
-		newLotValue = '';
-	}
+	import Addlot from '$lib/components/Addlot.svelte';
 
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 </script>
@@ -33,26 +15,7 @@
 </svelte:head>
 
 <section class="auction-section">
-	<div class="add-lot">
-		<Input
-			--input-w="300px"
-			type="text"
-			id="add-lot-text"
-			placeholder="Название лота"
-			bind:value={newLotText}
-			callback={addItemOrValue}
-		/>
-		<Input
-			--input-w="100px"
-			--input-text-al="center"
-			type="number"
-			id="add-lot-value"
-			placeholder="Сумма"
-			bind:value={newLotValue}
-			callback={addItemOrValue}
-		/>
-		<Button icon="listAddItem" on:click={addItemOrValue} />
-	</div>
+	<Addlot />
 
 	{#if $lots.length > 0}
 		<ol class="lots-list">
@@ -90,13 +53,6 @@
 		overflow-x: hidden;
 		overflow-y: auto;
 		scrollbar-gutter: stable;
-	}
-	.add-lot {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 10px;
-		padding: 30px;
 	}
 	.no-lots {
 		display: flex;

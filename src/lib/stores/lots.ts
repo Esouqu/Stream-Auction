@@ -1,4 +1,4 @@
-import type { ILot, IPieItem } from "$lib/interfaces";
+import type { ILot } from "$lib/interfaces";
 import { writable } from "svelte/store";
 
 const tempLots = [
