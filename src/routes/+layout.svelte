@@ -13,7 +13,9 @@
 	import { PUBLIC_DA_CLIENT_ID } from '$env/static/public';
 	import { textRules } from '$lib/stores/settings';
 	import Popup from '$lib/components/Popup.svelte';
-	import Input from '$lib/components/Input.svelte';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import { fade } from 'svelte/transition';
 
 	const userId = $page.data.userId;
 	const redirectUrl = 'http://localhost:5173/redirect';
@@ -29,6 +31,10 @@
 	let connectionToken: string;
 	let isDisabled = false;
 	let isLoggedIn = false;
+
+	onMount(() => {
+		if (browser) localStorage.clear();
+	});
 
 	function switchOn() {
 		if ($page.data.socketToken && !socket) {
@@ -98,7 +104,7 @@
 </script>
 
 {#if isLoggedIn}
-	<div class="layout">
+	<div class="layout" transition:fade>
 		<div class="layout-section layout-section_left">
 			<h1>Правила Аукциона</h1>
 			<h2>Аук на Все</h2>
@@ -155,9 +161,9 @@
 		style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; width: 100%;"
 	>
 		<h1>Доступно только по подписке</h1>
-		<button type="button" on:click={() => (isLoggedIn = !isLoggedIn)} style="font-size: 20px;"
-			>Арчидос. Подписаться</button
-		>
+		<button type="button" on:click={() => (isLoggedIn = !isLoggedIn)} style="font-size: 20px;">
+			Арчидос. Подписаться
+		</button>
 	</div>
 {/if}
 

@@ -6,12 +6,7 @@
 	import { fade } from 'svelte/transition';
 	import Input from './Input.svelte';
 	import donations from '$lib/stores/donations';
-	import {
-		addTimeOnNewItem,
-		addTimeOnNewLeader,
-		addWheelSpinTimeOnDonation,
-		stopWheelOnDonation
-	} from '$lib/stores/settings';
+	import { addWheelSpinTimeOnDonation, stopWheelOnDonation } from '$lib/stores/settings';
 	import lots from '$lib/stores/lots';
 
 	export let items: IPieItem[] = [];
@@ -26,8 +21,6 @@
 	const generalTime = accelerationTime + slowDownTime;
 	const decelerationTime = 0.3;
 	const degreeCapForTextDisplay = Number(((400 / 100) * 1.75).toFixed(2));
-
-	let previousLotsAmount = $lots.length;
 
 	let spinDuration = '10';
 	let wheelStartAngle = 0;
@@ -123,34 +116,37 @@
 		requestAnimationFrame(giveMoment);
 	}
 
-	function handleDonation(donations: IDonationData[], items: ILot[]) {
+	function handleDonation(_donations: IDonationData[], _lots: ILot[]) {
 		if (!isSpinning || (!$stopWheelOnDonation.isToggled && !$addWheelSpinTimeOnDonation.isToggled))
 			return;
 
 		const newDonationTime = $addWheelSpinTimeOnDonation.value;
 
 		if ($addWheelSpinTimeOnDonation.isToggled) {
-			if (items.length > previousLotsAmount) {
-				previousLotsAmount = items.length;
+			lots.onNewItem(() => {
 				spinDuration = String(+spinDuration + +newDonationTime);
-			}
+			});
 		}
 
-		for (let i = 0; i < donations.length; i++) {
-			const donation = donations[i];
-			const donationCreateTime = new Date(donation.created_at + ' UTC').getTime();
-			const donationValue = donation.amount_in_user_currency;
-			const isDonationValueEnough = donationValue > Number($stopWheelOnDonation.value);
-			const isDonationSendAfter = donationCreateTime > spinStartDateTime;
+		if ($addWheelSpinTimeOnDonation.isToggled) {
+			donations.onNewDonation((donationCreateTime, donationValue) => {
+				const isDonationSendAfter = donationCreateTime > spinStartDateTime;
+				const isDonationValueEnough = donationValue > Number($stopWheelOnDonation.value);
 
-			if (!isDonationValueEnough || !isDonationSendAfter) continue;
+				if (!isDonationValueEnough || !isDonationSendAfter) {
+					spinDuration = String(+spinDuration + +newDonationTime);
+				}
+			});
+		}
+		if ($stopWheelOnDonation.isToggled) {
+			donations.onNewDonation((donationCreateTime, donationValue) => {
+				const isDonationSendAfter = donationCreateTime > spinStartDateTime;
+				const isDonationValueEnough = donationValue > Number($stopWheelOnDonation.value);
 
-			if ($addWheelSpinTimeOnDonation.isToggled) {
-				spinDuration = String(+spinDuration + +newDonationTime);
-			}
-			if ($stopWheelOnDonation.isToggled) {
-				isSpinning = false;
-			}
+				if (!isDonationValueEnough || !isDonationSendAfter) {
+					isSpinning = false;
+				}
+			});
 		}
 	}
 

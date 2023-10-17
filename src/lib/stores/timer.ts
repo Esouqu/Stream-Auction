@@ -107,6 +107,6 @@ function createCountdownTimer(initialTime: number) {
   };
 };
 
-const timer = createCountdownTimer(120000);
+const timer = createCountdownTimer(10 * 1000 * 60);
 
 export default timer;
