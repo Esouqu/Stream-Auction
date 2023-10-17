@@ -107,6 +107,8 @@ function createLots() {
   const { subscribe, update } = writable<ILot[]>(tempLots);
 
   let id = tempLots.length;
+  let previousLotsAmount = tempLots.length;
+  let previousLeader = tempLots[0];
 
   function addItem(title: string, value: number, donator?: string) {
     id += 1;
@@ -159,6 +161,30 @@ function createLots() {
     }));
   }
 
+  function onNewItem(callback: () => void) {
+    update((state) => {
+      if (state.length < previousLotsAmount) return state;
+
+      previousLotsAmount = state.length;
+      callback();
+
+      return state
+    })
+  }
+
+  function onNewLeader(callback: () => void) {
+    update((state) => {
+      const newLeader = [...state].sort((a, b) => b.value - a.value)[0];
+
+      if (previousLeader.id !== newLeader.id) {
+        previousLeader = newLeader;
+        callback();
+      }
+
+      return state
+    })
+  }
+
   return {
     subscribe,
     addItem,
@@ -167,6 +193,8 @@ function createLots() {
     addValue,
     setValue,
     subtractValue,
+    onNewItem,
+    onNewLeader
   }
 }
 

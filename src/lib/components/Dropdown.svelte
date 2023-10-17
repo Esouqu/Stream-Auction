@@ -13,7 +13,7 @@
 	let newPresetName: string;
 	let isEditMode = false;
 
-	$: console.log(newPresetName);
+	// $: console.log(newPresetName);
 
 	function handlePresetCreation() {
 		if (presetNameInput) {

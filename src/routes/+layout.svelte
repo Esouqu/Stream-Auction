@@ -13,6 +13,7 @@
 	import { PUBLIC_DA_CLIENT_ID } from '$env/static/public';
 	import { textRules } from '$lib/stores/settings';
 	import Popup from '$lib/components/Popup.svelte';
+	import Input from '$lib/components/Input.svelte';
 
 	const userId = $page.data.userId;
 	const redirectUrl = 'http://localhost:5173/redirect';
@@ -27,6 +28,7 @@
 	let socket: WebSocket;
 	let connectionToken: string;
 	let isDisabled = false;
+	let isLoggedIn = false;
 
 	function switchOn() {
 		if ($page.data.socketToken && !socket) {
@@ -95,58 +97,69 @@
 	}
 </script>
 
-<div class="layout">
-	<div class="layout-section layout-section_left">
-		<h1>Правила Аукциона</h1>
-		<h2>Аук на Все</h2>
-		<h3 style="white-space: break-spaces;">
-			{JSON.parse(JSON.stringify($textRules))}
-		</h3>
-	</div>
-	<div class="layout-section layout-section_center">
-		<div class="layout-section-wrapper">
-			<slot />
+{#if isLoggedIn}
+	<div class="layout">
+		<div class="layout-section layout-section_left">
+			<h1>Правила Аукциона</h1>
+			<h2>Аук на Все</h2>
+			<h3 style="white-space: break-spaces;">
+				{JSON.parse(JSON.stringify($textRules))}
+			</h3>
 		</div>
-		<div class="navigation-wrapper">
-			<Navigation bind:activeRoute />
-		</div>
-	</div>
-	<div class="layout-section layout-section_right">
-		<Timer />
-		<div class="integration-wrapper">
-			<p>Интеграции</p>
-			<div class="integration-buttons">
-				<div class="integration">
-					{#if isDisabled}
-						<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
-					{/if}
-					<img class:small={isDisabled} src={daIcon} alt="" />
-					{#if $page.data.userId}
-						<Switch on={switchOn} {isDisabled} />
-					{/if}
-				</div>
-				<div class="integration">
-					<img src={twitchIcon} alt="" />
-					{#if $page.data.userId}
-						<Switch --switch-color="var(--color-purple)" isDisabled={true} />
-					{/if}
-				</div>
-				{#if !$page.data.userId}
-					<button type="button" on:click={() => goto(authorizeUrl)} class="auth-button">
-						Авторизоваться
-					</button>
-				{/if}
+		<div class="layout-section layout-section_center">
+			<div class="layout-section-wrapper">
+				<slot />
+			</div>
+			<div class="navigation-wrapper">
+				<Navigation bind:activeRoute />
 			</div>
 		</div>
-		<div class="donations-scroll-wrapper">
-			<div class="donations-wrapper" data-donations-queue={$donations.length}>
-				{#each $donations as { id, username, message, amount_in_user_currency, currency }}
-					<Donation {id} {username} {message} amount={amount_in_user_currency} {currency} />
-				{/each}
+		<div class="layout-section layout-section_right">
+			<Timer />
+			<div class="integration-wrapper">
+				<p>Интеграции</p>
+				<div class="integration-buttons">
+					<div class="integration">
+						{#if isDisabled}
+							<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
+						{/if}
+						<img class:small={isDisabled} src={daIcon} alt="" />
+						{#if $page.data.userId}
+							<Switch on={switchOn} {isDisabled} />
+						{/if}
+					</div>
+					<div class="integration">
+						<img src={twitchIcon} alt="" />
+						{#if $page.data.userId}
+							<Switch --switch-color="var(--color-purple)" isDisabled={true} />
+						{/if}
+					</div>
+					{#if !$page.data.userId}
+						<button type="button" on:click={() => goto(authorizeUrl)} class="auth-button">
+							Авторизоваться
+						</button>
+					{/if}
+				</div>
+			</div>
+			<div class="donations-scroll-wrapper">
+				<div class="donations-wrapper" data-donations-queue={$donations.length}>
+					{#each $donations as { id, username, message, amount_in_user_currency, currency }}
+						<Donation {id} {username} {message} amount={amount_in_user_currency} {currency} />
+					{/each}
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+{:else}
+	<div
+		style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; width: 100%;"
+	>
+		<h1>Доступно только по подписке</h1>
+		<button type="button" on:click={() => (isLoggedIn = !isLoggedIn)} style="font-size: 20px;"
+			>Арчидос. Подписаться</button
+		>
+	</div>
+{/if}
 
 <style lang="scss">
 	.auth-button {
