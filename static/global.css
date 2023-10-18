@@ -9,7 +9,8 @@ body {
   display: flex;
   height: 100vh;
   font-family: 'Nunito Sans', sans-serif;
-  background-image: url('./lyasya.png');
+  background-color: #0a0a0a;
+  background-image: url('./lyasya2.png');
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;

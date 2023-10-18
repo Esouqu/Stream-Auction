@@ -89,9 +89,6 @@
 			}
 			if (!result.type && result.channel === `$alerts:donation_${userId}`) {
 				const donation: IDonationData = result.data.data;
-
-				console.group('donation');
-
 				let minPercentsForMerge = [];
 				let mostSimilarLot = null;
 
@@ -112,7 +109,6 @@
 							...l
 						});
 					}
-					console.log(`id: ${l.id}`, `${comparePercent}%`);
 				}
 
 				if (minPercentsForMerge.length > 0) {
@@ -126,8 +122,6 @@
 				}
 
 				donations.add({ ...donation, mostSimilarLot });
-
-				console.groupEnd();
 			}
 		});
 		// socket.addEventListener('close', () => {
@@ -158,44 +152,46 @@
 		</div>
 	</div>
 	<div class="layout-section layout-section_right">
-		<Timer />
-		<div class="integration-wrapper">
-			<p>Интеграции</p>
-			<div class="integration-buttons">
-				<div class="integration">
-					{#if isDisabled}
-						<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
-					{/if}
-					<img class:small={isDisabled} src={daIcon} alt="" />
-					{#if $page.data.userId}
-						<Switch on={switchOn} {isDisabled} />
+		<div style="padding: 20px;">
+			<Timer />
+			<div class="integration-wrapper">
+				<p>Интеграции</p>
+				<div class="integration-buttons">
+					<div class="integration">
+						{#if isDisabled}
+							<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
+						{/if}
+						<img class:small={isDisabled} src={daIcon} alt="" />
+						{#if $page.data.userId}
+							<Switch on={switchOn} {isDisabled} />
+						{/if}
+					</div>
+					<div class="integration">
+						<img src={twitchIcon} alt="" />
+						{#if $page.data.userId}
+							<Switch --switch-color="var(--color-purple)" isDisabled={true} />
+						{/if}
+					</div>
+					{#if !$page.data.userId}
+						<button type="button" on:click={() => goto(authorizeUrl)} class="auth-button">
+							Авторизоваться
+						</button>
 					{/if}
 				</div>
-				<div class="integration">
-					<img src={twitchIcon} alt="" />
-					{#if $page.data.userId}
-						<Switch --switch-color="var(--color-purple)" isDisabled={true} />
-					{/if}
-				</div>
-				{#if !$page.data.userId}
-					<button type="button" on:click={() => goto(authorizeUrl)} class="auth-button">
-						Авторизоваться
-					</button>
-				{/if}
 			</div>
-		</div>
-		<div class="donations-scroll-wrapper">
-			<div class="donations-wrapper" data-donations-queue={$donations.length}>
-				{#each $donations as { id, username, message, amount_in_user_currency, currency, mostSimilarLot }}
-					<Donation
-						{id}
-						{username}
-						{message}
-						amount={amount_in_user_currency}
-						{currency}
-						{mostSimilarLot}
-					/>
-				{/each}
+			<div class="donations-scroll-wrapper">
+				<div class="donations-wrapper" data-donations-queue={$donations.length}>
+					{#each $donations as { id, username, message, amount_in_user_currency, currency, mostSimilarLot }}
+						<Donation
+							{id}
+							{username}
+							{message}
+							amount={amount_in_user_currency}
+							{currency}
+							{mostSimilarLot}
+						/>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -289,8 +285,12 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			gap: 20px;
+			padding: 20px;
+			background-color: #3d3d3d;
 
 			& p {
+				margin: 0;
 				text-align: center;
 				font-size: 18px;
 				font-weight: 600;
