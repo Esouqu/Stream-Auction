@@ -1,6 +1,30 @@
 import colors from "./colors";
 import type { IPieItem } from "./interfaces";
 
+export const getRandomColor = (() => {
+  let usedColors: string[] = [];
+
+  function getColor(colorArray: string[]) {
+    if (usedColors.length === colorArray.length) {
+      usedColors = [];
+    }
+
+    let randomIndex;
+    let randomColor;
+
+    do {
+      randomIndex = Math.floor(Math.random() * colorArray.length);
+      randomColor = colorArray[randomIndex];
+    } while (usedColors.includes(randomColor));
+
+    usedColors.push(randomColor);
+
+    return randomColor;
+  }
+
+  return getColor;
+})();
+
 export function polarToCartesian(radius: number, angleInDegrees: number) {
   const radians = (angleInDegrees - 90) * Math.PI / 180;
 
@@ -25,8 +49,8 @@ export function getTotal(values: number[]) {
 }
 
 export function compareStrings(str1: string, str2: string) {
-  const len1 = str1.length;
-  const len2 = str2.length;
+  const len1 = str1.replace(/\s/g, '').length;
+  const len2 = str2.replace(/\s/g, '').length;
   const matrix = [];
 
   // matrix = [0, 1, 2, 3, 4, 5]
@@ -42,15 +66,12 @@ export function compareStrings(str1: string, str2: string) {
   // Fill in the matrix
   for (let i = 1; i <= len1; i++) {
     for (let j = 1; j <= len2; j++) {
-      if (str1[i - 1] === str2[j - 1]) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1, // substitution
-          matrix[i][j - 1] + 1, // insertion
-          matrix[i - 1][j] + 1 // deletion
-        );
-      }
+      const cost = str1[i - 1].toLowerCase() === str2[j - 1].toLowerCase() ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j - 1] + cost, // substitution
+        matrix[i][j - 1] + 1, // insertion
+        matrix[i - 1][j] + 1 // deletion
+      );
     }
   }
 
@@ -77,9 +98,8 @@ export function createPie(items: IPieItem[], radius: number) {
   let startAngle: number;
   let endAngle: number;
 
-  return items.map(({ value, title }, idx) => {
+  return items.map(({ value, title, color }, idx) => {
     const deg = (value / total) * 360;
-    // console.log(deg);
 
     startAngle = idx && endAngle;
     endAngle = !idx ? deg : startAngle + deg;
@@ -90,8 +110,8 @@ export function createPie(items: IPieItem[], radius: number) {
     const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
     const middleAngle = (startAngle + endAngle) / 2;
     const middle = polarToCartesian(radius, middleAngle);
-    // const color = colors[3][Math.floor(Math.random() * colors[3].length)];
-    const color = colors[3][idx % colors[3].length];
+    // const color = colors[3][idx % colors[3].length];
+    // const colorsBetween = Math.floor(colors[3].length / (items.length - 1));
 
     return {
       shortTitle: calculateShortTitle(title, maxTitleLength),

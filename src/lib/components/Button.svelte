@@ -3,6 +3,7 @@
 	import getIcon from '$lib/icons';
 
 	export let icon: iconTypes;
+	export let text: string = '';
 	export let color: 'white' | 'black' = 'white';
 	export let shadowColor: string | null = null;
 </script>
@@ -10,6 +11,7 @@
 <button
 	type="button"
 	class="icon-button"
+	class:icon-button_text={text}
 	class:icon-button_black={color === 'black'}
 	on:click|stopPropagation
 >
@@ -20,6 +22,11 @@
 		alt="Icon button"
 		draggable="false"
 	/>
+	{#if text}
+		<div>
+			<span>{text}</span>
+		</div>
+	{/if}
 </button>
 
 <style lang="scss">
@@ -27,6 +34,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		gap: 10px;
 		width: var(--button-size, 40px);
 		height: var(--button-size, 40px);
 		padding: var(--button-p, 5px);
@@ -37,6 +45,28 @@
 		transition: 0.2s;
 		cursor: pointer;
 
+		&_text {
+			width: auto;
+
+			& div {
+				display: flex;
+				width: 100%;
+
+				& span {
+					display: inline-block;
+					max-width: 200px;
+					height: 100%;
+					font-weight: 700;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+					overflow: hidden;
+				}
+			}
+			& img {
+				width: fit-content !important;
+				height: 100%;
+			}
+		}
 		&_black:hover {
 			background-color: rgba(0, 0, 0, 0.1) !important;
 		}

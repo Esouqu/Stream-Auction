@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { radiansToDegrees } from '$lib/constants';
 	import type { IDonationData, ILot, IPieItem } from '$lib/interfaces';
-	import { createPie } from '$lib/utils';
+	import { createPie, formatTime } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Input from './Input.svelte';
@@ -12,7 +12,7 @@
 	export let items: IPieItem[] = [];
 	export let winner: number | null = null;
 
-	const radius = 350;
+	const radius = 360;
 	const width = radius * 2;
 	const offset = 50;
 	const maxSpeed = 5;
@@ -23,6 +23,7 @@
 	const degreeCapForTextDisplay = Number(((400 / 100) * 1.75).toFixed(2));
 
 	let spinDuration = '10';
+	let spinElapsedTime = 0;
 	let wheelStartAngle = 0;
 	let currentAngle = 0;
 	let oldAngle = 0;
@@ -78,6 +79,8 @@
 		const elapsedTime = currentTime - spinStartTime;
 		const progress = Math.min(elapsedTime / spinDurationInMs, 1);
 
+		spinElapsedTime = elapsedTime;
+
 		if (!isSpinning) {
 			spinStartTime = 0;
 
@@ -130,9 +133,9 @@
 	function handleDonation(_donations: IDonationData[]) {
 		if (!isSpinning || !$stopWheelOnDonation.isToggled) return;
 
-		donations.onNewDonation((donationCreateTime, donationValue) => {
-			const isDonationSendAfter = donationCreateTime > spinStartDateTime;
-			const isDonationValueEnough = donationValue > Number($stopWheelOnDonation.value);
+		donations.onNewDonation(({ createTime, amount_in_user_currency }) => {
+			const isDonationSendAfter = createTime > spinStartDateTime;
+			const isDonationValueEnough = amount_in_user_currency > Number($stopWheelOnDonation.value);
 
 			if (!isDonationValueEnough || !isDonationSendAfter) {
 				isSpinning = false;
@@ -178,6 +181,7 @@
 	{#if !isSpinning}
 		<div class="time-input" transition:fade>
 			<Input
+				--input-fw="700"
 				--input-w="100px"
 				--input-text-al="center"
 				id="spin-time"
@@ -186,6 +190,13 @@
 				bind:value={spinDuration}
 				colorStyle="white"
 			/>
+		</div>
+	{:else}
+		<div class="time-input" style="top: 15%; left: 0;">
+			<h2>Прошло {formatTime(spinElapsedTime).min}:{formatTime(spinElapsedTime).sec} сек.</h2>
+		</div>
+		<div class="time-input" style="top: 15%; right: 0; left: unset;">
+			<h2>Макс. {spinDuration} сек.</h2>
 		</div>
 	{/if}
 	<button
@@ -221,7 +232,7 @@
 			<!-- Slices -->
 			<g class="wheel-slices">
 				{#each pie as { startPoint, endPoint, isCircle, largeArcFlag, color }, idx}
-					{#if isCircle}
+					{#if isCircle || $lots.length < 1}
 						<circle cx={radius} cy={radius} r={radius} fill={color} stroke={color} />
 					{:else}
 						<path
@@ -296,7 +307,6 @@
 	.wheel {
 		position: relative;
 		display: flex;
-		flex: 1 1 0;
 
 		&__button {
 			position: absolute;

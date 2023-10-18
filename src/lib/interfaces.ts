@@ -1,16 +1,17 @@
 export interface IPieItem {
-  id: number,
+  id: number;
   title: string;
   value: number;
+  color: string;
 }
 
 export interface ILot extends IPieItem {
-  donators: string[],
+  donators: string[];
 }
 
 export interface IAuthTokenData {
-  token_type: string,
-  expires_in: number,
+  token_type: string;
+  expires_in: number;
   access_token: string;
   refresh_token: string;
 }
@@ -23,6 +24,7 @@ export interface IDonationData {
   currency: string;
   message: string;
   created_at: string;
+  mostSimilarLot: ILot | null;
 }
 
 export interface IRoute {

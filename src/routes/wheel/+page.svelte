@@ -10,7 +10,9 @@
 
 <section class="wheel-section">
 	<Addlot />
-	<WheelOfRandom items={$lots} />
+	<div style="display: flex; align-items: center; flex: 1 1 0;">
+		<WheelOfRandom items={$lots} />
+	</div>
 </section>
 
 <style lang="scss">
@@ -20,6 +22,7 @@
 		justify-content: end;
 		align-items: center;
 		height: 100%;
+		width: 100%;
 		overflow: hidden;
 	}
 </style>

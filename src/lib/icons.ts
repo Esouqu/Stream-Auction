@@ -9,8 +9,9 @@ import deleteIcon from '$lib/assets/close_icon.svg';
 import deleteIconBlack from '$lib/assets/close_icon_black.svg';
 import listRemoveIcon from '$lib/assets/list_remove_icon.svg';
 import infoIcon from '$lib/assets/donators_list_icon.svg';
-import plusIcon from '$lib/assets/add_icon.svg'
-import plusIconBlack from '$lib/assets/add_icon_black.svg'
+import plusIcon from '$lib/assets/add_icon.svg';
+import plusIconBlack from '$lib/assets/add_icon_black.svg';
+import trashcan from '$lib/assets/trashcan_icon.svg';
 
 export type iconTypes =
   | 'listAddItem'
@@ -22,7 +23,8 @@ export type iconTypes =
   | 'pause'
   | 'delete'
   | 'info'
-  | 'plus';
+  | 'plus'
+  | 'trashcan';
 
 export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'white') {
   switch (icon) {
@@ -44,6 +46,8 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
       return color === 'white' ? deleteIcon : deleteIconBlack;
     case 'info':
       return infoIcon;
+    case 'trashcan':
+      return trashcan;
     case 'plus':
       return color === 'white' ? plusIcon : plusIconBlack;
     default:

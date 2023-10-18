@@ -13,7 +13,7 @@
 		if (lot) {
 			lots.addValue(lot.id, Number(newLotValue));
 		} else {
-			lots.addItem(newLotText, Number(newLotValue));
+			lots.add(newLotText, Number(newLotValue));
 		}
 
 		newLotText = '';
@@ -48,6 +48,6 @@
 		align-items: center;
 		justify-content: center;
 		gap: 10px;
-		padding: 30px;
+		padding: 0px;
 	}
 </style>

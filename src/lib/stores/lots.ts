@@ -1,102 +1,50 @@
+import colors from "$lib/colors";
 import type { ILot } from "$lib/interfaces";
+import { getRandomColor } from "$lib/utils";
 import { writable } from "svelte/store";
 
 const tempLots = [
   {
     id: 1,
-    title: 'Папины дочки. Новые (сериал 2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 2,
-    title: 'Феррари (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 3,
-    title: 'Мастер и Маргарита (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 4,
     title: 'Гуррен Лаганн',
     value: Math.floor(Math.random() * 100),
     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color: getRandomColor(colors[4]),
   },
   {
-    id: 5,
-    title: 'Три мушкетёра: Миледи (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 6,
-    title: 'Сто лет тому вперёд',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 7,
+    id: 2,
     title: 'Холоп 2 (2023)',
     value: Math.floor(Math.random() * 100),
     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color: getRandomColor(colors[4]),
   },
   {
-    id: 8,
+    id: 3,
     title: 'Самая большая луна (2023)',
     value: Math.floor(Math.random() * 100),
     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color: getRandomColor(colors[4]),
   },
   {
-    id: 9,
+    id: 4,
     title: 'Гардемарины 1787. Мир (2023)',
     value: Math.floor(Math.random() * 100),
     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color: getRandomColor(colors[4]),
   },
   {
-    id: 10,
+    id: 5,
     title: 'Гладиатор',
     value: Math.floor(Math.random() * 100),
     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color: getRandomColor(colors[4]),
   },
   {
-    id: 11,
-    title: 'Папины дочки. Новые (сериал 2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 12,
-    title: 'Феррари (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 13,
-    title: 'Мастер и Маргарита (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 14,
+    id: 6,
     title: 'Дворец (2023)',
     value: Math.floor(Math.random() * 100),
     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 15,
-    title: 'Три мушкетёра: Миледи (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-  },
-  {
-    id: 16,
-    title: 'Сто лет тому вперёд',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color: getRandomColor(colors[4]),
   },
 ];
 
@@ -107,22 +55,31 @@ function createLots() {
   const { subscribe, update } = writable<ILot[]>(tempLots);
 
   let id = tempLots.length;
+  // let id = 0;
+  let color = getRandomColor(colors[4]);
+  // let color = '';
   let previousLotsAmount = tempLots.length;
   let previousLeader = tempLots[0];
 
-  function addItem(title: string, value: number, donator?: string) {
+  function add(title: string, value: number, donator?: string) {
     id += 1;
+    color = getRandomColor(colors[4]);
 
     update((lots) => {
       const randomIdx = Math.floor(Math.random() * lots.length);
-      const newLot = { id, title, value, donators: donator ? [donator] : [] };
+      const newLot = { id, title, value, donators: donator ? [donator] : [], color };
 
       return [...lots.slice(0, randomIdx), newLot, ...lots.slice(randomIdx)];
     });
   }
 
-  function removeItem(id: number) {
+  function remove(id: number) {
     update((items) => items.filter(item => item.id !== id));
+  }
+
+  function removeAll() {
+    id = 0;
+    update(() => []);
   }
 
   function setTitle(id: number, title: string) {
@@ -187,8 +144,9 @@ function createLots() {
 
   return {
     subscribe,
-    addItem,
-    removeItem,
+    add,
+    remove,
+    removeAll,
     setTitle,
     addValue,
     setValue,

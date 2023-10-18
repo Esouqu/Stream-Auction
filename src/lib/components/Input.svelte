@@ -114,6 +114,7 @@
 		border-bottom: 2px solid rgba(255, 255, 255, 0.3);
 		outline: 0;
 		line-height: 1;
+		font-weight: var(--input-fw);
 		text-overflow: ellipsis;
 		text-align: var(--input-text-al, start);
 		text-decoration: none;

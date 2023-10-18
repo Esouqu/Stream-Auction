@@ -10,6 +10,7 @@
 	export let value: string;
 	export let donators: string[];
 	export let percent: number;
+	export let color: string;
 
 	let isHovered = false;
 	let valueToAdd: string;
@@ -86,7 +87,7 @@
 				</div>
 			</Popup> -->
 			<Button icon="info" on:click={() => (isPopupShown = !isPopupShown)} />
-			<Button icon="listRemoveItem" on:click={() => lots.removeItem(id)} />
+			<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
 		</div>
 	</div>
 {/key}

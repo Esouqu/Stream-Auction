@@ -3,6 +3,7 @@
 	import donations from '$lib/stores/donations';
 	import Button from './Button.svelte';
 	import { fade } from 'svelte/transition';
+	import type { ILot } from '$lib/interfaces';
 
 	export let id: number;
 	export let message: string;
@@ -10,11 +11,19 @@
 	export let amount: number;
 	export let currency: string;
 	export let isDragged = false;
+	export let mostSimilarLot: ILot | null = null;
 
+	function handleAddSimilar(e: Event) {
+		e.stopPropagation();
+		if (!mostSimilarLot) return;
+
+		lots.addValue(mostSimilarLot.id, amount, username);
+		donations.remove(id);
+	}
 	function handleAdd(e: Event) {
 		e.stopPropagation();
 
-		lots.addItem(message, amount, username);
+		lots.add(message, amount, username);
 		donations.remove(id);
 	}
 
@@ -52,6 +61,9 @@
 				shadowColor="#F9A148"
 				on:click={(e) => handleAdd(e)}
 			/>
+			{#if mostSimilarLot}
+				<Button icon="plus" color="black" text={mostSimilarLot.title} on:click={handleAddSimilar} />
+			{/if}
 			<Button
 				icon="delete"
 				color="black"

@@ -6,6 +6,7 @@
 	import { getTotal } from '$lib/utils';
 	import Popup from '$lib/components/Popup.svelte';
 	import Addlot from '$lib/components/Addlot.svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 </script>
@@ -15,23 +16,33 @@
 </svelte:head>
 
 <section class="auction-section">
-	<Addlot />
-
-	{#if $lots.length > 0}
-		<ol class="lots-list">
-			{#each sortedLots as lot (lot.id)}
-				{@const percent = (lot.value / getTotal($lots.map((item) => item.value))) * 100}
-
-				<li animate:flip={{ duration: 200 }} transition:fly={{ duration: 200 }}>
-					<Lot {...lot} value={String(lot.value)} {percent} />
-				</li>
-			{/each}
-		</ol>
-	{:else}
-		<div class="no-lots" transition:fade>
-			<p>Лоты отсутствуют</p>
+	<div>
+		<Addlot />
+	</div>
+	<div style="display: flex; flex: 1 1 0; flex-direction: column;">
+		<div class="utils-row">
+			<p>Всего: {getTotal($lots.map((l) => l.value))}</p>
+			<div style="position: absolute; right: 35px;">
+				<Button icon="trashcan" on:click={() => lots.removeAll()} />
+			</div>
 		</div>
-	{/if}
+
+		{#if $lots.length > 0}
+			<ol class="lots-list">
+				{#each sortedLots as lot (lot.id)}
+					{@const percent = (lot.value / getTotal($lots.map((item) => item.value))) * 100}
+
+					<li animate:flip={{ duration: 200 }} transition:fly={{ duration: 200 }}>
+						<Lot {...lot} value={String(lot.value)} {percent} />
+					</li>
+				{/each}
+			</ol>
+		{:else}
+			<div class="no-lots" transition:fade>
+				<p>Лоты отсутствуют</p>
+			</div>
+		{/if}
+	</div>
 </section>
 
 <style lang="scss">
@@ -58,8 +69,22 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		flex: 1 1 0;
 		padding: 0 30px;
-		height: 100%;
 		font-size: 24px;
+	}
+	.utils-row {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 40px;
+		margin: 10px 0;
+
+		& p {
+			font-weight: 600;
+			margin: 0;
+		}
 	}
 </style>

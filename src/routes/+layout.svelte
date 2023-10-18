@@ -16,6 +16,8 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { fade } from 'svelte/transition';
+	import lots from '$lib/stores/lots';
+	import { compareStrings } from '$lib/utils';
 
 	const userId = $page.data.userId;
 	const redirectUrl = 'http://localhost:5173/redirect';
@@ -30,7 +32,6 @@
 	let socket: WebSocket;
 	let connectionToken: string;
 	let isDisabled = false;
-	let isLoggedIn = false;
 
 	onMount(() => {
 		if (browser) localStorage.clear();
@@ -89,7 +90,44 @@
 			if (!result.type && result.channel === `$alerts:donation_${userId}`) {
 				const donation: IDonationData = result.data.data;
 
-				donations.add(donation);
+				console.group('donation');
+
+				let minPercentsForMerge = [];
+				let mostSimilarLot = null;
+
+				for (const l of $lots) {
+					const comparePercent = compareStrings(donation.message, l.title);
+					const minPercentForMerge = 40;
+					const maxPercentForMerge = 60;
+
+					if (comparePercent > maxPercentForMerge) {
+						lots.addValue(l.id, donation.amount_in_user_currency);
+						donations.remove(donation.id);
+						minPercentsForMerge = [];
+
+						return;
+					} else if (comparePercent > minPercentForMerge) {
+						minPercentsForMerge.push({
+							comparePercent,
+							...l
+						});
+					}
+					console.log(`id: ${l.id}`, `${comparePercent}%`);
+				}
+
+				if (minPercentsForMerge.length > 0) {
+					mostSimilarLot = minPercentsForMerge.reduce((prev, current) => {
+						if (prev.comparePercent > current.comparePercent) {
+							return prev;
+						} else {
+							return current;
+						}
+					});
+				}
+
+				donations.add({ ...donation, mostSimilarLot });
+
+				console.groupEnd();
 			}
 		});
 		// socket.addEventListener('close', () => {
@@ -103,69 +141,65 @@
 	}
 </script>
 
-{#if isLoggedIn}
-	<div class="layout" transition:fade>
-		<div class="layout-section layout-section_left">
-			<h1 style="font-size: 24px;">Правила Аукциона</h1>
-			<h2 style="font-size: 28px;">По умолчанию</h2>
-			<h3 style="white-space: break-spaces; font-size: 20px;">
-				{JSON.parse(JSON.stringify($textRules))}
-			</h3>
+<div class="layout" transition:fade>
+	<div class="layout-section layout-section_left">
+		<h1 style="font-size: 24px;">Правила Аукциона</h1>
+		<h2 style="font-size: 28px;">По умолчанию</h2>
+		<h3 style="white-space: break-spaces; font-size: 20px;">
+			{JSON.parse(JSON.stringify($textRules))}
+		</h3>
+	</div>
+	<div class="layout-section layout-section_center">
+		<div class="layout-section-wrapper">
+			<slot />
 		</div>
-		<div class="layout-section layout-section_center">
-			<div class="layout-section-wrapper">
-				<slot />
-			</div>
-			<div class="navigation-wrapper">
-				<Navigation bind:activeRoute />
-			</div>
+		<div class="navigation-wrapper">
+			<Navigation bind:activeRoute />
 		</div>
-		<div class="layout-section layout-section_right">
-			<Timer />
-			<div class="integration-wrapper">
-				<p>Интеграции</p>
-				<div class="integration-buttons">
-					<div class="integration">
-						{#if isDisabled}
-							<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
-						{/if}
-						<img class:small={isDisabled} src={daIcon} alt="" />
-						{#if $page.data.userId}
-							<Switch on={switchOn} {isDisabled} />
-						{/if}
-					</div>
-					<div class="integration">
-						<img src={twitchIcon} alt="" />
-						{#if $page.data.userId}
-							<Switch --switch-color="var(--color-purple)" isDisabled={true} />
-						{/if}
-					</div>
-					{#if !$page.data.userId}
-						<button type="button" on:click={() => goto(authorizeUrl)} class="auth-button">
-							Авторизоваться
-						</button>
+	</div>
+	<div class="layout-section layout-section_right">
+		<Timer />
+		<div class="integration-wrapper">
+			<p>Интеграции</p>
+			<div class="integration-buttons">
+				<div class="integration">
+					{#if isDisabled}
+						<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
+					{/if}
+					<img class:small={isDisabled} src={daIcon} alt="" />
+					{#if $page.data.userId}
+						<Switch on={switchOn} {isDisabled} />
 					{/if}
 				</div>
-			</div>
-			<div class="donations-scroll-wrapper">
-				<div class="donations-wrapper" data-donations-queue={$donations.length}>
-					{#each $donations as { id, username, message, amount_in_user_currency, currency }}
-						<Donation {id} {username} {message} amount={amount_in_user_currency} {currency} />
-					{/each}
+				<div class="integration">
+					<img src={twitchIcon} alt="" />
+					{#if $page.data.userId}
+						<Switch --switch-color="var(--color-purple)" isDisabled={true} />
+					{/if}
 				</div>
+				{#if !$page.data.userId}
+					<button type="button" on:click={() => goto(authorizeUrl)} class="auth-button">
+						Авторизоваться
+					</button>
+				{/if}
+			</div>
+		</div>
+		<div class="donations-scroll-wrapper">
+			<div class="donations-wrapper" data-donations-queue={$donations.length}>
+				{#each $donations as { id, username, message, amount_in_user_currency, currency, mostSimilarLot }}
+					<Donation
+						{id}
+						{username}
+						{message}
+						amount={amount_in_user_currency}
+						{currency}
+						{mostSimilarLot}
+					/>
+				{/each}
 			</div>
 		</div>
 	</div>
-{:else}
-	<div
-		style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; width: 100%;"
-	>
-		<h1>Доступно только по подписке</h1>
-		<button type="button" on:click={() => (isLoggedIn = !isLoggedIn)} style="font-size: 20px;">
-			Арчидос. Подписаться
-		</button>
-	</div>
-{/if}
+</div>
 
 <style lang="scss">
 	.auth-button {
@@ -206,7 +240,7 @@
 
 			&_center {
 				justify-content: space-between;
-				padding: 0;
+				padding: 30px 0;
 				box-shadow: 0px 4px 15px black;
 				background-color: #141414;
 			}
@@ -243,7 +277,7 @@
 		}
 	}
 	.navigation-wrapper {
-		padding: 50px 0 20px 0;
+		padding: 50px 0 0 0;
 	}
 	.integration {
 		position: relative;
