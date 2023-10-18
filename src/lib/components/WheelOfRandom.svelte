@@ -139,6 +139,7 @@
 
 			if (!isDonationValueEnough || !isDonationSendAfter) {
 				isSpinning = false;
+				console.log(isSpinning);
 			}
 		});
 	}
@@ -178,40 +179,44 @@
 <svelte:window on:resize={onResize} />
 
 <div class="wheel">
-	{#if !isSpinning}
-		<div class="time-input" transition:fade>
-			<Input
-				--input-fw="700"
-				--input-w="100px"
-				--input-text-al="center"
-				id="spin-time"
-				placeholder="Секунды"
-				type="number"
-				bind:value={spinDuration}
-				colorStyle="white"
-			/>
-		</div>
-	{:else}
+	{#if isSpinning}
 		<div class="time-input" style="top: 15%; left: 0;">
-			<h2>Прошло {formatTime(spinElapsedTime).min}:{formatTime(spinElapsedTime).sec} сек.</h2>
-		</div>
-		<div class="time-input" style="top: 15%; right: 0; left: unset;">
-			<h2>Макс. {spinDuration} сек.</h2>
-		</div>
-	{/if}
-	<button
-		class="wheel__button"
-		class:disabled={isSpinning}
-		disabled={isSpinning}
-		on:click={() => spin()}
-	>
-		Крутить
-	</button>
-	{#if winner !== null}
-		<div class="winner" transition:fade>
-			{pie[winner].title} ({pie[winner].percent}%)
+			<h2>
+				{formatTime(spinElapsedTime).min}:{formatTime(spinElapsedTime).sec}:{formatTime(
+					spinElapsedTime
+				).ms}
+			</h2>
 		</div>
 	{/if}
+	<div class="wheel-settings-wrapper">
+		{#if !isSpinning}
+			<div class="time-input" transition:fade>
+				<Input
+					--input-fw="700"
+					--input-w="100px"
+					--input-text-al="center"
+					id="spin-time"
+					placeholder="Секунды"
+					type="number"
+					bind:value={spinDuration}
+					colorStyle="white"
+				/>
+			</div>
+		{/if}
+		<button
+			class="wheel__button"
+			class:disabled={isSpinning}
+			disabled={isSpinning}
+			on:click={() => spin()}
+		>
+			Крутить
+		</button>
+		{#if winner !== null}
+			<div class="winner" transition:fade>
+				{pie[winner].title} ({pie[winner].percent}%)
+			</div>
+		{/if}
+	</div>
 	<svg viewBox="0 10 20 60" id="pointer">
 		<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="buttonface" />
 	</svg>
@@ -308,6 +313,14 @@
 		position: relative;
 		display: flex;
 
+		/* &-settings-wrapper {
+			position: absolute;
+			z-index: 3;
+			width: 100%;
+			height: 100%;
+			border-radius: 50%;
+			background-color: buttonface;
+		} */
 		&__button {
 			position: absolute;
 			z-index: 2;

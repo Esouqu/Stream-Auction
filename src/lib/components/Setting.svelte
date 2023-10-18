@@ -7,6 +7,7 @@
 	export let description: string;
 	export let value: string;
 	export let valueKey: string;
+	export let isDisabled = false;
 	export let callback: (() => void) | null = null;
 </script>
 
@@ -26,7 +27,12 @@
 			/>
 		{/if}
 		{#if isToggled !== null}
-			<Switch on={() => (isToggled = true)} off={() => (isToggled = false)} bind:isToggled />
+			<Switch
+				on={() => (isToggled = true)}
+				off={() => (isToggled = false)}
+				bind:isToggled
+				bind:isDisabled
+			/>
 		{/if}
 	</div>
 </div>

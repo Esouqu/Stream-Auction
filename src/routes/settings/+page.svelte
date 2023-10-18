@@ -36,6 +36,7 @@
 			bind:value={$stopWheelOnDonation.value}
 			description={$stopWheelOnDonation.description}
 			valueKey={$stopWheelOnDonation.valueAttribute}
+			isDisabled={true}
 		/>
 		<Setting
 			id={2}
