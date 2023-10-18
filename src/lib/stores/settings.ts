@@ -11,8 +11,8 @@ interface ISetting {
 export const textRules = writable('Мои правила аукциона');
 export const stopWheelOnDonation = writable({
   isToggled: false,
-  description: 'Останавливать колесо при донате',
-  value: '30',
+  description: 'СТОПДОНАТ(Останавливать колесо при донате)',
+  value: '1000',
   valueAttribute: 'руб.',
 });
 export const addWheelSpinTimeOnDonation = writable({

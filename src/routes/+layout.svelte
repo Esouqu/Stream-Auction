@@ -242,7 +242,7 @@
 				justify-content: space-between;
 				padding: 30px 0;
 				box-shadow: 0px 4px 15px black;
-				background-color: #141414;
+				background-color: #14141470;
 			}
 			&_right {
 				align-items: stretch;
