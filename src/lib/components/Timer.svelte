@@ -1,8 +1,5 @@
 <script lang="ts">
-	import type { ILot } from '$lib/interfaces';
-	import lots from '$lib/stores/lots';
 	import timer from '$lib/stores/timer';
-	import { addTimeOnNewItem, addTimeOnNewLeader } from '$lib/stores/settings';
 	import { formatTime } from '$lib/utils';
 	import Button from './Button.svelte';
 	import wheel from '$lib/stores/wheel';
@@ -10,25 +7,6 @@
 	export let timeToAdd: number = 60000;
 
 	$: currentTime = formatTime($timer.timeRemaining);
-	$: $lots, addTime();
-
-	function addTime() {
-		if (!$timer.isRunning) return;
-
-		const newItemTime = $addTimeOnNewItem.value;
-		const newLeaderTime = $addTimeOnNewLeader.value;
-
-		if ($addTimeOnNewItem.isToggled && !$wheel.isSpinning) {
-			lots.onNewItem(() => {
-				timer.add(Number(newItemTime) * 1000);
-			});
-		}
-		if ($addTimeOnNewLeader.isToggled && !$wheel.isSpinning) {
-			lots.onNewLeader(() => {
-				timer.add(Number(newLeaderTime) * 1000);
-			});
-		}
-	}
 </script>
 
 <div class="timer">

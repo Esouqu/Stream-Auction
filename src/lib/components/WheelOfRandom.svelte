@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { createPie } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { draw, fade } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 	import Input from './Input.svelte';
-	import donations from '$lib/stores/donations';
-	import { addWheelSpinTimeOnDonation, stopWheelOnDonation } from '$lib/stores/settings';
 	import lots from '$lib/stores/lots';
 	import wheel from '$lib/stores/wheel';
 	import timer from '$lib/stores/timer';
@@ -16,19 +14,13 @@
 
 	let winner: number | null = null;
 	let spinDuration = '10';
-	let spinStartDateTime: number;
-	let isSpinning = false;
 	let wheelElement: SVGElement;
 	let wheelWidth: number;
 	let wheelHeight: number;
 	let wheelX: number;
 	let wheelY: number;
 
-	let isInitialLoad = true;
-
 	$: pie = createPie($lots, radius);
-	$: $lots, handleLots();
-	$: $donations, handleDonation();
 	$: getWinner($wheel.normalizedAngle);
 
 	onMount(() => onResize());
@@ -56,32 +48,6 @@
 		timer.setTime(secondsToSpin);
 		timer.start();
 		wheel.spin(secondsToSpin);
-	}
-
-	function handleLots() {
-		if (!$wheel.isSpinning || !$addWheelSpinTimeOnDonation.isToggled) return;
-		if (isInitialLoad) {
-			isInitialLoad = false;
-			return;
-		}
-
-		const addDonationTime = $addWheelSpinTimeOnDonation.value;
-
-		timer.add(Number(addDonationTime) * 1000);
-		wheel.addSpinDuration(Number(addDonationTime) * 1000);
-	}
-
-	function handleDonation() {
-		if (!isSpinning || !$stopWheelOnDonation.isToggled) return;
-
-		donations.onNewDonation(({ createTime, amount_in_user_currency }) => {
-			const isDonationSendAfter = createTime > spinStartDateTime;
-			const isDonationValueEnough = amount_in_user_currency > Number($stopWheelOnDonation.value);
-
-			if (!isDonationValueEnough || !isDonationSendAfter) {
-				isSpinning = false;
-			}
-		});
 	}
 
 	// function onRelease() {
@@ -120,7 +86,7 @@
 
 <div class="wheel">
 	<div class="wheel-settings-wrapper">
-		{#if !isSpinning}
+		{#if !$wheel.isSpinning}
 			<div class="time-input" transition:fade>
 				<Input
 					--input-fw="700"
@@ -144,7 +110,9 @@
 		</button>
 		{#if winner !== null}
 			<div class="winner" transition:fade>
-				{pie[winner].title} ({pie[winner].percent}%)
+				<span>
+					{pie[winner].title} ({pie[winner].percent}%)
+				</span>
 			</div>
 		{/if}
 	</div>
@@ -287,8 +255,6 @@
 		}
 
 		&__slice {
-			transition: fill 0.5s linear, stroke 0.5s linear;
-
 			&:not(.selected) {
 				stroke: transparent;
 				filter: grayscale(1) opacity(0.3);

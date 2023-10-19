@@ -11,27 +11,10 @@ function createDonations() {
     update((donations) => donations.filter((don) => don.id !== id));
   }
 
-  function onNewDonation(callback: (donation: IDonationData & { createTime: number }) => void) {
-    update((state) => {
-      for (let i = 0; i < state.length; i++) {
-        const donation = state[i];
-        const donationCreateTime = new Date(donation.created_at + ' UTC').getTime();
-
-        callback({
-          ...donation,
-          createTime: donationCreateTime,
-        });
-      }
-
-      return state
-    })
-  }
-
   return {
     subscribe,
     add,
     remove,
-    onNewDonation
   }
 }
 

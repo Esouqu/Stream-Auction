@@ -14,12 +14,6 @@
 	import timer from '$lib/stores/timer';
 
 	let presets: string[] = ['По умолчанию'];
-
-	// 'Колесный Киноаукцион', 'Аук на все', 'Самарский'
-	// $: console.log($stopWheelOnDonation);
-	// $: console.log($addTimeOnNewItem);
-	// $: console.log($addTimeOnNewLeader);
-	// $: console.log($timerStarterTime.isToggled);
 </script>
 
 <svelte:head>
@@ -37,6 +31,7 @@
 			bind:value={$stopWheelOnDonation.value}
 			description={$stopWheelOnDonation.description}
 			valueKey={$stopWheelOnDonation.valueAttribute}
+			isDisabled={true}
 		/>
 		<Setting
 			id={2}

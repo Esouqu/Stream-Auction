@@ -11,14 +11,19 @@
 	import Switch from '$lib/components/Switch.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import { PUBLIC_DA_CLIENT_ID } from '$env/static/public';
-	import { stopWheelOnDonation, textRules } from '$lib/stores/settings';
+	import {
+		addTimeOnNewItem,
+		addTimeOnNewLeader,
+		addWheelSpinTimeOnDonation,
+		stopWheelOnDonation,
+		textRules
+	} from '$lib/stores/settings';
 	import Popup from '$lib/components/Popup.svelte';
 	import { fade } from 'svelte/transition';
 	import lots from '$lib/stores/lots';
 	import { compareStrings, isUrl } from '$lib/utils';
 	import wheel from '$lib/stores/wheel';
 	import timer from '$lib/stores/timer';
-	import events from '$lib/stores/events';
 
 	const userId = $page.data.userId;
 	const redirectUrl = 'http://localhost:5173/redirect';
@@ -32,7 +37,36 @@
 	let activeRoute: IRoute;
 	let socket: WebSocket;
 	let connectionToken: string;
-	let isDisabled = false;
+	let isConnecting = false;
+
+	$: $lots, addSpinTime(), addCountdownTime();
+
+	function addCountdownTime() {
+		if (!$timer.isRunning) return;
+
+		const newItemTime = $addTimeOnNewItem.value;
+		const newLeaderTime = $addTimeOnNewLeader.value;
+
+		if ($addTimeOnNewItem.isToggled && !$wheel.isSpinning) {
+			lots.onNewItem(() => {
+				timer.add(Number(newItemTime) * 1000);
+			});
+		}
+		if ($addTimeOnNewLeader.isToggled && !$wheel.isSpinning) {
+			lots.onNewLeader(() => {
+				timer.add(Number(newLeaderTime) * 1000);
+			});
+		}
+	}
+
+	function addSpinTime() {
+		if (!$wheel.isSpinning || !$addWheelSpinTimeOnDonation.isToggled) return;
+
+		const addDonationTime = $addWheelSpinTimeOnDonation.value;
+
+		timer.add(Number(addDonationTime) * 1000);
+		wheel.addSpinDuration(Number(addDonationTime) * 1000);
+	}
 
 	function switchOn() {
 		if ($page.data.socketToken && !socket) {
@@ -61,7 +95,7 @@
 			const { result } = JSON.parse(event.data);
 
 			if (!connectionToken) {
-				isDisabled = true;
+				isConnecting = true;
 
 				connectionToken = await fetch('/api/da/pubsub', {
 					method: 'POST',
@@ -82,7 +116,7 @@
 					})
 				);
 
-				isDisabled = false;
+				isConnecting = false;
 			}
 			if (!result.type && result.channel === `$alerts:donation_${userId}`) {
 				const donation: IDonationData = result.data.data;
@@ -97,15 +131,15 @@
 					const maxPercentForMerge = 60;
 
 					if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughValue) {
+						// donations.remove(donation.id);
 						if (comparePercent > maxPercentForMerge) {
 							lots.addValue(l.id, donation.amount_in_user_currency);
 						} else {
 							lots.add(donation.message, donation.amount_in_user_currency, donation.username);
 						}
 
-						donations.remove(donation.id);
-						timer.reset();
 						wheel.stop();
+						timer.reset();
 
 						return;
 					}
@@ -171,12 +205,12 @@
 				<p>Интеграции</p>
 				<div class="integration-buttons">
 					<div class="integration">
-						{#if isDisabled}
+						{#if isConnecting}
 							<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
 						{/if}
-						<img class:small={isDisabled} src={daIcon} alt="" />
+						<img class:small={isConnecting} src={daIcon} alt="" />
 						{#if $page.data.userId}
-							<Switch on={switchOn} {isDisabled} />
+							<Switch on={switchOn} isDisabled={isConnecting} />
 						{/if}
 					</div>
 					<div class="integration">

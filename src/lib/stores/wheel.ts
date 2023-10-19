@@ -57,10 +57,10 @@ function createWheel() {
 
       const angleModulo = Math.abs(state.angle % 360);
       const isClockwiseRotation = state.angle >= 0;
-      const angle = isClockwiseRotation ? 360 - angleModulo : angleModulo;
+      const normalizedAngle = isClockwiseRotation ? 360 - angleModulo : angleModulo;
       animationId = requestAnimationFrame(giveMoment);
 
-      return { ...state, angle: state.angle + speed, normalizedAngle: angle }
+      return { ...state, angle: state.angle + speed, normalizedAngle }
     });
   }
 
@@ -88,7 +88,10 @@ function createWheel() {
   }
 
   function stop() {
-    update((state) => ({ ...state, isSpinning: false }));
+    update((state) => {
+      console.log(state.normalizedAngle)
+      return { ...state, isSpinning: false }
+    });
   }
 
   return {
