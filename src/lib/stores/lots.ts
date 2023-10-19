@@ -52,16 +52,16 @@ function createLots() {
 
   // need to shuffleArray
 
-  const { subscribe, update } = writable<ILot[]>([]);
+  const { subscribe, update } = writable<ILot[]>(tempLots);
 
-  // let id = tempLots.length;
-  // let color = getRandomColor(colors[4]);
-  // let previousLotsAmount = tempLots.length;
-  // let previousLeader = tempLots[0];
-  let id = 0;
-  let color = '';
-  let previousLotsAmount = 0;
-  let previousLeader = 0;
+  let id = tempLots.length;
+  let color = getRandomColor(colors[4]);
+  let previousLotsAmount = tempLots.length;
+  let previousLeader = tempLots[0].id;
+  // let id = 0;
+  // let color = '';
+  // let previousLotsAmount = 0;
+  // let previousLeader = 0;
 
   function add(title: string, value: number, donator?: string) {
     id += 1;

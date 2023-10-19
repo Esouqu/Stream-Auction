@@ -116,7 +116,7 @@
 		{#if winner !== null}
 			<div class="winner" transition:fade>
 				{#if isUrl(winner.title)}
-					<a href={winner.title} style="color: var(--color-orange);">
+					<a href={winner.title} target="_blank" style="color: var(--color-orange);">
 						{winner.title} ({winner.percent}%)
 					</a>
 				{:else}
