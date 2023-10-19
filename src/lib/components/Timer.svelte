@@ -61,10 +61,10 @@
 		}
 		&__time {
 			margin: 0;
-			font-size: 72px;
-			letter-spacing: 5px;
+			font-size: 80px;
+			font-weight: 600;
 			font-variant-numeric: tabular-nums;
-			font-weight: 200;
+			user-select: none;
 		}
 	}
 </style>
