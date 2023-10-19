@@ -142,3 +142,13 @@ export function formatTime(ms: number) {
     ms: String(msRemaining).padStart(2, '0')
   };
 }
+
+export function isUrl(str: string) {
+  const replacedStr = str.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}/g, '');
+
+  if (replacedStr.length < str.length) {
+    return true
+  }
+
+  return false;
+}

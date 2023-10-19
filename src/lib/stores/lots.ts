@@ -52,12 +52,12 @@ function createLots() {
 
   // need to shuffleArray
 
-  const { subscribe, update } = writable<ILot[]>(tempLots);
+  const { subscribe, update } = writable<ILot[]>([]);
 
-  let id = tempLots.length;
-  // let id = 0;
-  let color = getRandomColor(colors[4]);
-  // let color = '';
+  // let id = tempLots.length;
+  let id = 0;
+  // let color = getRandomColor(colors[4]);
+  let color = '';
   let previousLotsAmount = tempLots.length;
   let previousLeader = tempLots[0];
 
@@ -120,7 +120,7 @@ function createLots() {
 
   function onNewItem(callback: () => void) {
     update((state) => {
-      if (state.length < previousLotsAmount) return state;
+      if (state.length <= previousLotsAmount) return state;
 
       previousLotsAmount = state.length;
       callback();

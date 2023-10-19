@@ -5,25 +5,25 @@
 	import { addTimeOnNewItem, addTimeOnNewLeader } from '$lib/stores/settings';
 	import { formatTime } from '$lib/utils';
 	import Button from './Button.svelte';
+	import wheel from '$lib/stores/wheel';
 
 	export let timeToAdd: number = 60000;
 
 	$: currentTime = formatTime($timer.timeRemaining);
-	$: addTime($lots);
+	$: $lots, addTime();
 
-	function addTime(_: ILot[]) {
+	function addTime() {
 		if (!$timer.isRunning) return;
 
 		const newItemTime = $addTimeOnNewItem.value;
 		const newLeaderTime = $addTimeOnNewLeader.value;
 
-		if ($addTimeOnNewItem.isToggled) {
+		if ($addTimeOnNewItem.isToggled && !$wheel.isSpinning) {
 			lots.onNewItem(() => {
 				timer.add(Number(newItemTime) * 1000);
 			});
 		}
-
-		if ($addTimeOnNewLeader.isToggled) {
+		if ($addTimeOnNewLeader.isToggled && !$wheel.isSpinning) {
 			lots.onNewLeader(() => {
 				timer.add(Number(newLeaderTime) * 1000);
 			});
@@ -34,24 +34,38 @@
 <div class="timer">
 	<p class="timer__time">{currentTime.min}:{currentTime.sec}:{currentTime.ms}</p>
 	<div class="timer-buttons-wrapper">
-		{#if !$timer.isRunning}
-			<Button --button-size="60px" --button-p="10px" icon="start" on:click={() => timer.start()} />
+		{#if $wheel.isSpinning}
+			<h3>Идет прокрут колеса</h3>
 		{:else}
-			<Button --button-size="60px" --button-p="10px" icon="pause" on:click={() => timer.pause()} />
+			{#if !$timer.isRunning}
+				<Button
+					--button-size="60px"
+					--button-p="10px"
+					icon="start"
+					on:click={() => timer.start()}
+				/>
+			{:else}
+				<Button
+					--button-size="60px"
+					--button-p="10px"
+					icon="pause"
+					on:click={() => timer.pause()}
+				/>
+			{/if}
+			<Button --button-size="60px" --button-p="10px" icon="reset" on:click={() => timer.reset()} />
+			<Button
+				--button-size="60px"
+				--button-p="10px"
+				icon="upArrow"
+				on:click={() => timer.add(timeToAdd)}
+			/>
+			<Button
+				--button-size="60px"
+				--button-p="10px"
+				icon="downArrow"
+				on:click={() => timer.subtract(timeToAdd)}
+			/>
 		{/if}
-		<Button --button-size="60px" --button-p="10px" icon="reset" on:click={() => timer.reset()} />
-		<Button
-			--button-size="60px"
-			--button-p="10px"
-			icon="upArrow"
-			on:click={() => timer.add(timeToAdd)}
-		/>
-		<Button
-			--button-size="60px"
-			--button-p="10px"
-			icon="downArrow"
-			on:click={() => timer.subtract(timeToAdd)}
-		/>
 	</div>
 </div>
 

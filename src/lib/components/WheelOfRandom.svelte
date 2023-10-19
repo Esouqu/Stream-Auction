@@ -1,66 +1,47 @@
 <script lang="ts">
-	import { radiansToDegrees } from '$lib/constants';
-	import type { IDonationData, ILot, IPieItem } from '$lib/interfaces';
-	import { createPie, formatTime } from '$lib/utils';
+	import { createPie } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { draw, fade } from 'svelte/transition';
 	import Input from './Input.svelte';
 	import donations from '$lib/stores/donations';
 	import { addWheelSpinTimeOnDonation, stopWheelOnDonation } from '$lib/stores/settings';
 	import lots from '$lib/stores/lots';
-
-	export let items: IPieItem[] = [];
-	export let winner: number | null = null;
+	import wheel from '$lib/stores/wheel';
+	import timer from '$lib/stores/timer';
 
 	const radius = 360;
 	const width = radius * 2;
 	const offset = 50;
-	const maxSpeed = 5;
-	const accelerationTime = 0.2;
-	const slowDownTime = 0.5;
-	const generalTime = accelerationTime + slowDownTime;
-	const decelerationTime = 0.3;
 	const degreeCapForTextDisplay = Number(((400 / 100) * 1.75).toFixed(2));
 
+	let winner: number | null = null;
 	let spinDuration = '10';
-	let spinElapsedTime = 0;
-	let wheelStartAngle = 0;
-	let currentAngle = 0;
-	let oldAngle = 0;
-	let speed = 0;
-	let animationId: number;
-	let spinStartTime: number;
 	let spinStartDateTime: number;
 	let isSpinning = false;
-	let isDragging = false;
-	let wheel: SVGElement;
+	let wheelElement: SVGElement;
 	let wheelWidth: number;
 	let wheelHeight: number;
 	let wheelX: number;
 	let wheelY: number;
 
-	$: pie = createPie(items, radius);
-	$: spinDurationInMs = +spinDuration * 1000;
-	$: handleLots($lots);
-	$: handleDonation($donations);
+	let isInitialLoad = true;
 
-	onMount(() => {
-		onResize();
+	$: pie = createPie($lots, radius);
+	$: $lots, handleLots();
+	$: $donations, handleDonation();
+	$: getWinner($wheel.normalizedAngle);
 
-		return () => cancelAnimationFrame(animationId);
-	});
+	onMount(() => onResize());
 
 	function onResize() {
-		wheelWidth = wheel.getBoundingClientRect().width;
-		wheelHeight = wheel.getBoundingClientRect().height;
-		wheelX = wheel.getBoundingClientRect().x + wheelWidth / 2;
-		wheelY = wheel.getBoundingClientRect().y + wheelHeight / 2;
+		wheelWidth = wheelElement.getBoundingClientRect().width;
+		wheelHeight = wheelElement.getBoundingClientRect().height;
+		wheelX = wheelElement.getBoundingClientRect().x + wheelWidth / 2;
+		wheelY = wheelElement.getBoundingClientRect().y + wheelHeight / 2;
 	}
 
-	function getWinner() {
-		const normalizedAngle = Math.abs(oldAngle % 360);
-		const isClockwiseRotation = oldAngle >= 0;
-		const angle = isClockwiseRotation ? 360 - normalizedAngle : normalizedAngle;
+	function getWinner(angle: number) {
+		if (!$wheel.isSpinning) return;
 
 		pie.forEach((slice, idx) => {
 			if (slice.startAngle <= angle && slice.endAngle >= angle) {
@@ -69,68 +50,28 @@
 		});
 	}
 
-	function giveMoment(currentTime: number) {
-		if (!spinStartTime) spinStartTime = currentTime;
-
-		if (spinDurationInMs !== +spinDuration * 1000) {
-			spinDurationInMs = +spinDuration * 1000;
-		}
-
-		const elapsedTime = currentTime - spinStartTime;
-		const progress = Math.min(elapsedTime / spinDurationInMs, 1);
-
-		spinElapsedTime = elapsedTime;
-
-		if (!isSpinning) {
-			spinStartTime = 0;
-
-			return;
-		}
-
-		if (progress >= 1) {
-			isSpinning = false;
-			spinStartTime = 0;
-
-			return;
-		} else if (progress <= accelerationTime) {
-			speed = maxSpeed * (progress / accelerationTime);
-		} else if (progress > accelerationTime && progress <= generalTime) {
-			const slowdownProgress = (progress - accelerationTime) / slowDownTime;
-			speed = maxSpeed - slowdownProgress * (maxSpeed - 1);
-		} else {
-			const slowdownProgress =
-				(elapsedTime - spinDurationInMs * generalTime) / (spinDurationInMs * decelerationTime);
-			speed = 1 * (1 - slowdownProgress);
-		}
-
-		oldAngle += speed;
-		getWinner();
-		animationId = requestAnimationFrame(giveMoment);
+	function handleWheelSpin() {
+		const secondsToSpin = Number(spinDuration) * 1000;
+		timer.reset();
+		timer.setTime(secondsToSpin);
+		timer.start();
+		wheel.spin(secondsToSpin);
 	}
 
-	function spin() {
-		if (isSpinning || Number(spinDuration) < 1) return;
-
-		spinStartDateTime = new Date(Date.now()).getTime();
-		winner = null;
-		isSpinning = true;
-		speed = maxSpeed;
-		oldAngle = Math.floor(Math.random() * 360);
-
-		requestAnimationFrame(giveMoment);
-	}
-
-	function handleLots(_lots: ILot[]) {
-		if (!isSpinning || !$addWheelSpinTimeOnDonation.isToggled) return;
+	function handleLots() {
+		if (!$wheel.isSpinning || !$addWheelSpinTimeOnDonation.isToggled) return;
+		if (isInitialLoad) {
+			isInitialLoad = false;
+			return;
+		}
 
 		const addDonationTime = $addWheelSpinTimeOnDonation.value;
 
-		lots.onNewItem(() => {
-			spinDuration = String(+spinDuration + +addDonationTime);
-		});
+		timer.add(Number(addDonationTime) * 1000);
+		wheel.addSpinDuration(Number(addDonationTime) * 1000);
 	}
 
-	function handleDonation(_donations: IDonationData[]) {
+	function handleDonation() {
 		if (!isSpinning || !$stopWheelOnDonation.isToggled) return;
 
 		donations.onNewDonation(({ createTime, amount_in_user_currency }) => {
@@ -139,55 +80,45 @@
 
 			if (!isDonationValueEnough || !isDonationSendAfter) {
 				isSpinning = false;
-				console.log(isSpinning);
 			}
 		});
 	}
 
-	function onRelease() {
-		if (!isDragging) return;
+	// function onRelease() {
+	// 	if (!isDragging) return;
 
-		isDragging = false;
-		oldAngle = currentAngle;
-	}
+	// 	isDragging = false;
+	// 	oldAngle = currentAngle;
+	// }
 
-	function onMove(x: number, y: number) {
-		if (!isDragging) return;
+	// function onMove(x: number, y: number) {
+	// 	if (!isDragging) return;
 
-		const deltaAngle = calculateAngle(x, y) - wheelStartAngle;
+	// 	const deltaAngle = calculateAngle(x, y) - wheelStartAngle;
 
-		currentAngle = deltaAngle + oldAngle;
-	}
+	// 	currentAngle = deltaAngle + oldAngle;
+	// }
 
-	function onGrab(x: number, y: number) {
-		if (isSpinning) return;
+	// function onGrab(x: number, y: number) {
+	// 	if (isSpinning) return;
 
-		winner = null;
-		isDragging = true;
-		wheelStartAngle = calculateAngle(x, y);
-	}
+	// 	winner = null;
+	// 	isDragging = true;
+	// 	wheelStartAngle = calculateAngle(x, y);
+	// }
 
-	function calculateAngle(currentX: number, currentY: number) {
-		let xLength = currentX - wheelX;
-		let yLength = currentY - wheelY;
-		let angle = Math.atan2(xLength, yLength) * radiansToDegrees;
+	// function calculateAngle(currentX: number, currentY: number) {
+	// 	let xLength = currentX - wheelX;
+	// 	let yLength = currentY - wheelY;
+	// 	let angle = Math.atan2(xLength, yLength) * radiansToDegrees;
 
-		return 360 - angle; // was 365
-	}
+	// 	return 360 - angle;
+	// }
 </script>
 
 <svelte:window on:resize={onResize} />
 
 <div class="wheel">
-	{#if isSpinning}
-		<div class="time-input" style="top: 15%; left: 0;">
-			<h2>
-				{formatTime(spinElapsedTime).min}:{formatTime(spinElapsedTime).sec}:{formatTime(
-					spinElapsedTime
-				).ms}
-			</h2>
-		</div>
-	{/if}
 	<div class="wheel-settings-wrapper">
 		{#if !isSpinning}
 			<div class="time-input" transition:fade>
@@ -205,9 +136,9 @@
 		{/if}
 		<button
 			class="wheel__button"
-			class:disabled={isSpinning}
-			disabled={isSpinning}
-			on:click={() => spin()}
+			class:disabled={$wheel.isSpinning}
+			disabled={$wheel.isSpinning}
+			on:click={handleWheelSpin}
 		>
 			Крутить
 		</button>
@@ -222,28 +153,25 @@
 	</svg>
 	<svg
 		class="wheel__svg"
-		bind:this={wheel}
-		on:mousedown={(e) => onGrab(e.clientX, e.clientY)}
-		on:mousemove={(e) => onMove(e.clientX, e.clientY)}
-		on:mouseup={onRelease}
+		bind:this={wheelElement}
 		aria-hidden
 		{width}
 		height={width}
 		viewBox="-{offset / 2} -{offset / 2} {width + offset} {width + offset}"
-		style="--wheel-rot: {isDragging ? currentAngle : oldAngle}deg"
+		style="--wheel-rot: {$wheel.angle}deg"
 		pointer-events="none"
 	>
 		<g pointer-events="fill">
 			<!-- Slices -->
 			<g class="wheel-slices">
 				{#each pie as { startPoint, endPoint, isCircle, largeArcFlag, color }, idx}
-					{#if isCircle || $lots.length < 1}
+					{#if isCircle}
 						<circle cx={radius} cy={radius} r={radius} fill={color} stroke={color} />
 					{:else}
 						<path
 							id="{idx}slice"
 							class="wheel__slice"
-							class:selected={isSpinning || winner === null || winner === idx}
+							class:selected={$wheel.isSpinning || winner === null || winner === idx}
 							d="M {startPoint.x} {startPoint.y} A {radius} {radius} 0 {largeArcFlag} 1 {endPoint.x} {endPoint.y} L {radius} {radius} Z"
 							fill={color}
 							stroke={color}
@@ -255,7 +183,11 @@
 			<!-- Paths for slice text -->
 			<defs>
 				{#each pie as { middlePoint }, idx}
-					<path id="textPath-{idx}" d="M {middlePoint.x} {middlePoint.y} L {radius} {radius}" />
+					<path
+						id="textPath-{idx}"
+						d="M {middlePoint.x} {middlePoint.y} L {radius} {radius}"
+						style="user-select: none;"
+					/>
 				{/each}
 			</defs>
 
@@ -335,6 +267,7 @@
 			font-size: 18px;
 			text-transform: uppercase;
 			transition: 0.2s;
+			user-select: none;
 
 			&.disabled {
 				box-shadow: inset 0 2px 10px black;
@@ -345,7 +278,6 @@
 		&__svg {
 			rotate: var(--wheel-rot, 0);
 			border-radius: 50%;
-			/* will-change: rotate; */
 			user-select: none;
 		}
 
@@ -355,11 +287,11 @@
 		}
 
 		&__slice {
-			/* transition: 1s; */
+			transition: fill 0.5s linear, stroke 0.5s linear;
 
 			&:not(.selected) {
-				filter: grayscale(1) opacity(0.3);
 				stroke: transparent;
+				filter: grayscale(1) opacity(0.3);
 			}
 		}
 

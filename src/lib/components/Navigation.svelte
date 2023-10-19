@@ -8,6 +8,7 @@
 	import { page } from '$app/stores';
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
+	import wheel from '$lib/stores/wheel';
 
 	const routes: IRoute[] = [
 		{ id: 0, title: 'Лоты', icon: listIcon, url: '/', element: null },
@@ -38,6 +39,7 @@
 						href={route.url}
 						class="navigation__route"
 						class:active={route.url === activeRoute?.url}
+						class:disabled={$wheel.isSpinning && route.id === 3}
 						on:click={() => handleRouteClick(route)}
 						draggable="false"
 					>
@@ -106,6 +108,14 @@
 			user-select: none;
 			transition: 0.3s;
 
+			&.disabled:not(.active) {
+				pointer-events: none;
+				cursor: not-allowed;
+
+				&:hover {
+					opacity: 0.2;
+				}
+			}
 			&:hover:not(.active) {
 				opacity: 0.7;
 			}

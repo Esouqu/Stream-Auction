@@ -2,6 +2,7 @@
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import Setting from '$lib/components/Setting.svelte';
 	import Textarea from '$lib/components/Textarea.svelte';
+	import lots from '$lib/stores/lots';
 	import {
 		stopWheelOnDonation,
 		addTimeOnNewItem,
@@ -26,9 +27,9 @@
 </svelte:head>
 
 <section class="settings-section">
-	<Dropdown options={presets} />
+	<!-- <Dropdown options={presets} />
 
-	<Textarea id="rules-setting" bind:value={$textRules} />
+	<Textarea id="rules-setting" bind:value={$textRules} /> -->
 	<div class="toggles-wrapper">
 		<Setting
 			id={1}
@@ -36,7 +37,6 @@
 			bind:value={$stopWheelOnDonation.value}
 			description={$stopWheelOnDonation.description}
 			valueKey={$stopWheelOnDonation.valueAttribute}
-			isDisabled={true}
 		/>
 		<Setting
 			id={2}
@@ -65,7 +65,7 @@
 			bind:value={$timerStarterTime.value}
 			description={$timerStarterTime.description}
 			valueKey={$timerStarterTime.valueAttribute}
-			callback={() => timer.setStarterTime(Number($timerStarterTime.value))}
+			callback={() => timer.setInitialTime(Number($timerStarterTime.value) * 1000 * 60)}
 		/>
 	</div>
 </section>

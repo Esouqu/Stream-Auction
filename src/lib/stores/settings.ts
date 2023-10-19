@@ -17,7 +17,7 @@ export const stopWheelOnDonation = writable({
 });
 export const addWheelSpinTimeOnDonation = writable({
   isToggled: true,
-  description: 'Добавлять время прокрутки колеса за новый/обновленный лот',
+  description: 'Добавлять время прокрута колеса за новый/измененный лот',
   value: '60',
   valueAttribute: 'сек.',
 });

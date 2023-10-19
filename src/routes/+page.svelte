@@ -19,7 +19,7 @@
 	<div>
 		<Addlot />
 	</div>
-	<div style="display: flex; flex: 1 1 0; flex-direction: column;">
+	<div style="position: relative; display: flex; flex: 1 1 0; flex-direction: column;">
 		<div class="utils-row">
 			<p>Всего: {getTotal($lots.map((l) => l.value))}</p>
 			<div style="position: absolute; right: 35px;">
@@ -66,11 +66,13 @@
 		scrollbar-gutter: stable;
 	}
 	.no-lots {
+		position: absolute;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		flex: 1 1 0;
-		padding: 0 30px;
+		width: 100%;
+		height: 100%;
 		font-size: 24px;
 	}
 	.utils-row {

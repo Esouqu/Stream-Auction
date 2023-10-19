@@ -11,13 +11,14 @@
 	import Switch from '$lib/components/Switch.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import { PUBLIC_DA_CLIENT_ID } from '$env/static/public';
-	import { textRules } from '$lib/stores/settings';
+	import { stopWheelOnDonation, textRules } from '$lib/stores/settings';
 	import Popup from '$lib/components/Popup.svelte';
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import { fade } from 'svelte/transition';
 	import lots from '$lib/stores/lots';
-	import { compareStrings } from '$lib/utils';
+	import { compareStrings, isUrl } from '$lib/utils';
+	import wheel from '$lib/stores/wheel';
+	import timer from '$lib/stores/timer';
+	import events from '$lib/stores/events';
 
 	const userId = $page.data.userId;
 	const redirectUrl = 'http://localhost:5173/redirect';
@@ -32,10 +33,6 @@
 	let socket: WebSocket;
 	let connectionToken: string;
 	let isDisabled = false;
-
-	onMount(() => {
-		if (browser) localStorage.clear();
-	});
 
 	function switchOn() {
 		if ($page.data.socketToken && !socket) {
@@ -91,11 +88,27 @@
 				const donation: IDonationData = result.data.data;
 				let minPercentsForMerge = [];
 				let mostSimilarLot = null;
+				const isEnoughValue = donation.amount_in_user_currency > Number($stopWheelOnDonation.value);
 
 				for (const l of $lots) {
+					const isUrlMessage = isUrl(donation.message);
 					const comparePercent = compareStrings(donation.message, l.title);
 					const minPercentForMerge = 40;
 					const maxPercentForMerge = 60;
+
+					if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughValue) {
+						if (comparePercent > maxPercentForMerge) {
+							lots.addValue(l.id, donation.amount_in_user_currency);
+						} else {
+							lots.add(donation.message, donation.amount_in_user_currency, donation.username);
+						}
+
+						donations.remove(donation.id);
+						timer.reset();
+						wheel.stop();
+
+						return;
+					}
 
 					if (comparePercent > maxPercentForMerge) {
 						lots.addValue(l.id, donation.amount_in_user_currency);
@@ -138,10 +151,10 @@
 <div class="layout" transition:fade>
 	<div class="layout-section layout-section_left">
 		<h1 style="font-size: 24px;">Правила Аукциона</h1>
-		<h2 style="font-size: 28px;">По умолчанию</h2>
+		<!-- <h2 style="font-size: 28px;">По умолчанию</h2>
 		<h3 style="white-space: break-spaces; font-size: 20px;">
 			{JSON.parse(JSON.stringify($textRules))}
-		</h3>
+		</h3> -->
 	</div>
 	<div class="layout-section layout-section_center">
 		<div class="layout-section-wrapper">
@@ -152,7 +165,7 @@
 		</div>
 	</div>
 	<div class="layout-section layout-section_right">
-		<div style="padding: 20px;">
+		<div class="layout-wrapper">
 			<Timer />
 			<div class="integration-wrapper">
 				<p>Интеграции</p>
@@ -220,6 +233,13 @@
 		display: grid;
 		grid-template-columns: 1fr minmax(960px, 1fr) 1fr;
 
+		&-wrapper {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			height: 100%;
+			padding: 20px;
+		}
 		&-section-wrapper {
 			display: flex;
 			justify-content: center;
@@ -242,7 +262,7 @@
 			}
 			&_right {
 				align-items: stretch;
-				padding: 20px 0;
+				padding: 0;
 			}
 		}
 	}
@@ -287,6 +307,8 @@
 			align-items: center;
 			gap: 20px;
 			padding: 20px;
+			min-width: 350px;
+			max-width: 350px;
 			background-color: #3d3d3d;
 
 			& p {

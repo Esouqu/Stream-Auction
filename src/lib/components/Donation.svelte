@@ -93,7 +93,7 @@
 		}
 		&-wrapper {
 			position: relative;
-			width: 400px;
+			width: 375px;
 			border-radius: 10px;
 			box-shadow: 0 0 0 0 #909090;
 			transform: scale(1);

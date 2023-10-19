@@ -63,14 +63,14 @@ function createCountdownTimer(initialTime: number) {
     })
   }
 
-  function add(seconds: number) {
-    currentTime += seconds;
-    update((state) => ({ ...state, timeRemaining: state.timeRemaining + seconds }));
+  function add(ms: number) {
+    currentTime += ms;
+    update((state) => ({ ...state, timeRemaining: state.timeRemaining + ms }));
   }
 
-  function subtract(seconds: number) {
+  function subtract(ms: number) {
     update((state) => {
-      currentTime -= seconds;
+      currentTime -= ms;
 
       if (state.timeRemaining <= 0) {
         resetTime();
@@ -78,16 +78,19 @@ function createCountdownTimer(initialTime: number) {
         return { timeRemaining: 0, isRunning: false }
       }
 
-      return { ...state, timeRemaining: Math.max(0, state.timeRemaining - seconds) };
+      return { ...state, timeRemaining: Math.max(0, state.timeRemaining - ms) };
     });
   }
 
-  function setStarterTime(min: number) {
-    const timeToSet = min * 1000 * 60;
+  function setInitialTime(ms: number) {
+    currentTime = ms;
+    currentInitialTime = ms;
+    update((state) => ({ ...state, timeRemaining: ms }));
+  }
 
-    currentTime = timeToSet;
-    currentInitialTime = timeToSet;
-    update((state) => ({ ...state, timeRemaining: timeToSet }))
+  function setTime(ms: number) {
+    currentTime = ms;
+    update((state) => ({ ...state, timeRemaining: ms }));
   }
 
   function resetTime(t: number = 0) {
@@ -103,7 +106,8 @@ function createCountdownTimer(initialTime: number) {
     add,
     subtract,
     reset,
-    setStarterTime
+    setInitialTime,
+    setTime
   };
 };
 

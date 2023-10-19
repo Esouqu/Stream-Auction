@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Addlot from '$lib/components/Addlot.svelte';
 	import WheelOfRandom from '$lib/components/WheelOfRandom.svelte';
-	import lots from '$lib/stores/lots';
 </script>
 
 <svelte:head>
@@ -11,7 +10,7 @@
 <section class="wheel-section">
 	<Addlot />
 	<div style="display: flex; align-items: center; flex: 1 1 0;">
-		<WheelOfRandom items={$lots} />
+		<WheelOfRandom />
 	</div>
 </section>
 
