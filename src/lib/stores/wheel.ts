@@ -89,7 +89,6 @@ function createWheel() {
 
   function stop() {
     update((state) => {
-      console.log(state.normalizedAngle)
       return { ...state, isSpinning: false }
     });
   }

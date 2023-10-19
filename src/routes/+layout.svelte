@@ -118,18 +118,33 @@
 
 				isConnecting = false;
 			}
+
 			if (!result.type && result.channel === `$alerts:donation_${userId}`) {
 				const donation: IDonationData = result.data.data;
+				const isEnoughValue = donation.amount_in_user_currency > Number($stopWheelOnDonation.value);
+				const isUrlMessage = isUrl(donation.message);
+				const minPercentForMerge = 40;
+				const maxPercentForMerge = 60;
+
 				let minPercentsForMerge = [];
 				let mostSimilarLot = null;
-				const isEnoughValue = donation.amount_in_user_currency > Number($stopWheelOnDonation.value);
 
 				for (const l of $lots) {
-					const isUrlMessage = isUrl(donation.message);
 					const comparePercent = compareStrings(donation.message, l.title);
-					const minPercentForMerge = 40;
-					const maxPercentForMerge = 60;
 
+					if (isUrlMessage && !$wheel.isSpinning) {
+						console.log('start');
+						donations.add(donation);
+
+						return;
+					} else if ($wheel.isSpinning && isUrlMessage) {
+						console.log('wtf');
+						lots.add(donation.message, donation.amount_in_user_currency, donation.username);
+
+						return;
+					}
+
+					// stop wheel on donation
 					if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughValue) {
 						// donations.remove(donation.id);
 						if (comparePercent > maxPercentForMerge) {
@@ -146,7 +161,6 @@
 
 					if (comparePercent > maxPercentForMerge) {
 						lots.addValue(l.id, donation.amount_in_user_currency);
-						donations.remove(donation.id);
 						minPercentsForMerge = [];
 
 						return;
@@ -167,6 +181,7 @@
 						}
 					});
 				}
+				console.log('end');
 
 				donations.add({ ...donation, mostSimilarLot });
 			}

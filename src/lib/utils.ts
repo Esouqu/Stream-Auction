@@ -144,7 +144,7 @@ export function formatTime(ms: number) {
 }
 
 export function isUrl(str: string) {
-  const replacedStr = str.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}/g, '');
+  const replacedStr = str.replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}/g, '');
 
   if (replacedStr.length < str.length) {
     return true
