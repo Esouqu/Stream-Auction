@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createPie } from '$lib/utils';
+	import { createPie, isUrl } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Input from './Input.svelte';
@@ -115,9 +115,15 @@
 		</button>
 		{#if winner !== null}
 			<div class="winner" transition:fade>
-				<span>
-					{winner.title} ({winner.percent}%)
-				</span>
+				{#if isUrl(winner.title)}
+					<a href={winner.title} style="color: var(--color-orange);">
+						{winner.title} ({winner.percent}%)
+					</a>
+				{:else}
+					<span>
+						{winner.title} ({winner.percent}%)
+					</span>
+				{/if}
 			</div>
 			{#if !$wheel.isSpinning}
 				<div class="winner-delete-button">

@@ -57,7 +57,7 @@ function createLots() {
   // let id = tempLots.length;
   // let color = getRandomColor(colors[4]);
   // let previousLotsAmount = tempLots.length;
-  // let previousLeader = tempLots[0].id;
+  // let previousLeader = tempLots[0];
   let id = 0;
   let color = '';
   let previousLotsAmount = 0;
