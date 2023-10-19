@@ -119,10 +119,22 @@
 					<a href={winner.title} target="_blank" style="color: var(--color-orange);">
 						{winner.title} ({winner.percent}%)
 					</a>
+					<div class="winner-donators">
+						{winner.donators.join(', ')}
+						<!-- {#each winner.donators as donator}
+							<span>{donator}</span>
+						{/each} -->
+					</div>
 				{:else}
 					<span>
 						{winner.title} ({winner.percent}%)
 					</span>
+					<div class="winner-donators">
+						{winner.donators.join(', ')}
+						<!-- {#each winner.donators as donator}
+							<span>{donator}</span>
+						{/each} -->
+					</div>
 				{/if}
 			</div>
 			{#if !$wheel.isSpinning}
@@ -219,6 +231,13 @@
 		color: white;
 		background-color: rgba(0, 0, 0, 0.5);
 
+		&-donators {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			/* gap: 10px; */
+			text-transform: none;
+		}
 		&-delete-button {
 			position: absolute;
 			top: calc(50% + 100px);
