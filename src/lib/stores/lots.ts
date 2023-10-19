@@ -55,11 +55,13 @@ function createLots() {
   const { subscribe, update } = writable<ILot[]>([]);
 
   // let id = tempLots.length;
-  let id = 0;
   // let color = getRandomColor(colors[4]);
+  // let previousLotsAmount = tempLots.length;
+  // let previousLeader = tempLots[0];
+  let id = 0;
   let color = '';
-  let previousLotsAmount = tempLots.length;
-  let previousLeader = tempLots[0];
+  let previousLotsAmount = 0;
+  let previousLeader = 0;
 
   function add(title: string, value: number, donator?: string) {
     id += 1;
@@ -131,9 +133,9 @@ function createLots() {
 
   function onNewLeader(callback: () => void) {
     update((state) => {
-      const newLeader = [...state].sort((a, b) => b.value - a.value)[0];
+      const newLeader = [...state].sort((a, b) => b.value - a.value)[0].id;
 
-      if (previousLeader.id !== newLeader.id) {
+      if (previousLeader !== newLeader) {
         previousLeader = newLeader;
         callback();
       }
