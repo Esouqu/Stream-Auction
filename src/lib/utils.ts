@@ -1,5 +1,4 @@
-import colors from "./colors";
-import type { IPieItem } from "./interfaces";
+import type { ILot } from "./interfaces";
 
 export const getRandomColor = (() => {
   let usedColors: string[] = [];
@@ -91,15 +90,15 @@ export function getPercentFromTotal(value: number, total: number, decimals: numb
   return ((value / total) * 100).toFixed(decimals);
 }
 
-export function createPie(items: IPieItem[], radius: number) {
+export function createPie(items: ILot[], radius: number) {
   const total = getTotal(items.map((item) => item.value));
   const maxTitleLength = Number(((radius / 100) * 5.75).toFixed(2));
 
   let startAngle: number;
   let endAngle: number;
 
-  return items.map(({ value, title, color }, idx) => {
-    const deg = (value / total) * 360;
+  return items.map((item, idx) => {
+    const deg = (item.value / total) * 360;
 
     startAngle = idx && endAngle;
     endAngle = !idx ? deg : startAngle + deg;
@@ -114,11 +113,9 @@ export function createPie(items: IPieItem[], radius: number) {
     // const colorsBetween = Math.floor(colors[3].length / (items.length - 1));
 
     return {
-      shortTitle: calculateShortTitle(title, maxTitleLength),
-      title,
-      value,
-      percent: getPercentFromTotal(value, total),
-      color,
+      ...item,
+      shortTitle: calculateShortTitle(item.title, maxTitleLength),
+      percent: getPercentFromTotal(item.value, total),
       startAngle,
       middleAngle,
       endAngle,

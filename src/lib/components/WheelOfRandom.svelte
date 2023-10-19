@@ -6,13 +6,15 @@
 	import lots from '$lib/stores/lots';
 	import wheel from '$lib/stores/wheel';
 	import timer from '$lib/stores/timer';
+	import type { IPieItem } from '$lib/interfaces';
 
 	const radius = 360;
 	const width = radius * 2;
 	const offset = 50;
 	const degreeCapForTextDisplay = Number(((400 / 100) * 1.75).toFixed(2));
 
-	let winner: number | null = null;
+	let isCenterButtonDisabled = false;
+	let winner: IPieItem | null = null;
 	let spinDuration = '10';
 	let wheelElement: SVGElement;
 	let wheelWidth: number;
@@ -37,7 +39,7 @@
 
 		pie.forEach((slice, idx) => {
 			if (slice.startAngle <= angle && slice.endAngle >= angle) {
-				winner = idx;
+				winner = slice;
 			}
 		});
 	}
@@ -103,17 +105,28 @@
 		<button
 			class="wheel__button"
 			class:disabled={$wheel.isSpinning}
-			disabled={$wheel.isSpinning}
-			on:click={handleWheelSpin}
+			disabled={isCenterButtonDisabled}
+			on:click={() => {
+				handleWheelSpin();
+				isCenterButtonDisabled = true;
+			}}
 		>
-			Крутить
+			Ролл
 		</button>
 		{#if winner !== null}
 			<div class="winner" transition:fade>
 				<span>
-					{pie[winner].title} ({pie[winner].percent}%)
+					{winner.title} ({winner.percent}%)
 				</span>
 			</div>
+			{#if !$wheel.isSpinning}
+				<div class="winner-delete-button">
+					<button type="button" on:click={handleWheelSpin}> Реролл </button>
+					<button type="button" on:click={() => winner && lots.remove(winner.id)}>
+						Удалить лот
+					</button>
+				</div>
+			{/if}
 		{/if}
 	</div>
 	<svg viewBox="0 10 20 60" id="pointer">
@@ -132,14 +145,14 @@
 		<g pointer-events="fill">
 			<!-- Slices -->
 			<g class="wheel-slices">
-				{#each pie as { startPoint, endPoint, isCircle, largeArcFlag, color }, idx}
+				{#each pie as { id, startPoint, endPoint, isCircle, largeArcFlag, color }, idx}
 					{#if isCircle}
 						<circle cx={radius} cy={radius} r={radius} fill={color} stroke={color} />
 					{:else}
 						<path
 							id="{idx}slice"
 							class="wheel__slice"
-							class:selected={$wheel.isSpinning || winner === null || winner === idx}
+							class:selected={$wheel.isSpinning || winner === null || winner.id === id}
 							d="M {startPoint.x} {startPoint.y} A {radius} {radius} 0 {largeArcFlag} 1 {endPoint.x} {endPoint.y} L {radius} {radius} Z"
 							fill={color}
 							stroke={color}
@@ -199,6 +212,39 @@
 		text-transform: uppercase;
 		color: white;
 		background-color: rgba(0, 0, 0, 0.5);
+
+		&-delete-button {
+			position: absolute;
+			top: calc(50% + 100px);
+			left: 50%;
+			z-index: 2;
+			translate: -50% -50%;
+
+			& button {
+				padding: 10px;
+				border: 0;
+				border-radius: 10px;
+				box-shadow: 0 2px 4px black;
+				font-weight: 700;
+				text-transform: uppercase;
+				color: white;
+				background-color: crimson;
+				transition: 0.2s;
+
+				&:nth-child(1) {
+					background-color: var(--color-purple);
+				}
+				&:hover {
+					translate: 0% -5%;
+					box-shadow: 0 2px 7px black;
+					cursor: pointer;
+				}
+				&:active {
+					translate: 0% 5%;
+					box-shadow: 0 1px 0px black;
+				}
+			}
+		}
 	}
 	#pointer {
 		position: absolute;
@@ -255,6 +301,7 @@
 		}
 
 		&__slice {
+			transition: fill 0.2s linear;
 			&:not(.selected) {
 				stroke: transparent;
 				filter: grayscale(1) opacity(0.3);

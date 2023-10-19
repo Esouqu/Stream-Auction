@@ -133,12 +133,10 @@
 					const comparePercent = compareStrings(donation.message, l.title);
 
 					if (isUrlMessage && !$wheel.isSpinning) {
-						console.log('start');
 						donations.add(donation);
 
 						return;
 					} else if ($wheel.isSpinning && isUrlMessage) {
-						console.log('wtf');
 						lots.add(donation.message, donation.amount_in_user_currency, donation.username);
 
 						return;
@@ -181,7 +179,6 @@
 						}
 					});
 				}
-				console.log('end');
 
 				donations.add({ ...donation, mostSimilarLot });
 			}

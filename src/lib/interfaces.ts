@@ -1,12 +1,27 @@
-export interface IPieItem {
+export interface IPoint {
+  x: number;
+  y: number;
+}
+
+export interface ILot {
   id: number;
   title: string;
   value: number;
   color: string;
+  donators: string[];
 }
 
-export interface ILot extends IPieItem {
-  donators: string[];
+export interface IPieItem extends ILot {
+  shortTitle: string;
+  percent: string;
+  startAngle: number;
+  middleAngle: number;
+  endAngle: number;
+  startPoint: IPoint;
+  middlePoint: IPoint;
+  endPoint: IPoint;
+  largeArcFlag: number;
+  isCircle: boolean;
 }
 
 export interface IAuthTokenData {

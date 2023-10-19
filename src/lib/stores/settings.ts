@@ -22,13 +22,13 @@ export const addWheelSpinTimeOnDonation = writable({
   valueAttribute: 'сек.',
 });
 export const addTimeOnNewItem = writable({
-  isToggled: false,
+  isToggled: true,
   description: 'Добавлять время за новый лот',
   value: '60',
   valueAttribute: 'сек.',
 });
 export const addTimeOnNewLeader = writable({
-  isToggled: false,
+  isToggled: true,
   description: 'Добавлять время за нового лидера',
   value: '120',
   valueAttribute: 'сек.',
