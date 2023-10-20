@@ -52,7 +52,7 @@
 			flex: 1 1 0;
 			margin: 0;
 			font-size: 20px;
-			font-weight: 600;
+			font-weight: 500;
 		}
 	}
 </style>

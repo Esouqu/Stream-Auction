@@ -24,6 +24,9 @@
 	import { compareStrings, isUrl } from '$lib/utils';
 	import wheel from '$lib/stores/wheel';
 	import timer from '$lib/stores/timer';
+	import TextButton from '$lib/components/TextButton.svelte';
+	import Event from '$lib/components/Event.svelte';
+	import events from '$lib/stores/events';
 
 	const userId = $page.data.userId;
 	const redirectUrl = 'http://localhost:5173/redirect';
@@ -138,6 +141,7 @@
 						return;
 					} else if ($wheel.isSpinning && isUrlMessage) {
 						lots.add(donation.message, donation.amount_in_user_currency, donation.username);
+						events.add(`${donation.message}`, 'add');
 
 						return;
 					}
@@ -147,8 +151,10 @@
 						// donations.remove(donation.id);
 						if (comparePercent > maxPercentForMerge) {
 							lots.addValue(l.id, donation.amount_in_user_currency);
+							events.add(`+${donation.amount_in_user_currency}: ${l.title}`);
 						} else {
 							lots.add(donation.message, donation.amount_in_user_currency, donation.username);
+							events.add(`${donation.message}`, 'add');
 						}
 
 						wheel.stop();
@@ -159,6 +165,7 @@
 
 					if (comparePercent > maxPercentForMerge) {
 						lots.addValue(l.id, donation.amount_in_user_currency);
+						events.add(`+${donation.amount_in_user_currency}: ${l.title}`);
 						minPercentsForMerge = [];
 
 						return;
@@ -196,11 +203,11 @@
 
 <div class="layout" transition:fade>
 	<div class="layout-section layout-section_left">
-		<h1 style="font-size: 24px;">Правила Аукциона</h1>
-		<!-- <h2 style="font-size: 28px;">По умолчанию</h2>
-		<h3 style="white-space: break-spaces; font-size: 20px;">
+		<h1 style="font-size: 28px;">Правила Аукциона</h1>
+		<!-- <h2 style="font-size: 28px;">По умолчанию</h2> -->
+		<h3 style="white-space: break-spaces; font-size: 24px;">
 			{JSON.parse(JSON.stringify($textRules))}
-		</h3> -->
+		</h3>
 	</div>
 	<div class="layout-section layout-section_center">
 		<div class="layout-section-wrapper">
@@ -232,9 +239,11 @@
 						{/if}
 					</div>
 					{#if !$page.data.userId}
-						<button type="button" on:click={() => goto(authorizeUrl)} class="auth-button">
-							Авторизоваться
-						</button>
+						<TextButton
+							text="Авторизоваться"
+							color="gradient"
+							on:click={() => goto(authorizeUrl)}
+						/>
 					{/if}
 				</div>
 			</div>
@@ -250,6 +259,9 @@
 							{mostSimilarLot}
 						/>
 					{/each}
+					{#each $events as event}
+						<Event {...event} />
+					{/each}
 				</div>
 			</div>
 		</div>
@@ -257,24 +269,6 @@
 </div>
 
 <style lang="scss">
-	.auth-button {
-		border: 0;
-		border-radius: 10px;
-		padding: 5px 10px;
-		font-family: 'Nunito Sans';
-		font-size: 18px;
-		font-style: normal;
-		font-weight: 600;
-		text-shadow: rgb(0, 0, 0) 0px 2px 0px;
-		color: #fff;
-		background: linear-gradient(90deg, #f57d07 0.32%, #9146ff 100.32%);
-		transition: 0.3s;
-		cursor: pointer;
-
-		&:hover {
-			filter: brightness(1.2);
-		}
-	}
 	.layout {
 		display: grid;
 		grid-template-columns: 1fr minmax(960px, 1fr) 1fr;
@@ -305,7 +299,7 @@
 				justify-content: space-between;
 				padding: 30px 0;
 				box-shadow: 0px 4px 15px black;
-				background-color: #14141470;
+				background-color: rgb(20 20 20 / 40%);
 			}
 			&_right {
 				align-items: stretch;
@@ -356,7 +350,8 @@
 			padding: 20px;
 			min-width: 350px;
 			max-width: 350px;
-			background-color: #3d3d3d;
+			box-shadow: 0px 3px 8px black;
+			background-color: rgb(20 20 20 / 40%);
 
 			& p {
 				margin: 0;

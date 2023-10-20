@@ -83,6 +83,10 @@ function createWheel() {
     });
   }
 
+  function setAngle(deg: number) {
+    update((state) => ({ ...state, angle: deg }));
+  }
+
   function addSpinDuration(ms: number) {
     update((state) => ({ ...state, spinDuration: state.spinDuration + ms }))
   }
@@ -97,7 +101,8 @@ function createWheel() {
     subscribe,
     spin,
     addSpinDuration,
-    stop
+    stop,
+    setAngle
   }
 }
 

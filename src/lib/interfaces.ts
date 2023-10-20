@@ -55,3 +55,5 @@ export interface ISetting {
   description: string;
   value: string | null;
 }
+
+export type eventTypes = 'add' | 'time' | null;

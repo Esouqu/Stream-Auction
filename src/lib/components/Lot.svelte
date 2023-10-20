@@ -86,7 +86,7 @@
 					{/if}
 				</div>
 			</Popup> -->
-			<Button icon="info" on:click={() => (isPopupShown = !isPopupShown)} />
+			<!-- <Button icon="info" on:click={() => (isPopupShown = !isPopupShown)} /> -->
 			<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
 		</div>
 	</div>

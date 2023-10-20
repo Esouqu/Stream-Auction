@@ -67,4 +67,11 @@
 			user-select: none;
 		}
 	}
+
+	@keyframes bonusTime {
+		0% {
+		}
+		100% {
+		}
+	}
 </style>

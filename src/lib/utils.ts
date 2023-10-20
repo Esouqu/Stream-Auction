@@ -149,3 +149,10 @@ export function isUrl(str: string) {
 
   return false;
 }
+
+export function getRandomInRange(min: number | string, max: number | string) {
+  const minNum = Number(min);
+  const maxNum = Number(max);
+
+  return Math.floor(Math.random() * (maxNum - minNum + 1) + minNum);
+}

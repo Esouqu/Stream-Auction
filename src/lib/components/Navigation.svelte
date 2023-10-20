@@ -13,8 +13,8 @@
 	const routes: IRoute[] = [
 		{ id: 0, title: 'Лоты', icon: listIcon, url: '/', element: null },
 		{ id: 1, title: 'Колесо', icon: pieIcon, url: '/wheel', element: null },
-		{ id: 2, title: 'События', icon: eventIcon, url: '/events', element: null },
-		{ id: 3, title: 'Настройки', icon: settingsIcon, url: '/settings', element: null }
+		// { id: 2, title: 'События', icon: eventIcon, url: '/events', element: null },
+		{ id: 2, title: 'Настройки', icon: settingsIcon, url: '/settings', element: null }
 	];
 
 	export let activeRoute: IRoute | undefined = routes.find((r) => r.url === $page.route.id);
@@ -58,7 +58,7 @@
 		position: relative;
 		border-radius: 10px;
 		box-shadow: inset 0 2px 4px black;
-		background-color: #0a0a0a;
+		background-color: rgb(20 20 20 / 60%);
 
 		& h2 {
 			position: absolute;
@@ -88,7 +88,7 @@
 				border-radius: 10px;
 				box-shadow: 0 2px 4px black;
 				background-color: var(--color-purple);
-				transition: 0.2s ease-in-out;
+				transition: left 0.2s ease-in-out;
 			}
 		}
 
@@ -106,7 +106,7 @@
 			overflow: hidden;
 			color: white;
 			user-select: none;
-			transition: 0.3s;
+			transition: opacity 0.3s;
 
 			&.disabled:not(.active) {
 				pointer-events: none;

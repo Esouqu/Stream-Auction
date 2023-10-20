@@ -20,6 +20,7 @@
 		flex-direction: column;
 		justify-content: end;
 		align-items: center;
+		gap: 10px;
 		height: 100%;
 		width: 100%;
 		overflow: hidden;

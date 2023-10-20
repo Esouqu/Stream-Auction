@@ -17,14 +17,17 @@
 <style lang="scss">
 	.textarea {
 		box-sizing: border-box;
-		width: 483px;
+		width: 100%;
+		height: 200px;
 		padding: 10px;
 		border: 2px solid rgba(255, 255, 255, 0.3);
 		outline: 0;
-		font-size: 20px;
+		font-size: 24px;
+		font-weight: bold;
 		line-height: 1;
 		text-overflow: ellipsis;
 		text-decoration: none;
+		white-space: break-spaces;
 		color: white;
 		background-color: transparent;
 		transition: 0.2s;

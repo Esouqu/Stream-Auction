@@ -2,7 +2,7 @@
 	import lots from '$lib/stores/lots';
 	import donations from '$lib/stores/donations';
 	import Button from './Button.svelte';
-	import { fade } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import type { ILot } from '$lib/interfaces';
 
 	export let id: number;
@@ -45,7 +45,8 @@
 	on:dragend={() => (isDragged = false)}
 	aria-hidden
 	draggable="true"
-	transition:fade={{ duration: 200 }}
+	in:fly={{ y: 100 }}
+	out:fade
 >
 	<div class="donation">
 		<div class="donation__info">

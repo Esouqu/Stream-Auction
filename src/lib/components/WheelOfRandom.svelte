@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createPie, isUrl } from '$lib/utils';
+	import { createPie, getRandomInRange, isUrl } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Input from './Input.svelte';
@@ -7,15 +7,22 @@
 	import wheel from '$lib/stores/wheel';
 	import timer from '$lib/stores/timer';
 	import type { IPieItem } from '$lib/interfaces';
+	import { radiansToDegrees } from '$lib/constants';
+	import TextButton from './TextButton.svelte';
 
 	const radius = 360;
 	const width = radius * 2;
 	const offset = 50;
 	const degreeCapForTextDisplay = Number(((400 / 100) * 1.75).toFixed(2));
 
-	let isCenterButtonDisabled = false;
+	let draggingAngle = 0;
+	let draggingStartAngle = 0;
+	let isDragging = false;
+	let isSettingsShown = true;
 	let winner: IPieItem | null = null;
 	let spinDuration = '10';
+	let minSpinDuration = '10';
+	let maxSpinDuration = '20';
 	let wheelElement: SVGElement;
 	let wheelWidth: number;
 	let wheelHeight: number;
@@ -37,7 +44,7 @@
 	function getWinner(angle: number) {
 		if (!$wheel.isSpinning) return;
 
-		pie.forEach((slice, idx) => {
+		pie.forEach((slice) => {
 			if (slice.startAngle <= angle && slice.endAngle >= angle) {
 				winner = slice;
 			}
@@ -52,113 +59,166 @@
 		wheel.spin(secondsToSpin);
 	}
 
-	// function onRelease() {
-	// 	if (!isDragging) return;
+	function handleLotDeletion() {
+		if (!winner) return;
 
-	// 	isDragging = false;
-	// 	oldAngle = currentAngle;
-	// }
+		lots.remove(winner.id);
+		winner = null;
+	}
 
-	// function onMove(x: number, y: number) {
-	// 	if (!isDragging) return;
+	function onRelease() {
+		if (!isDragging) return;
 
-	// 	const deltaAngle = calculateAngle(x, y) - wheelStartAngle;
+		isDragging = false;
+		wheel.setAngle(draggingAngle);
+	}
 
-	// 	currentAngle = deltaAngle + oldAngle;
-	// }
+	function onMove(x: number, y: number) {
+		if (!isDragging) return;
 
-	// function onGrab(x: number, y: number) {
-	// 	if (isSpinning) return;
+		const deltaAngle = calculateAngle(x, y) - draggingStartAngle;
 
-	// 	winner = null;
-	// 	isDragging = true;
-	// 	wheelStartAngle = calculateAngle(x, y);
-	// }
+		draggingAngle = deltaAngle + $wheel.angle;
+	}
 
-	// function calculateAngle(currentX: number, currentY: number) {
-	// 	let xLength = currentX - wheelX;
-	// 	let yLength = currentY - wheelY;
-	// 	let angle = Math.atan2(xLength, yLength) * radiansToDegrees;
+	function onGrab(x: number, y: number) {
+		if ($wheel.isSpinning) return;
 
-	// 	return 360 - angle;
-	// }
+		winner = null;
+		isDragging = true;
+		draggingStartAngle = calculateAngle(x, y);
+	}
+
+	function calculateAngle(currentX: number, currentY: number) {
+		let xLength = currentX - wheelX;
+		let yLength = currentY - wheelY;
+		let angle = Math.atan2(xLength, yLength) * radiansToDegrees;
+
+		return 360 - angle;
+	}
 </script>
 
 <svelte:window on:resize={onResize} />
 
-<div class="wheel">
-	<div class="wheel-settings-wrapper">
-		{#if !$wheel.isSpinning}
-			<div class="time-input" transition:fade>
-				<Input
-					--input-fw="700"
-					--input-w="100px"
-					--input-text-al="center"
-					id="spin-time"
-					placeholder="Секунды"
-					type="number"
-					bind:value={spinDuration}
-					colorStyle="white"
-				/>
-			</div>
-		{/if}
-		<button
-			class="wheel__button"
-			class:disabled={$wheel.isSpinning}
-			disabled={isCenterButtonDisabled}
-			on:click={() => {
-				handleWheelSpin();
-				isCenterButtonDisabled = true;
-			}}
-		>
-			Ролл
-		</button>
-		{#if winner !== null}
-			<div class="winner" transition:fade>
-				{#if isUrl(winner.title)}
-					<a href={winner.title} target="_blank" style="color: var(--color-orange);">
-						{winner.title} ({winner.percent}%)
-					</a>
+<div
+	class="wheel"
+	style="
+    --wheel-outline: {winner?.color};
+    --wheel-h: {width - offset - 10}px; --wheel-w: {width - offset - 10}px;
+    --wheel-rot: {isDragging ? draggingAngle : $wheel.angle}deg;
+  "
+>
+	{#if winner !== null && isSettingsShown}
+		<div class="winner" transition:fade={{ duration: 200 }}>
+			{#if isUrl(winner.title)}
+				<a href={winner.title} target="_blank" style="color: var(--color-orange);">
+					{winner.title} ({winner.percent}%)
+				</a>
+				{#if !$wheel.isSpinning}
 					<div class="winner-donators">
-						{winner.donators.join(', ')}
-						<!-- {#each winner.donators as donator}
-							<span>{donator}</span>
-						{/each} -->
-					</div>
-				{:else}
-					<span>
-						{winner.title} ({winner.percent}%)
-					</span>
-					<div class="winner-donators">
-						{winner.donators.join(', ')}
-						<!-- {#each winner.donators as donator}
-							<span>{donator}</span>
-						{/each} -->
+						Заказавшие: {winner.donators.join(', ')}
 					</div>
 				{/if}
-			</div>
+			{:else}
+				<span>
+					{winner.title} ({winner.percent}%)
+				</span>
+				{#if !$wheel.isSpinning}
+					<div class="winner-donators">
+						Заказавшие: {winner.donators.join(', ')}
+					</div>
+				{/if}
+			{/if}
+		</div>
+	{/if}
+	{#if isSettingsShown && !$wheel.isSpinning}
+		<div class="wheel-settings-wrapper" transition:fade={{ duration: 200 }}>
 			{#if !$wheel.isSpinning}
-				<div class="winner-delete-button">
-					<button type="button" on:click={handleWheelSpin}> Реролл </button>
-					<button type="button" on:click={() => winner && lots.remove(winner.id)}>
-						Удалить лот
-					</button>
+				<div
+					class="winner-buttons-wrapper"
+					class:spaced={winner !== null}
+					transition:fade={{ duration: 200 }}
+				>
+					<div class="interactables-wrapper" style="display: flex; flex-direction: row; gap: 5px;">
+						<div style="display: flex; flex-direction: column; gap: 5px;">
+							<Input
+								--input-fw="700"
+								--input-w="100px"
+								--input-text-al="center"
+								id="spin-min"
+								placeholder="Мин"
+								type="number"
+								bind:value={minSpinDuration}
+								colorStyle="white"
+							/>
+							<Input
+								--input-fw="700"
+								--input-w="100px"
+								--input-text-al="center"
+								id="spin-max"
+								placeholder="Макс"
+								type="number"
+								bind:value={maxSpinDuration}
+								colorStyle="white"
+							/>
+						</div>
+						<TextButton
+							text="Сгенерировать"
+							on:click={() =>
+								(spinDuration = String(getRandomInRange(minSpinDuration, maxSpinDuration)))}
+						/>
+						<Input
+							--input-fw="700"
+							--input-w="100px"
+							--input-text-al="center"
+							id="spin-time"
+							placeholder="Секунды"
+							type="number"
+							bind:value={spinDuration}
+							colorStyle="white"
+						/>
+					</div>
+					<div
+						class="interactables-wrapper"
+						style="display: flex; gap: 5px; flex-direction: column;"
+					>
+						<div>
+							<TextButton text="Ролл" color="orange" on:click={handleWheelSpin} />
+							<TextButton
+								text="Удалить Лот"
+								color="red"
+								on:click={handleLotDeletion}
+								isDisabled={winner === null}
+							/>
+						</div>
+					</div>
 				</div>
 			{/if}
-		{/if}
-	</div>
+		</div>
+	{/if}
+
+	{#if !$wheel.isSpinning}
+		<div style="position: absolute; bottom: 10%; left: 50%; z-index: 2; translate: -50% -10%;">
+			<TextButton
+				text={isSettingsShown ? 'Скрыть' : 'Показать'}
+				on:click={() => (isSettingsShown = !isSettingsShown)}
+			/>
+		</div>
+	{/if}
 	<svg viewBox="0 10 20 60" id="pointer">
 		<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="buttonface" />
 	</svg>
 	<svg
 		class="wheel__svg"
 		bind:this={wheelElement}
-		aria-hidden
 		{width}
 		height={width}
 		viewBox="-{offset / 2} -{offset / 2} {width + offset} {width + offset}"
-		style="--wheel-rot: {$wheel.angle}deg"
 		pointer-events="none"
+		on:mousedown={(e) => onGrab(e.clientX, e.clientY)}
+		on:mousemove={(e) => onMove(e.clientX, e.clientY)}
+		on:mouseup={onRelease}
+		aria-hidden
 	>
 		<g pointer-events="fill">
 			<!-- Slices -->
@@ -206,24 +266,18 @@
 			</g>
 		</g>
 	</svg>
+	<div class="wheel__background" />
 </div>
 
 <style lang="scss">
-	.time-input {
-		position: absolute;
-		z-index: 2;
-		top: calc(50% - 70px);
-		left: 50%;
-		translate: -50% -50%;
-	}
 	.winner {
 		position: absolute;
-		top: calc(50% - 20px);
+		top: 50%;
 		left: 50%;
-		z-index: 2;
+		z-index: 3;
 		width: 90%;
 		padding: 10px 0;
-		translate: -50%;
+		translate: -50% -50%;
 		font-size: 24px;
 		font-weight: bold;
 		text-align: center;
@@ -235,38 +289,27 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			/* gap: 10px; */
+			margin-top: 10px;
+			font-size: 20px;
 			text-transform: none;
 		}
-		&-delete-button {
-			position: absolute;
-			top: calc(50% + 100px);
-			left: 50%;
-			z-index: 2;
-			translate: -50% -50%;
+		&-buttons-wrapper {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
 
-			& button {
-				padding: 10px;
-				border: 0;
-				border-radius: 10px;
-				box-shadow: 0 2px 4px black;
-				font-weight: 700;
-				text-transform: uppercase;
-				color: white;
-				background-color: crimson;
-				transition: 0.2s;
-
-				&:nth-child(1) {
-					background-color: var(--color-purple);
+			& .interactables-wrapper {
+				translate: 0;
+				transition: translate 0.2s ease-in-out;
+			}
+			&.spaced {
+				& .interactables-wrapper:nth-child(1) {
+					translate: 0 -150%;
 				}
-				&:hover {
-					translate: 0% -5%;
-					box-shadow: 0 2px 7px black;
-					cursor: pointer;
-				}
-				&:active {
-					translate: 0% 5%;
-					box-shadow: 0 1px 0px black;
+				& .interactables-wrapper:nth-child(2) {
+					translate: 0 150%;
 				}
 			}
 		}
@@ -284,52 +327,48 @@
 		position: relative;
 		display: flex;
 
-		/* &-settings-wrapper {
+		&-settings-wrapper {
 			position: absolute;
-			z-index: 3;
-			width: 100%;
-			height: 100%;
-			border-radius: 50%;
-			background-color: buttonface;
-		} */
-		&__button {
-			position: absolute;
-			z-index: 2;
 			top: 50%;
 			left: 50%;
 			translate: -50% -50%;
-			width: 100px;
-			height: 100px;
-			border: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 			border-radius: 50%;
-			font-weight: 700;
-			font-size: 18px;
-			text-transform: uppercase;
-			transition: 0.2s;
-			user-select: none;
+			z-index: 2;
+			background-color: rgb(20 20 20 / 60%);
+			width: calc(var(--wheel-w) + 30px);
+			height: calc(var(--wheel-h) + 30px);
+		}
 
-			&.disabled {
-				box-shadow: inset 0 2px 10px black;
-				background-color: white;
-				font-size: 0;
-			}
+		&__background {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			z-index: 0;
+			translate: -50% -50%;
+			width: var(--wheel-w, 100%);
+			height: var(--wheel-h, 100%);
+			border-radius: 50%;
+			outline: 15px solid var(--wheel-outline, buttonface);
+			background-color: rgb(20 20 20 / 40%);
+			transition: outline 0.2s linear;
 		}
 		&__svg {
+			position: relative;
+			z-index: 1;
 			rotate: var(--wheel-rot, 0);
 			border-radius: 50%;
 			user-select: none;
 		}
 
-		&-slices {
-			outline: 6px solid white;
-			border-radius: 100%;
-		}
-
 		&__slice {
 			transition: fill 0.2s linear;
+
 			&:not(.selected) {
 				stroke: transparent;
-				filter: grayscale(1) opacity(0.3);
+				filter: grayscale(1) brightness(0.4);
 			}
 		}
 

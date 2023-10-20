@@ -21,9 +21,9 @@
 </svelte:head>
 
 <section class="settings-section">
-	<!-- <Dropdown options={presets} />
+	<!-- <Dropdown options={presets} /> -->
 
-	<Textarea id="rules-setting" bind:value={$textRules} /> -->
+	<Textarea id="rules-setting" bind:value={$textRules} />
 	<div class="toggles-wrapper">
 		<Setting
 			id={1}
