@@ -73,7 +73,6 @@
 		const addDonationTime = $addWheelSpinTimeOnDonation.value;
 		const currentMinDonation = Number($addWheelSpinTimeMinDonationPrice.value);
 
-		console.log(donationValue);
 		if ($addWheelSpinTimeMinDonationPrice.isToggled && donationValue >= currentMinDonation) {
 			const minDonationStep = Number($addWheelSpinTimeMinDonationPriceStep.value);
 
