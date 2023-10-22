@@ -8,13 +8,12 @@
 	import { page } from '$app/stores';
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
-	import wheel from '$lib/stores/wheel';
 
 	const routes: IRoute[] = [
-		{ id: 0, title: 'Лоты', icon: listIcon, url: '/', element: null },
-		{ id: 1, title: 'Колесо', icon: pieIcon, url: '/wheel', element: null },
-		// { id: 2, title: 'События', icon: eventIcon, url: '/events', element: null },
-		{ id: 2, title: 'Настройки', icon: settingsIcon, url: '/settings', element: null }
+		{ id: 0, title: 'Лоты', icon: listIcon, url: '/' },
+		{ id: 1, title: 'Колесо', icon: pieIcon, url: '/wheel' },
+		// { id: 2, title: 'События', icon: eventIcon, url: '/events' },
+		{ id: 2, title: 'Настройки', icon: settingsIcon, url: '/settings' }
 	];
 
 	export let activeRoute: IRoute | undefined = routes.find((r) => r.url === $page.route.id);
@@ -33,13 +32,12 @@
 	{/key}
 	{#if activeRoute}
 		<ul class="navigation-list" style="--select-left: {activeRoute?.id * 50}px">
-			{#each routes as route, idx}
-				<li bind:this={routes[idx].element}>
+			{#each routes as route}
+				<li>
 					<a
 						href={route.url}
 						class="navigation__route"
 						class:active={route.url === activeRoute?.url}
-						class:disabled={$wheel.isSpinning && route.id === 3}
 						on:click={() => handleRouteClick(route)}
 						draggable="false"
 					>
@@ -108,14 +106,6 @@
 			user-select: none;
 			transition: opacity 0.3s;
 
-			&.disabled:not(.active) {
-				pointer-events: none;
-				cursor: not-allowed;
-
-				&:hover {
-					opacity: 0.2;
-				}
-			}
 			&:hover:not(.active) {
 				opacity: 0.7;
 			}

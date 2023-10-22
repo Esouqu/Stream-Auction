@@ -57,7 +57,7 @@ function createLots() {
   // let id = tempLots.length;
   // let color = getRandomColor(colors[4]);
   // let previousLotsAmount = tempLots.length;
-  // let previousLeader = tempLots[0];
+  // let previousLeader = tempLots[0].id;
   let id = 0;
   let color = '';
   let previousLotsAmount = 0;
@@ -96,7 +96,7 @@ function createLots() {
     update((lots) => lots.map((lot) => {
       if (lot.id !== id) return lot;
 
-      if (donator && lot.donators.includes(donator)) {
+      if (donator && !lot.donators.includes(donator)) {
         return { ...lot, value: lot.value + value, donators: [...lot.donators, donator] }
       }
 

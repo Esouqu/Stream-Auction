@@ -10,6 +10,7 @@
 		textRules,
 		timerStarterTime,
 		addWheelSpinTimeOnDonation
+		// addWheelSpinTimeMinDonationPrice
 	} from '$lib/stores/settings';
 	import timer from '$lib/stores/timer';
 
@@ -31,7 +32,6 @@
 			bind:value={$stopWheelOnDonation.value}
 			description={$stopWheelOnDonation.description}
 			valueKey={$stopWheelOnDonation.valueAttribute}
-			isDisabled={true}
 		/>
 		<Setting
 			id={2}
@@ -40,22 +40,29 @@
 			description={$addWheelSpinTimeOnDonation.description}
 			valueKey={$addWheelSpinTimeOnDonation.valueAttribute}
 		/>
-		<Setting
+		<!-- <Setting
 			id={3}
+			bind:isToggled={$addWheelSpinTimeMinDonationPrice.isToggled}
+			bind:value={$addWheelSpinTimeMinDonationPrice.value}
+			description={$addWheelSpinTimeMinDonationPrice.description}
+			valueKey={$addWheelSpinTimeMinDonationPrice.valueAttribute}
+		/> -->
+		<Setting
+			id={5}
 			bind:isToggled={$addTimeOnNewItem.isToggled}
 			bind:value={$addTimeOnNewItem.value}
 			description={$addTimeOnNewItem.description}
 			valueKey={$addTimeOnNewItem.valueAttribute}
 		/>
 		<Setting
-			id={4}
+			id={6}
 			bind:isToggled={$addTimeOnNewLeader.isToggled}
 			bind:value={$addTimeOnNewLeader.value}
 			description={$addTimeOnNewLeader.description}
 			valueKey={$addTimeOnNewLeader.valueAttribute}
 		/>
 		<Setting
-			id={5}
+			id={7}
 			bind:isToggled={$timerStarterTime.isToggled}
 			bind:value={$timerStarterTime.value}
 			description={$timerStarterTime.description}

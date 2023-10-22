@@ -31,7 +31,7 @@ function createCountdownTimer(initialTime: number) {
 
       animationId = requestAnimationFrame(tick);
 
-      return { ...state, timeRemaining: Number(remaining.toFixed()) };
+      return { ...state, timeRemaining: Math.round(remaining) };
     })
   }
 

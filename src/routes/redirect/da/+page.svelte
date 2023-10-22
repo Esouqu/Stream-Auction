@@ -2,7 +2,7 @@
 </script>
 
 <svelte:head>
-	<title>Redirect - Auction</title>
+	<title>DA - Redirect - Auction</title>
 </svelte:head>
 
 <div>redirect</div>

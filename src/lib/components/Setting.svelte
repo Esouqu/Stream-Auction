@@ -28,6 +28,7 @@
 		{/if}
 		{#if isToggled !== null}
 			<Switch
+				color="orange"
 				on={() => (isToggled = true)}
 				off={() => (isToggled = false)}
 				bind:isToggled
@@ -41,6 +42,7 @@
 	.setting {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 20px;
 		min-height: 34px;
 
@@ -51,6 +53,7 @@
 		& p {
 			flex: 1 1 0;
 			margin: 0;
+			max-width: 650px;
 			font-size: 20px;
 			font-weight: 500;
 		}

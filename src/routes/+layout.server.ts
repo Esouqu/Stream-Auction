@@ -1,14 +1,17 @@
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({ cookies }) => {
-  const session = cookies.get('session');
-
-  // console.log(session)
-  if (!session) return;
+export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
+  await fetch('/api/twitch/validate').then((res) => res.status === 200);
+  const daSession = await fetch('/api/da/session')
+    .then((res) => res.json())
+    .then((data) => data);
+  const twitchSession = await fetch('/api/twitch/session')
+    .then((res) => res.json())
+    .then((data) => data);
 
   return {
-    userId: JSON.parse(session).userId,
-    socketToken: JSON.parse(session).socketToken,
+    daSession,
+    twitchSession
   }
   // await axios.post('https://api.random.org/json-rpc/4/invoke', {
   //   "jsonrpc": "4.0",

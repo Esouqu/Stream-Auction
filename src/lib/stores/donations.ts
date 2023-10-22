@@ -7,7 +7,7 @@ function createDonations() {
   function add(donation: IDonationData) {
     update((donations) => [...donations, donation]);
   }
-  function remove(id: number) {
+  function remove(id: number | string) {
     update((donations) => donations.filter((don) => don.id !== id));
   }
 

@@ -79,7 +79,7 @@ export function compareStrings(str1: string, str2: string) {
   const maxLength = Math.max(len1, len2);
   const similarity = ((maxLength - distance) / maxLength) * 100;
 
-  return Number(similarity.toFixed(0));
+  return Math.round(similarity);
 }
 
 export function calculateShortTitle(title: string, maxLength: number): string {

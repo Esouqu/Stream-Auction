@@ -4,13 +4,12 @@
 	import Donation from '$lib/components/Donation.svelte';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import Timer from '$lib/components/Timer.svelte';
-	import type { IDonationData, IRoute } from '$lib/interfaces';
+	import type { IDonationData, IRoute, ITwitchRedeemedReward } from '$lib/interfaces';
 	import donations from '$lib/stores/donations';
 	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_Color.svg';
 	import twitchIcon from '$lib/assets/twitch-logo/TwitchGlitchPurple.svg';
 	import Switch from '$lib/components/Switch.svelte';
 	import Loader from '$lib/components/Loader.svelte';
-	import { PUBLIC_DA_CLIENT_ID } from '$env/static/public';
 	import {
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
@@ -27,22 +26,28 @@
 	import TextButton from '$lib/components/TextButton.svelte';
 	import Event from '$lib/components/Event.svelte';
 	import events from '$lib/stores/events';
-
-	const userId = $page.data.userId;
-	const redirectUrl = 'http://localhost:5173/redirect';
-	const scope = 'oauth-user-show+oauth-donation-subscribe';
-	const queryParams = `client_id=${PUBLIC_DA_CLIENT_ID}&redirect_url=${redirectUrl}&response_type=code&scope=${scope}`;
-	const authorizeUrl = `https://www.donationalerts.com/oauth/authorize?${queryParams}`;
-	// const twitchClient = 'oyo39c1yw5jrvnonhqtj8rwf26a70i';
-	// const scope = 'channel%3Amanage%3Aredemptions+channel%3Aread%3Aredemptions';
-	// const authorizeUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${scope}`;
+	import { onMount } from 'svelte';
 
 	let activeRoute: IRoute;
-	let socket: WebSocket;
-	let connectionToken: string;
-	let isConnecting = false;
+	let daSession: string = $page.data.daSession;
+	let twitchSession: string = $page.data.twitchSession;
+	let isConnectingToDonationAlerts = false;
+	let isConnectingToTwitch = false;
+	let donationAlertsWebSocket: WebSocket;
+	let twitchWebSocket: WebSocket;
 
 	$: $lots, addSpinTime(), addCountdownTime();
+
+	onMount(() => {
+		const validationInterval = 1000 * 60 * 60;
+		let validationIntervalId: NodeJS.Timeout;
+
+		validationIntervalId = setInterval(async () => {
+			await fetch('/api/twitch/validate');
+		}, validationInterval);
+
+		return () => clearInterval(validationIntervalId);
+	});
 
 	function addCountdownTime() {
 		if (!$timer.isRunning) return;
@@ -71,133 +76,266 @@
 		wheel.addSpinDuration(Number(addDonationTime) * 1000);
 	}
 
-	function switchOn() {
-		if ($page.data.socketToken && !socket) {
-			makeWebsocketConnection();
+	function twitchSwitchOn() {
+		isConnectingToTwitch = true;
+
+		if (twitchSession) {
+			connectToTwitchSocket();
 		} else {
-			goto(authorizeUrl);
+			goto('/api/twitch/auth');
 		}
 	}
 
-	function makeWebsocketConnection() {
-		socket = new WebSocket('wss://centrifugo.donationalerts.com/connection/websocket');
+	function daSwitchOn() {
+		isConnectingToDonationAlerts = true;
 
-		socket.addEventListener('open', () => {
-			// console.log('WebSocket connection opened');
-			socket.send(
+		if (daSession) {
+			connectToDonationAlertsSocket();
+		} else {
+			goto('/api/da/auth');
+		}
+	}
+
+	async function connectToTwitchSocket() {
+		const pingIntervalInMin = 1000 * 60;
+		const reconnectInterval = 1000 * 3;
+		const twitchChannel = await fetch('/api/twitch/user')
+			.then((res) => res.json())
+			.then((data) => data);
+
+		let heartbeatInterval: NodeJS.Timeout;
+		let rewardId: string;
+
+		twitchWebSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
+
+		function heartbeat() {
+			twitchWebSocket.send(
+				JSON.stringify({
+					type: 'PING'
+				})
+			);
+		}
+
+		twitchWebSocket.addEventListener('open', async () => {
+			// console.log('Twitch WebSocket connection opened');
+			twitchWebSocket.send(
+				JSON.stringify({
+					type: 'LISTEN',
+					data: {
+						topics: [`channel-points-channel-v1.${twitchChannel}`],
+						auth_token: twitchSession
+					}
+				})
+			);
+
+			rewardId = await fetch(
+				`/api/twitch/rewards?broadcaster_id=${twitchChannel}&moderator_id=${twitchChannel}`,
+				{
+					method: 'POST',
+					headers: {
+						Authorization: `Bearer ${twitchSession}`
+					}
+				}
+			)
+				.then((res) => res.json())
+				.then((data) => data.data[0].id);
+
+			heartbeat();
+			heartbeatInterval = setInterval(() => {
+				heartbeat();
+			}, pingIntervalInMin);
+		});
+		twitchWebSocket.addEventListener('message', (event) => {
+			// console.log(JSON.parse(event.data));
+			const message = JSON.parse(event.data);
+
+			if (message.type === 'RECONNECT') {
+				setTimeout(connectToTwitchSocket, reconnectInterval);
+			}
+			if (message.type === 'RESPONSE' && message.error === '') {
+				isConnectingToTwitch = false;
+			}
+			if (message.type === 'reward-redeemed' && rewardId === message.data.redemption.id) {
+				const redeemedReward: ITwitchRedeemedReward = message.data;
+				const id = redeemedReward.redemption.id;
+				const username = redeemedReward.redemption.user.display_name;
+				const input = redeemedReward.redemption.user_input;
+				const amount = redeemedReward.redemption.reward.cost;
+				const createdAt = redeemedReward.redemption.redeemed_at;
+
+				donations.add({
+					id,
+					username,
+					amount,
+					amount_in_user_currency: amount,
+					message: input,
+					currency: '',
+					created_at: createdAt.toString(),
+					mostSimilarLot: null
+				});
+			}
+		});
+		twitchWebSocket.addEventListener('close', () => {
+			console.log('WebSocket connection closed');
+
+			clearInterval(heartbeatInterval);
+		});
+		twitchWebSocket.addEventListener('error', (event) => {
+			console.error('WebSocket error:', event);
+		});
+	}
+
+	async function connectToDonationAlertsSocket() {
+		const donationAlertsUser = await fetch('/api/da/user')
+			.then((res) => res.json())
+			.then((data) => data);
+
+		donationAlertsWebSocket = new WebSocket(
+			'wss://centrifugo.donationalerts.com/connection/websocket'
+		);
+
+		donationAlertsWebSocket.addEventListener('open', () => {
+			donationAlertsWebSocket.send(
 				JSON.stringify({
 					params: {
-						token: $page.data.socketToken
+						token: donationAlertsUser.socket_connection_token
 					},
 					id: 1
 				})
 			);
 		});
-		socket.addEventListener('message', async (event) => {
-			// console.log(JSON.parse(event.data));
-			const { result } = JSON.parse(event.data);
+		donationAlertsWebSocket.addEventListener('message', async (event) => {
+			const message = JSON.parse(event.data);
+			// console.log(message);
 
-			if (!connectionToken) {
-				isConnecting = true;
-
-				connectionToken = await fetch('/api/da/pubsub', {
+			if (message.id === 1) {
+				const socketToken = await fetch('/api/da/pubsub', {
 					method: 'POST',
 					body: JSON.stringify({
-						channels: [`$alerts:donation_${userId}`],
-						client: result.client
+						channels: [`$alerts:donation_${donationAlertsUser.id}`],
+						client: message.result.client
 					})
 				}).then((res) => res.json());
 
-				socket.send(
+				donationAlertsWebSocket.send(
 					JSON.stringify({
 						params: {
-							channel: `$alerts:donation_${userId}`,
-							token: connectionToken
+							channel: `$alerts:donation_${donationAlertsUser.id}`,
+							token: socketToken
 						},
 						method: 1,
 						id: 2
 					})
 				);
 
-				isConnecting = false;
+				isConnectingToDonationAlerts = false;
 			}
 
-			if (!result.type && result.channel === `$alerts:donation_${userId}`) {
-				const donation: IDonationData = result.data.data;
-				const isEnoughValue = donation.amount_in_user_currency > Number($stopWheelOnDonation.value);
-				const isUrlMessage = isUrl(donation.message);
-				const minPercentForMerge = 40;
-				const maxPercentForMerge = 60;
+			if (
+				!message.result.type &&
+				message.result.channel === `$alerts:donation_${donationAlertsUser.id}`
+			) {
+				const donation: IDonationData = message.result.data.data;
+				const username = donation.username ?? 'Аноним';
+				const roundedAmount = Math.round(donation.amount_in_user_currency);
+				const isEnoughAmount = roundedAmount >= Number($stopWheelOnDonation.value);
+				const lotId = donation.message.match(/\B(\#[\d]+\b)(?!;)/);
+				const haveUrl = isUrl(donation.message);
 
-				let minPercentsForMerge = [];
+				if (lotId) {
+					const id = Number(lotId[0].replace('#', ''));
+
+					for (const l of $lots) {
+						if (l.id !== id) continue;
+
+						lots.addValue(id, roundedAmount, username);
+						events.add(`+${roundedAmount}: ${l.title}`);
+					}
+
+					if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughAmount) {
+						wheel.stop();
+						timer.reset();
+					}
+
+					return;
+				}
+
+				if (haveUrl) {
+					if (!$wheel.isSpinning) {
+						donations.add({
+							...donation,
+							amount_in_user_currency: roundedAmount,
+							username
+						});
+					} else {
+						lots.add(donation.message, roundedAmount, username);
+						events.add(`${donation.message}`, 'add');
+
+						if ($stopWheelOnDonation.isToggled && isEnoughAmount) {
+							wheel.stop();
+							timer.reset();
+						}
+					}
+
+					return;
+				}
+
+				const minMergeTreshold = 40;
+				const maxMergeTreshold = 60;
+
+				let acceptableLots = [];
 				let mostSimilarLot = null;
 
 				for (const l of $lots) {
 					const comparePercent = compareStrings(donation.message, l.title);
 
-					if (isUrlMessage && !$wheel.isSpinning) {
-						donations.add(donation);
+					if (comparePercent > maxMergeTreshold) {
+						lots.addValue(l.id, roundedAmount, username);
+						events.add(`+${roundedAmount}: ${l.title}`);
+						acceptableLots = [];
 
-						return;
-					} else if ($wheel.isSpinning && isUrlMessage) {
-						lots.add(donation.message, donation.amount_in_user_currency, donation.username);
-						events.add(`${donation.message}`, 'add');
-
-						return;
-					}
-
-					// stop wheel on donation
-					if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughValue) {
-						// donations.remove(donation.id);
-						if (comparePercent > maxPercentForMerge) {
-							lots.addValue(l.id, donation.amount_in_user_currency);
-							events.add(`+${donation.amount_in_user_currency}: ${l.title}`);
-						} else {
-							lots.add(donation.message, donation.amount_in_user_currency, donation.username);
-							events.add(`${donation.message}`, 'add');
+						if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughAmount) {
+							wheel.stop();
+							timer.reset();
 						}
+
+						return;
+					} else if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughAmount) {
+						lots.add(donation.message, roundedAmount, username);
+						events.add(`${donation.message}`, 'add');
 
 						wheel.stop();
 						timer.reset();
 
 						return;
-					}
-
-					if (comparePercent > maxPercentForMerge) {
-						lots.addValue(l.id, donation.amount_in_user_currency);
-						events.add(`+${donation.amount_in_user_currency}: ${l.title}`);
-						minPercentsForMerge = [];
-
-						return;
-					} else if (comparePercent > minPercentForMerge) {
-						minPercentsForMerge.push({
-							comparePercent,
-							...l
+					} else if (comparePercent > minMergeTreshold) {
+						acceptableLots.push({
+							...l,
+							comparePercent
 						});
 					}
 				}
 
-				if (minPercentsForMerge.length > 0) {
-					mostSimilarLot = minPercentsForMerge.reduce((prev, current) => {
-						if (prev.comparePercent > current.comparePercent) {
-							return prev;
-						} else {
-							return current;
-						}
-					});
+				if (acceptableLots.length > 0) {
+					mostSimilarLot = acceptableLots.reduce((prev, current) =>
+						prev.comparePercent > current.comparePercent ? prev : current
+					);
 				}
 
-				donations.add({ ...donation, mostSimilarLot });
+				donations.add({
+					...donation,
+					amount_in_user_currency: roundedAmount,
+					username,
+					mostSimilarLot
+				});
 			}
 		});
-		// socket.addEventListener('close', () => {
-		// 	console.log('WebSocket connection closed');
-		// });
-		// socket.addEventListener('error', (event) => {
-		// 	console.error('WebSocket error:', event);
-		// });
-
-		return socket;
+		donationAlertsWebSocket.addEventListener('close', () => {
+			console.log('WebSocket connection closed');
+		});
+		donationAlertsWebSocket.addEventListener('error', (event) => {
+			console.error('WebSocket error:', event);
+		});
 	}
 </script>
 
@@ -224,37 +362,54 @@
 				<p>Интеграции</p>
 				<div class="integration-buttons">
 					<div class="integration">
-						{#if isConnecting}
-							<Loader --loader-color="#ffffff" --loader-dur="1s" --loader-size="24px" />
-						{/if}
-						<img class:small={isConnecting} src={daIcon} alt="" />
-						{#if $page.data.userId}
-							<Switch on={switchOn} isDisabled={isConnecting} />
+						<img src={daIcon} alt="Donationalerts logo" />
+						<p>Donation Alerts</p>
+						{#if daSession}
+							<Switch
+								color="orange"
+								on={daSwitchOn}
+								off={() => donationAlertsWebSocket.close()}
+								isDisabled={isConnectingToDonationAlerts}
+							/>
+						{:else}
+							<TextButton
+								text="Авторизоваться"
+								color="gradient"
+								on:click={() => goto('/api/da/auth')}
+							/>
 						{/if}
 					</div>
 					<div class="integration">
-						<img src={twitchIcon} alt="" />
-						{#if $page.data.userId}
-							<Switch --switch-color="var(--color-purple)" isDisabled={true} />
-						{/if}
-					</div>
-					{#if !$page.data.userId}
-						<TextButton
-							text="Авторизоваться"
-							color="gradient"
-							on:click={() => goto(authorizeUrl)}
+						<img src={twitchIcon} alt="Twitch logo" />
+						<p>Twitch</p>
+						<!-- {#if twitchSession} -->
+						<Switch
+							color="purple"
+							on={twitchSwitchOn}
+							off={() => twitchWebSocket.close()}
+							isDisabled={true}
 						/>
-					{/if}
+						<!-- {:else}
+							<TextButton
+								text="Авторизоваться"
+								color="gradient"
+								on:click={() => goto('/api/twitch/auth')}
+							/> -->
+						<!-- {/if} -->
+					</div>
+					<!-- {#if !$page.data.userId}
+					{/if} -->
 				</div>
 			</div>
 			<div class="donations-scroll-wrapper">
 				<div class="donations-wrapper" data-donations-queue={$donations.length}>
-					{#each $donations as { id, username, message, amount_in_user_currency, currency, mostSimilarLot }}
+					{#each $donations as { id, username, message, amount, amount_in_user_currency, currency, mostSimilarLot }}
 						<Donation
 							{id}
 							{username}
 							{message}
-							amount={amount_in_user_currency}
+							{amount}
+							{amount_in_user_currency}
 							{currency}
 							{mostSimilarLot}
 						/>
@@ -362,6 +517,8 @@
 		}
 		&-buttons {
 			display: flex;
+			flex-direction: column;
+			align-items: center;
 			gap: 20px;
 		}
 
@@ -369,10 +526,6 @@
 			height: 30px;
 			object-fit: contain;
 			transition: 0.2s;
-
-			&.small {
-				height: 15px;
-			}
 		}
 	}
 </style>

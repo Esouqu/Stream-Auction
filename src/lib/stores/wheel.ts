@@ -1,4 +1,45 @@
 import { writable } from 'svelte/store';
+import confetti from 'canvas-confetti';
+
+function fireConfetti() {
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.75 }
+  };
+
+  function fire(particleRatio: number, opts: confetti.Options) {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio),
+      shapes: ['circle'],
+      scalar: 2 / 2
+    });
+  }
+
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55
+  });
+  fire(0.2, {
+    spread: 60
+  });
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45
+  });
+}
 
 interface IWheelStore {
   isSpinning: boolean;
@@ -18,10 +59,10 @@ function createWheel() {
   });
 
   const maxSpeed = 5;
-  const accelerationTime = 0.2;
-  const slowDownTime = 0.5;
-  const generalTime = accelerationTime + slowDownTime;
+  const accelerationTime = 0.1;
   const decelerationTime = 0.3;
+  const slowDownTime = 0.6;
+  const generalTime = accelerationTime + slowDownTime;
 
   let speed = 0;
   let animationId: number;
@@ -33,8 +74,9 @@ function createWheel() {
     update((state) => {
       if (!state.isSpinning) {
         spinStartTime = 0;
+        fireConfetti();
 
-        return state;
+        return { ...state, isSpinning: false };
       }
 
       const elapsedTime = currentTime - spinStartTime;
@@ -42,6 +84,7 @@ function createWheel() {
 
       if (progress >= 1) {
         spinStartTime = 0;
+        fireConfetti();
 
         return { ...state, isSpinning: false };
       } else if (progress <= accelerationTime) {

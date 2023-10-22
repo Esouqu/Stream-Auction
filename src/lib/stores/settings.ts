@@ -12,15 +12,21 @@ export const textRules = writable('Мои правила аукциона');
 export const stopWheelOnDonation = writable({
   isToggled: false,
   description: 'Останавливать колесо при донате',
-  value: '1000',
+  value: '3000',
   valueAttribute: 'руб.',
 });
 export const addWheelSpinTimeOnDonation = writable({
   isToggled: true,
-  description: 'Добавлять время прокрута колеса за новый/измененный лот',
+  description: 'Добавлять время к прокруту колеса за новый/обновленный лот',
   value: '60',
   valueAttribute: 'сек.',
 });
+// export const addWheelSpinTimeMinDonationPrice = writable({
+//   isToggled: true,
+//   description: 'Минимальная сумма доната для добавления времени прокрута колеса',
+//   value: '30',
+//   valueAttribute: 'руб.',
+// });
 export const addTimeOnNewItem = writable({
   isToggled: true,
   description: 'Добавлять время за новый лот',

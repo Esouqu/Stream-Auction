@@ -22,7 +22,7 @@
 
 		const donation = JSON.parse(data);
 
-		lots.addValue(id, donation.value);
+		lots.addValue(id, donation.value, donation.username);
 		donations.remove(donation.id);
 		e.dataTransfer?.clearData();
 		isHovered = false;
@@ -73,7 +73,7 @@
 			callback={() => lots.setValue(id, Number(value))}
 			isDefault={false}
 		/>
-		<div class="lot__percent">{percent.toFixed(1)}%</div>
+		<div class="lot__percent">{Math.round(percent)}%</div>
 		<div class="lot-buttons-wrapper">
 			<!-- <Popup bind:isShown={isPopupShown}>
 				<div class="lot-donators">

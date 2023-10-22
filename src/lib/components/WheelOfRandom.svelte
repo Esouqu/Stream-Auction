@@ -9,11 +9,13 @@
 	import type { IPieItem } from '$lib/interfaces';
 	import { radiansToDegrees } from '$lib/constants';
 	import TextButton from './TextButton.svelte';
+	import winnerSound from '$lib/assets/sounds/winner_sound.wav';
 
 	const radius = 360;
 	const width = radius * 2;
 	const offset = 50;
 	const degreeCapForTextDisplay = Number(((400 / 100) * 1.75).toFixed(2));
+	// const wheelWinnerCelebrationSound = new Audio(winnerSound);
 
 	let draggingAngle = 0;
 	let draggingStartAngle = 0;
@@ -21,8 +23,8 @@
 	let isSettingsShown = true;
 	let winner: IPieItem | null = null;
 	let spinDuration = '10';
-	let minSpinDuration = '10';
-	let maxSpinDuration = '20';
+	let minSpinDuration = '100';
+	let maxSpinDuration = '250';
 	let wheelElement: SVGElement;
 	let wheelWidth: number;
 	let wheelHeight: number;
@@ -41,18 +43,30 @@
 		wheelY = wheelElement.getBoundingClientRect().y + wheelHeight / 2;
 	}
 
+	// function playCelebrationSound() {
+	// 	wheelWinnerCelebrationSound.volume = 0.3;
+	// 	wheelWinnerCelebrationSound.play();
+	// }
+
 	function getWinner(angle: number) {
-		if (!$wheel.isSpinning) return;
+		// if (!$wheel.isSpinning) return;
 
 		pie.forEach((slice) => {
 			if (slice.startAngle <= angle && slice.endAngle >= angle) {
 				winner = slice;
 			}
 		});
+
+		if (!$wheel.isSpinning) {
+			// playCelebrationSound();
+		}
 	}
 
 	function handleWheelSpin() {
 		const secondsToSpin = Number(spinDuration) * 1000;
+
+		isSettingsShown = false;
+
 		timer.reset();
 		timer.setTime(secondsToSpin);
 		timer.start();
@@ -98,7 +112,11 @@
 	}
 </script>
 
-<svelte:window on:resize={onResize} />
+<svelte:window
+	on:resize={onResize}
+	on:mousemove={(e) => onMove(e.clientX, e.clientY)}
+	on:mouseup={onRelease}
+/>
 
 <div
 	class="wheel"
@@ -108,7 +126,7 @@
     --wheel-rot: {isDragging ? draggingAngle : $wheel.angle}deg;
   "
 >
-	{#if winner !== null && isSettingsShown}
+	{#if winner !== null}
 		<div class="winner" transition:fade={{ duration: 200 }}>
 			{#if isUrl(winner.title)}
 				<a href={winner.title} target="_blank" style="color: var(--color-orange);">
@@ -183,7 +201,12 @@
 						style="display: flex; gap: 5px; flex-direction: column;"
 					>
 						<div>
-							<TextButton text="Ролл" color="orange" on:click={handleWheelSpin} />
+							<TextButton
+								text="Ролл"
+								color="orange"
+								on:click={handleWheelSpin}
+								isDisabled={$lots.length < 1}
+							/>
 							<TextButton
 								text="Удалить Лот"
 								color="red"
@@ -197,7 +220,7 @@
 		</div>
 	{/if}
 
-	{#if !$wheel.isSpinning}
+	{#if !$wheel.isSpinning && !isDragging}
 		<div style="position: absolute; bottom: 10%; left: 50%; z-index: 2; translate: -50% -10%;">
 			<TextButton
 				text={isSettingsShown ? 'Скрыть' : 'Показать'}
@@ -216,8 +239,6 @@
 		viewBox="-{offset / 2} -{offset / 2} {width + offset} {width + offset}"
 		pointer-events="none"
 		on:mousedown={(e) => onGrab(e.clientX, e.clientY)}
-		on:mousemove={(e) => onMove(e.clientX, e.clientY)}
-		on:mouseup={onRelease}
 		aria-hidden
 	>
 		<g pointer-events="fill">
@@ -233,7 +254,8 @@
 							class:selected={$wheel.isSpinning || winner === null || winner.id === id}
 							d="M {startPoint.x} {startPoint.y} A {radius} {radius} 0 {largeArcFlag} 1 {endPoint.x} {endPoint.y} L {radius} {radius} Z"
 							fill={color}
-							stroke={color}
+							stroke="white"
+							stroke-width="2px"
 						/>
 					{/if}
 				{/each}
@@ -346,14 +368,14 @@
 			position: absolute;
 			top: 50%;
 			left: 50%;
-			z-index: 0;
+			z-index: 1;
 			translate: -50% -50%;
 			width: var(--wheel-w, 100%);
 			height: var(--wheel-h, 100%);
 			border-radius: 50%;
 			outline: 15px solid var(--wheel-outline, buttonface);
-			background-color: rgb(20 20 20 / 40%);
 			transition: outline 0.2s linear;
+			pointer-events: none;
 		}
 		&__svg {
 			position: relative;

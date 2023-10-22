@@ -5,10 +5,11 @@
 	import { fade, fly } from 'svelte/transition';
 	import type { ILot } from '$lib/interfaces';
 
-	export let id: number;
+	export let id: number | string;
 	export let message: string;
 	export let username: string;
 	export let amount: number;
+	export let amount_in_user_currency: number;
 	export let currency: string;
 	export let isDragged = false;
 	export let mostSimilarLot: ILot | null = null;
@@ -17,20 +18,21 @@
 		e.stopPropagation();
 		if (!mostSimilarLot) return;
 
-		lots.addValue(mostSimilarLot.id, amount, username);
+		lots.addValue(mostSimilarLot.id, amount_in_user_currency, username);
 		donations.remove(id);
 	}
 	function handleAdd(e: Event) {
 		e.stopPropagation();
 
-		lots.add(message, amount, username);
+		lots.add(message, amount_in_user_currency, username);
 		donations.remove(id);
 	}
 
 	function handleDragStart(e: DragEvent) {
 		const obj = {
 			id,
-			value: Math.round(amount)
+			value: amount_in_user_currency,
+			username
 		};
 
 		e.dataTransfer?.setData('application/json', JSON.stringify(obj));

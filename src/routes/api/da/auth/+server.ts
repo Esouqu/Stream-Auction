@@ -1,36 +1,13 @@
 import { PUBLIC_DA_CLIENT_ID } from "$env/static/public";
 import { redirect, type RequestHandler } from "@sveltejs/kit";
 
-interface ICookieSession {
-  accessToken: string,
-  accessTokenExpiration: string,
-  refreshToken: string,
-  userId: string,
-  socketToken: string,
-}
+export const GET: RequestHandler = async () => {
+  const daScope = 'oauth-user-show+oauth-donation-subscribe';
+  const redirectUrl = 'http://localhost:5173/redirect/da';
+  const daQueryParams = `client_id=${PUBLIC_DA_CLIENT_ID}&redirect_url=${redirectUrl}&response_type=code&scope=${daScope}`;
+  const daAuthUrl = `https://www.donationalerts.com/oauth/authorize?${daQueryParams}`;
 
-export const GET: RequestHandler = async ({ cookies }) => {
-  const redirectUrl = 'http://localhost:5173/redirect';
-  const scope = 'oauth-user-show+oauth-donation-subscribe';
-  const session = cookies.get('session');
-
-  if (!session) {
-    const queryParams = `client_id=${PUBLIC_DA_CLIENT_ID}&redirect_url=${redirectUrl}&response_type=code&scope=${scope}`;
-    const authorizeUrl = `https://www.donationalerts.com/oauth/authorize?${queryParams}`;
-
-    throw redirect(302, authorizeUrl);
-  } else {
-    const parsedSession: ICookieSession = JSON.parse(session);
-    const expiration = parsedSession.accessTokenExpiration;
-    const expirationTime = new Date(expiration).getTime();
-
-    if (Date.now() < expirationTime) {
-      // console.log(parsedSession.refreshToken)
-      throw redirect(302, '/redirect')
-    }
-  }
-
-  throw redirect(302, '/');
+  throw redirect(302, daAuthUrl);
 };
 
 // export const POST: RequestHandler = async ({ request }) => {
