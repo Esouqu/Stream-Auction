@@ -13,6 +13,8 @@
 	import {
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
+		addWheelSpinTimeMinDonationPrice,
+		addWheelSpinTimeMinDonationPriceStep,
 		addWheelSpinTimeOnDonation,
 		stopWheelOnDonation,
 		textRules
@@ -36,7 +38,7 @@
 	let donationAlertsWebSocket: WebSocket;
 	let twitchWebSocket: WebSocket;
 
-	$: $lots, addSpinTime(), addCountdownTime();
+	$: $lots, addCountdownTime();
 
 	onMount(() => {
 		const validationInterval = 1000 * 60 * 60;
@@ -67,13 +69,18 @@
 		}
 	}
 
-	function addSpinTime() {
-		if (!$wheel.isSpinning || !$addWheelSpinTimeOnDonation.isToggled) return;
-
+	function addSpinTime(donationValue: number) {
 		const addDonationTime = $addWheelSpinTimeOnDonation.value;
+		const currentMinDonation = Number($addWheelSpinTimeMinDonationPrice.value);
 
-		timer.add(Number(addDonationTime) * 1000);
-		wheel.addSpinDuration(Number(addDonationTime) * 1000);
+		console.log(donationValue);
+		if ($addWheelSpinTimeMinDonationPrice.isToggled && donationValue >= currentMinDonation) {
+			const minDonationStep = Number($addWheelSpinTimeMinDonationPriceStep.value);
+
+			$addWheelSpinTimeMinDonationPrice.value = String(currentMinDonation + minDonationStep);
+			timer.add(Number(addDonationTime) * 1000);
+			wheel.addSpinDuration(Number(addDonationTime) * 1000);
+		}
 	}
 
 	function twitchSwitchOn() {
@@ -241,6 +248,10 @@
 				const isEnoughAmount = roundedAmount >= Number($stopWheelOnDonation.value);
 				const lotId = donation.message.match(/\B(\#[\d]+\b)(?!;)/);
 				const haveUrl = isUrl(donation.message);
+
+				if ($wheel.isSpinning && $addWheelSpinTimeOnDonation.isToggled) {
+					addSpinTime(roundedAmount);
+				}
 
 				if (lotId) {
 					const id = Number(lotId[0].replace('#', ''));

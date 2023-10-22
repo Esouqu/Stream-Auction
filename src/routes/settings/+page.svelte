@@ -2,15 +2,15 @@
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import Setting from '$lib/components/Setting.svelte';
 	import Textarea from '$lib/components/Textarea.svelte';
-	import lots from '$lib/stores/lots';
 	import {
 		stopWheelOnDonation,
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
 		textRules,
 		timerStarterTime,
-		addWheelSpinTimeOnDonation
-		// addWheelSpinTimeMinDonationPrice
+		addWheelSpinTimeOnDonation,
+		addWheelSpinTimeMinDonationPrice,
+		addWheelSpinTimeMinDonationPriceStep
 	} from '$lib/stores/settings';
 	import timer from '$lib/stores/timer';
 
@@ -40,13 +40,20 @@
 			description={$addWheelSpinTimeOnDonation.description}
 			valueKey={$addWheelSpinTimeOnDonation.valueAttribute}
 		/>
-		<!-- <Setting
+		<Setting
 			id={3}
 			bind:isToggled={$addWheelSpinTimeMinDonationPrice.isToggled}
 			bind:value={$addWheelSpinTimeMinDonationPrice.value}
 			description={$addWheelSpinTimeMinDonationPrice.description}
 			valueKey={$addWheelSpinTimeMinDonationPrice.valueAttribute}
-		/> -->
+		/>
+		<Setting
+			id={4}
+			bind:isToggled={$addWheelSpinTimeMinDonationPriceStep.isToggled}
+			bind:value={$addWheelSpinTimeMinDonationPriceStep.value}
+			description={$addWheelSpinTimeMinDonationPriceStep.description}
+			valueKey={$addWheelSpinTimeMinDonationPriceStep.valueAttribute}
+		/>
 		<Setting
 			id={5}
 			bind:isToggled={$addTimeOnNewItem.isToggled}
