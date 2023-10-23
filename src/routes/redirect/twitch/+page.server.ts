@@ -8,7 +8,7 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ url, cookies }) => {
   const code = url.searchParams.get('code');
-  const redirectUrl = 'http://localhost:5173/redirect/twitch';
+  const redirectUrl = 'https://stream-auction.vercel.app/redirect/twitch';
   const tokenUrl = 'https://id.twitch.tv/oauth2/token';
 
   if (!code) throw redirect(300, '/');
