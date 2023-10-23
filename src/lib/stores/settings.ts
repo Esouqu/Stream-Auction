@@ -85,12 +85,12 @@ export const addWheelSpinTimeMinDonationPrice = writable({
   value: '30',
   valueAttribute: 'руб.',
 });
-export const addWheelSpinTimeMinDonationPriceStep = writable({
-  isToggled: true,
-  description: 'Увеличивать минимальную сумму доната для доп. времени прокрута колеса после каждого добавления',
-  value: '10',
-  valueAttribute: 'руб.',
-});
+// export const addWheelSpinTimeMinDonationPriceStep = writable({
+//   isToggled: true,
+//   description: 'Увеличивать минимальную сумму доната для доп. времени прокрута колеса после каждого добавления',
+//   value: '10',
+//   valueAttribute: 'руб.',
+// });
 export const addTimeOnNewItem = writable({
   isToggled: true,
   description: 'Добавлять время за новый лот',

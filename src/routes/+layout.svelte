@@ -14,7 +14,6 @@
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
 		addWheelSpinTimeMinDonationPrice,
-		addWheelSpinTimeMinDonationPriceStep,
 		addWheelSpinTimeOnDonation,
 		stopWheelOnDonation,
 		textRules
@@ -71,15 +70,14 @@
 
 	function addSpinTime(donationValue: number) {
 		const addDonationTime = $addWheelSpinTimeOnDonation.value;
-		const currentMinDonation = Number($addWheelSpinTimeMinDonationPrice.value);
+		// const currentMinDonation = Number($addWheelSpinTimeMinDonationPrice.value);
 
-		if ($addWheelSpinTimeMinDonationPrice.isToggled && donationValue >= currentMinDonation) {
-			const minDonationStep = Number($addWheelSpinTimeMinDonationPriceStep.value);
+		// if ($addWheelSpinTimeMinDonationPrice.isToggled && donationValue >= currentMinDonation) {
+		// const minDonationStep = Number($addWheelSpinTimeMinDonationPriceStep.value);
 
-			$addWheelSpinTimeMinDonationPrice.value = String(currentMinDonation + minDonationStep);
-			timer.add(Number(addDonationTime) * 1000);
-			wheel.addSpinDuration(Number(addDonationTime) * 1000);
-		}
+		// $addWheelSpinTimeMinDonationPrice.value = String(currentMinDonation + minDonationStep);
+		timer.add(Number(addDonationTime) * 1000);
+		wheel.addSpinDuration(Number(addDonationTime) * 1000);
 	}
 
 	function twitchSwitchOn() {
@@ -146,6 +144,7 @@
 				.then((res) => res.json())
 				.then((data) => data.data);
 
+			console.log(rewardId);
 			heartbeat();
 			heartbeatInterval = setInterval(() => {
 				heartbeat();
@@ -356,6 +355,11 @@
 		<h3 style="white-space: break-spaces; font-size: 24px;">
 			{JSON.parse(JSON.stringify($textRules))}
 		</h3>
+		<!-- <h2>
+			Сумма для доп. времени прокрута
+			{$addWheelSpinTimeMinDonationPriceStep.value}
+			{$addWheelSpinTimeMinDonationPriceStep.valueAttribute}
+		</h2> -->
 	</div>
 	<div class="layout-section layout-section_center">
 		<div class="layout-section-wrapper">

@@ -9,8 +9,7 @@
 		textRules,
 		timerStarterTime,
 		addWheelSpinTimeOnDonation,
-		addWheelSpinTimeMinDonationPrice,
-		addWheelSpinTimeMinDonationPriceStep
+		addWheelSpinTimeMinDonationPrice
 	} from '$lib/stores/settings';
 	import timer from '$lib/stores/timer';
 	import { fly } from 'svelte/transition';
@@ -48,13 +47,13 @@
 			description={$addWheelSpinTimeMinDonationPrice.description}
 			valueKey={$addWheelSpinTimeMinDonationPrice.valueAttribute}
 		/>
-		<Setting
+		<!-- <Setting
 			id={4}
 			bind:isToggled={$addWheelSpinTimeMinDonationPriceStep.isToggled}
 			bind:value={$addWheelSpinTimeMinDonationPriceStep.value}
 			description={$addWheelSpinTimeMinDonationPriceStep.description}
 			valueKey={$addWheelSpinTimeMinDonationPriceStep.valueAttribute}
-		/>
+		/> -->
 		<Setting
 			id={5}
 			bind:isToggled={$addTimeOnNewItem.isToggled}

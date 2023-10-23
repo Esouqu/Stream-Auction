@@ -20,6 +20,5 @@ export const POST: RequestHandler = async ({ request, url }) => {
     }
   }).then((res) => res.data);
 
-  // console.log(reward.request)
   return new Response(JSON.stringify(reward), { status: 200 });
 };
