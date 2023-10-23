@@ -395,20 +395,15 @@
 					<div class="integration">
 						<img src={twitchIcon} alt="Twitch logo" />
 						<p>Twitch</p>
-						<!-- {#if twitchSession} -->
-						<Switch
-							color="purple"
-							on={twitchSwitchOn}
-							off={() => twitchWebSocket.close()}
-							isDisabled={true}
-						/>
-						<!-- {:else}
+						{#if twitchSession}
+							<Switch color="purple" on={twitchSwitchOn} off={() => twitchWebSocket.close()} />
+						{:else}
 							<TextButton
 								text="Авторизоваться"
 								color="gradient"
 								on:click={() => goto('/api/twitch/auth')}
 							/>
-						{/if} -->
+						{/if}
 					</div>
 				</div>
 			</div>
