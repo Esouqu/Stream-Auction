@@ -98,7 +98,7 @@
 		align-items: center;
 		gap: 10px;
 		border-radius: 10px;
-		animation: blink 1s ease-in-out forwards paused;
+		animation: blink 1s ease-in-out forwards;
 		/* 
 		&-donators {
 			display: flex;
