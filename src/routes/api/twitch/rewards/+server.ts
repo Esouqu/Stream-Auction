@@ -8,7 +8,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
   // const rewardsUrl = `http://localhost:8080/mock/channel_points/custom_rewards?broadcaster_id=${broadcasterId}`;
   const rewardsUrl = `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${broadcasterId}`;
 
-  await axios.post(rewardsUrl, {
+
+  const reward = await axios.post(rewardsUrl, {
     title: 'Stream Auction - Бесплатный Заказ',
     cost: 10,
   }, {
@@ -17,7 +18,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
       'client-id': PUBLIC_TWITCH_CLEINT_ID,
       "Content-Type": 'application/json',
     }
-  });
+  }).then((res) => res.data);
 
-  return new Response();
+  // console.log(reward.request)
+  return new Response(JSON.stringify(reward), { status: 200 });
 };

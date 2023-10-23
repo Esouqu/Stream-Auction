@@ -137,17 +137,14 @@
 			// const session = await fetch('http://localhost:8080/units/clients')
 			// 	.then((res) => res.json())
 			// 	.then((data) => console.log(data));
-			rewardId = await fetch(
-				`/api/twitch/rewards?broadcaster_id=${twitchChannel}&moderator_id=${twitchChannel}`,
-				{
-					method: 'POST',
-					headers: {
-						Authorization: `Bearer ${twitchSession}`
-					}
+			rewardId = await fetch(`/api/twitch/rewards?broadcaster_id=${twitchChannel}`, {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${twitchSession}`
 				}
-			)
+			})
 				.then((res) => res.json())
-				.then((data) => data.data[0].id);
+				.then((data) => data.data);
 
 			heartbeat();
 			heartbeatInterval = setInterval(() => {
