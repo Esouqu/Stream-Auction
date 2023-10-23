@@ -344,7 +344,7 @@
 			}
 		});
 		donationAlertsWebSocket.addEventListener('close', () => {
-			console.log('WebSocket connection closed');
+			// console.log('WebSocket connection closed');
 		});
 		donationAlertsWebSocket.addEventListener('error', (event) => {
 			console.error('WebSocket error:', event);
@@ -395,18 +395,16 @@
 					<div class="integration">
 						<img src={twitchIcon} alt="Twitch logo" />
 						<p>Twitch</p>
-						<!-- {#if twitchSession} -->
-						<Switch color="purple" on={twitchSwitchOn} off={() => twitchWebSocket.close()} />
-						<!-- {:else}
+						{#if twitchSession}
+							<Switch color="purple" on={twitchSwitchOn} off={() => twitchWebSocket.close()} />
+						{:else}
 							<TextButton
 								text="Авторизоваться"
 								color="gradient"
 								on:click={() => goto('/api/twitch/auth')}
-							/> -->
-						<!-- {/if} -->
+							/>
+						{/if}
 					</div>
-					<!-- {#if !$page.data.userId}
-					{/if} -->
 				</div>
 			</div>
 			<div class="donations-scroll-wrapper">
