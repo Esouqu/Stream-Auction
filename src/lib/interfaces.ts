@@ -1,3 +1,5 @@
+import type { TIMER_SETTINGS } from "./enums";
+
 export interface IPoint {
   x: number;
   y: number;
@@ -49,10 +51,17 @@ export interface IRoute {
   url: string;
 }
 
-export interface ISetting {
-  isToggled: boolean;
+export interface ITimerSettingsOption {
+  title: string;
+  value: number;
+  attribute: string;
+}
+
+export interface ITimerSettings {
+  id: TIMER_SETTINGS;
   description: string;
-  value: string | null;
+  isToggled: boolean | null;
+  options: ITimerSettingsOption[];
 }
 
 export interface IDonationAlertsUserData {

@@ -134,6 +134,9 @@
 				})
 			);
 
+			// const session = await fetch('http://localhost:8080/units/clients')
+			// 	.then((res) => res.json())
+			// 	.then((data) => console.log(data));
 			rewardId = await fetch(
 				`/api/twitch/rewards?broadcaster_id=${twitchChannel}&moderator_id=${twitchChannel}`,
 				{
@@ -182,7 +185,7 @@
 			}
 		});
 		twitchWebSocket.addEventListener('close', () => {
-			console.log('WebSocket connection closed');
+			// console.log('WebSocket connection closed');
 
 			clearInterval(heartbeatInterval);
 		});
@@ -393,12 +396,7 @@
 						<img src={twitchIcon} alt="Twitch logo" />
 						<p>Twitch</p>
 						<!-- {#if twitchSession} -->
-						<Switch
-							color="purple"
-							on={twitchSwitchOn}
-							off={() => twitchWebSocket.close()}
-							isDisabled={true}
-						/>
+						<Switch color="purple" on={twitchSwitchOn} off={() => twitchWebSocket.close()} />
 						<!-- {:else}
 							<TextButton
 								text="Авторизоваться"
@@ -465,6 +463,7 @@
 				padding: 30px 0;
 				box-shadow: 0px 4px 15px black;
 				background-color: rgb(20 20 20 / 40%);
+				overflow: hidden;
 			}
 			&_right {
 				align-items: stretch;

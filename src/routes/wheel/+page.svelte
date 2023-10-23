@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Addlot from '$lib/components/Addlot.svelte';
 	import WheelOfRandom from '$lib/components/WheelOfRandom.svelte';
+	import { fly } from 'svelte/transition';
 </script>
 
 <svelte:head>
@@ -16,12 +17,13 @@
 
 <style lang="scss">
 	.wheel-section {
+		position: absolute;
 		display: flex;
 		flex-direction: column;
 		justify-content: end;
 		align-items: center;
 		gap: 10px;
-		height: 100%;
+		/* height: 100%; */
 		width: 100%;
 		overflow: hidden;
 	}

@@ -13,6 +13,7 @@
 		addWheelSpinTimeMinDonationPriceStep
 	} from '$lib/stores/settings';
 	import timer from '$lib/stores/timer';
+	import { fly } from 'svelte/transition';
 
 	let presets: string[] = ['По умолчанию'];
 </script>
@@ -81,6 +82,7 @@
 
 <style lang="scss">
 	.settings-section {
+		position: absolute;
 		display: flex;
 		flex: 1;
 		flex-direction: column;

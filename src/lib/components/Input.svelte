@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+
 	export let id: number | string;
 	export let value: string = '';
 	export let valueKey: string | null = null;
@@ -8,6 +10,8 @@
 	export let isDefault = true;
 	export let colorStyle: 'white' | 'default' = 'default';
 	export let callback: (() => void) | null = null;
+
+	const pathName = $page.url.pathname;
 
 	function handleInput(e: Event) {
 		if (!isDefault) return;
@@ -87,10 +91,10 @@
 <div class="input-wrapper" style="--input-p-l: {type === 'text' ? 5 : 0}px;">
 	<input
 		type="text"
-		id="input-{id}"
+		id="input-{id}-{pathName}"
 		class="input"
 		class:input_white={colorStyle === 'white'}
-		name="input-{id}"
+		name="input-{id}-{pathName}"
 		{placeholder}
 		{value}
 		spellcheck="false"

@@ -373,8 +373,10 @@
 			width: var(--wheel-w, 100%);
 			height: var(--wheel-h, 100%);
 			border-radius: 50%;
-			outline: 15px solid var(--wheel-outline, buttonface);
+			box-shadow: 0 2px 10px 10px black;
+			outline: 10px solid var(--wheel-outline, buttonface);
 			transition: outline 0.2s linear;
+			/* animation: pulse 0.5s ease-out alternate infinite; */
 			pointer-events: none;
 		}
 		&__svg {
@@ -409,6 +411,14 @@
 					font-size: 0;
 				}
 			}
+		}
+	}
+	@keyframes pulse {
+		0% {
+			outline-width: 0;
+		}
+		100% {
+			outline-width: 10px;
 		}
 	}
 </style>

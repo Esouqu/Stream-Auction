@@ -2,13 +2,16 @@
 	import Lot from '$lib/components/Lot.svelte';
 	import lots from '$lib/stores/lots';
 	import { flip } from 'svelte/animate';
-	import { fade, fly } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import { getTotal } from '$lib/utils';
 	import Popup from '$lib/components/Popup.svelte';
 	import Addlot from '$lib/components/Addlot.svelte';
 	import Button from '$lib/components/Button.svelte';
 
+	let isTotalShown = false;
+
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
+	$: total = getTotal($lots.map((l) => l.value));
 </script>
 
 <svelte:head>
@@ -21,7 +24,12 @@
 	</div>
 	<div style="position: relative; display: flex; flex: 1 1 0; flex-direction: column;">
 		<div class="utils-row">
-			<p>Всего: {getTotal($lots.map((l) => l.value))}</p>
+			{#if isTotalShown}
+				<p transition:slide={{ duration: 200, axis: 'x' }}>
+					Всего: {total}
+				</p>
+			{/if}
+			<Button icon="visibility" on:click={() => (isTotalShown = !isTotalShown)} />
 			<div style="position: absolute; right: 35px;">
 				<Button icon="trashcan" on:click={() => lots.removeAll()} />
 			</div>
@@ -47,6 +55,7 @@
 
 <style lang="scss">
 	.auction-section {
+		position: absolute;
 		display: flex;
 		flex-direction: column;
 		width: 100%;
@@ -80,11 +89,13 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		gap: 5px;
 		width: 100%;
 		height: 40px;
 		margin: 10px 0;
 
 		& p {
+			height: 16px;
 			font-weight: 600;
 			margin: 0;
 		}

@@ -98,13 +98,13 @@
 		align-items: center;
 		gap: 10px;
 		border-radius: 10px;
-		animation: an 1s ease-in-out forwards;
-
+		animation: blink 1s ease-in-out forwards paused;
+		/* 
 		&-donators {
 			display: flex;
 			flex-direction: column;
 			gap: 10px;
-		}
+		} */
 		&::before {
 			content: attr(data-lot-id);
 			display: flex;
@@ -132,7 +132,7 @@
 		}
 	}
 
-	@keyframes an {
+	@keyframes blink {
 		0% {
 			scale: 1;
 			background-color: transparent;

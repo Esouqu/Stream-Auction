@@ -12,6 +12,7 @@ import infoIcon from '$lib/assets/donators_list_icon.svg';
 import plusIcon from '$lib/assets/add_icon.svg';
 import plusIconBlack from '$lib/assets/add_icon_black.svg';
 import trashcan from '$lib/assets/trashcan_icon.svg';
+import visibility from '$lib/assets/visibility_off_icon.svg';
 
 export type iconTypes =
   | 'listAddItem'
@@ -24,7 +25,8 @@ export type iconTypes =
   | 'delete'
   | 'info'
   | 'plus'
-  | 'trashcan';
+  | 'trashcan'
+  | 'visibility';
 
 export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'white') {
   switch (icon) {
@@ -48,6 +50,8 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
       return infoIcon;
     case 'trashcan':
       return trashcan;
+    case 'visibility':
+      return visibility;
     case 'plus':
       return color === 'white' ? plusIcon : plusIconBlack;
     default:
