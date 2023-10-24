@@ -132,7 +132,7 @@
 				<a href={winner.title} target="_blank" style="color: var(--color-orange);">
 					{winner.title} ({winner.percent}%)
 				</a>
-				{#if !$wheel.isSpinning}
+				{#if !$wheel.isSpinning && winner.donators.length > 1}
 					<div class="winner-donators">
 						Заказавшие: {winner.donators.join(', ')}
 					</div>
@@ -141,7 +141,7 @@
 				<span>
 					{winner.title} ({winner.percent}%)
 				</span>
-				{#if !$wheel.isSpinning}
+				{#if !$wheel.isSpinning && winner.donators.length > 1}
 					<div class="winner-donators">
 						Заказавшие: {winner.donators.join(', ')}
 					</div>

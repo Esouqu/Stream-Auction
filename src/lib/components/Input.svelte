@@ -137,7 +137,6 @@
 				display: flex;
 				justify-content: start;
 				align-items: center;
-				width: 50px;
 				font-size: 14px;
 				text-transform: uppercase;
 			}

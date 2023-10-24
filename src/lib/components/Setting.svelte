@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Input from './Input.svelte';
+	import NumberInput from './NumberInput.svelte';
 	import Switch from './Switch.svelte';
 
-	export let id: number;
-	export let isToggled: boolean | null;
+	export let id: number | string;
 	export let description: string;
-	export let value: string;
-	export let valueKey: string;
+	export let value: number | undefined = undefined;
+	export let attribute: string | null = null;
+	export let isToggled: boolean | null = null;
 	export let isDisabled = false;
 	export let callback: (() => void) | null = null;
 </script>
@@ -14,16 +14,16 @@
 <div class="setting">
 	<p>{description}</p>
 	<div class="setting-inputs">
-		{#if isToggled || isToggled === null}
-			<Input
+		{#if value !== undefined}
+			<NumberInput
 				--input-w="100px"
 				--input-text-al="center"
 				{id}
+				{attribute}
 				placeholder="Значение"
-				type="number"
+				isDisabled={isToggled !== null ? !isToggled : false}
 				bind:value
-				{callback}
-				{valueKey}
+				on:input={callback}
 			/>
 		{/if}
 		{#if isToggled !== null}
@@ -49,12 +49,14 @@
 		&-inputs {
 			display: flex;
 			align-items: center;
+			gap: 10px;
 		}
 		& p {
 			flex: 1 1 0;
 			margin: 0;
 			max-width: 650px;
-			font-size: 20px;
+			line-height: 1;
+			font-size: 18px;
 			font-weight: 500;
 		}
 	}

@@ -55,7 +55,6 @@
 
 <style lang="scss">
 	.auction-section {
-		position: absolute;
 		display: flex;
 		flex-direction: column;
 		width: 100%;

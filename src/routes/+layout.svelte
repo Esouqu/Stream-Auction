@@ -9,13 +9,13 @@
 	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_Color.svg';
 	import twitchIcon from '$lib/assets/twitch-logo/TwitchGlitchPurple.svg';
 	import Switch from '$lib/components/Switch.svelte';
-	import Loader from '$lib/components/Loader.svelte';
 	import {
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
-		addWheelSpinTimeMinDonationPrice,
-		addWheelSpinTimeOnDonation,
-		stopWheelOnDonation,
+		additionSpinTimePrice,
+		additionSpinTimePriceStep,
+		additionSpinTime,
+		stopSpin,
 		textRules
 	} from '$lib/stores/settings';
 	import Popup from '$lib/components/Popup.svelte';
@@ -69,15 +69,28 @@
 	}
 
 	function addSpinTime(donationValue: number) {
-		const addDonationTime = $addWheelSpinTimeOnDonation.value;
-		// const currentMinDonation = Number($addWheelSpinTimeMinDonationPrice.value);
+		const time = $additionSpinTime.value;
+		const currentMinDonation = Number($additionSpinTimePrice.value);
+		const minDonationStep = Number($additionSpinTimePriceStep.value);
 
-		// if ($addWheelSpinTimeMinDonationPrice.isToggled && donationValue >= currentMinDonation) {
-		// const minDonationStep = Number($addWheelSpinTimeMinDonationPriceStep.value);
+		if (donationValue < currentMinDonation) return;
 
-		// $addWheelSpinTimeMinDonationPrice.value = String(currentMinDonation + minDonationStep);
-		timer.add(Number(addDonationTime) * 1000);
-		wheel.addSpinDuration(Number(addDonationTime) * 1000);
+		$additionSpinTimePrice.value = currentMinDonation + minDonationStep;
+		timer.add(Number(time) * 1000);
+		wheel.addSpinDuration(Number(time) * 1000);
+
+		// if (minDonationIsToggled && donationValue >= currentMinDonation) {
+		//   if ($addWheelSpinTimeMinDonationPriceStep.isToggled) {
+		//     const minDonationStep = Number($addWheelSpinTimeMinDonationPriceStep.value);
+		//     $addWheelSpinTimeMinDonationPrice.value = String(currentMinDonation + minDonationStep);
+		//   }
+
+		//   timer.add(Number(time) * 1000);
+		//   wheel.addSpinDuration(Number(time) * 1000);
+		// } else if (minDonationIsToggled) {
+		//   timer.add(Number(time) * 1000);
+		//   wheel.addSpinDuration(Number(time) * 1000);
+		// }
 	}
 
 	function twitchSwitchOn() {
@@ -98,6 +111,113 @@
 		} else {
 			goto('/api/da/auth');
 		}
+	}
+
+	function processIdDonation(lotId: RegExpMatchArray, amount: number, username: string) {
+		const id = Number(lotId[0].replace('#', ''));
+		const isEnoughAmount = amount >= Number($stopSpin.value);
+
+		for (const l of $lots) {
+			if (l.id !== id) continue;
+
+			lots.addValue(id, amount, username);
+			events.add(`+${amount}: ${l.title}`);
+		}
+
+		if ($stopSpin.isToggled && $wheel.isSpinning && isEnoughAmount) {
+			wheel.stop();
+			timer.reset();
+		}
+	}
+
+	function precessUrlDonation(donation: IDonationData) {
+		const isEnoughAmount = donation.amount >= Number($stopSpin.value);
+
+		if (!$wheel.isSpinning) {
+			donations.add({
+				...donation,
+				amount_in_user_currency: donation.amount
+			});
+		} else {
+			lots.add(donation.message, donation.amount, donation.username);
+			events.add(`${donation.message}`, 'add');
+
+			if ($stopSpin.isToggled && isEnoughAmount) {
+				wheel.stop();
+				timer.reset();
+			}
+		}
+	}
+
+	function processDonation(donation: IDonationData) {
+		const amount = donation.amount_in_user_currency;
+		const lotId = donation.message.match(/\B(\#[\d]+\b)(?!;)/);
+		const haveUrl = isUrl(donation.message);
+		const isEnoughAmount = amount >= Number($stopSpin.value);
+
+		if ($wheel.isSpinning && $additionSpinTime.isToggled) {
+			addSpinTime(amount);
+		}
+
+		if (lotId) {
+			processIdDonation(lotId, amount, donation.username);
+
+			return;
+		}
+
+		if (haveUrl) {
+			precessUrlDonation({ ...donation, amount_in_user_currency: amount });
+
+			return;
+		}
+
+		const minMergeThreshold = 40;
+		const maxMergeThreshold = 60;
+
+		let acceptableLots = [];
+		let mostSimilarLot = null;
+
+		for (const l of $lots) {
+			const comparePercent = compareStrings(donation.message, l.title);
+
+			if (comparePercent > maxMergeThreshold) {
+				lots.addValue(l.id, amount, donation.username);
+				events.add(`+${amount}: ${l.title}`);
+				acceptableLots = [];
+
+				if ($stopSpin.isToggled && $wheel.isSpinning && isEnoughAmount) {
+					wheel.stop();
+					timer.reset();
+				}
+
+				return;
+			}
+
+			if ($stopSpin.isToggled && $wheel.isSpinning && isEnoughAmount) {
+				lots.add(donation.message, amount, donation.username);
+				events.add(`${donation.message}`, 'add');
+
+				wheel.stop();
+				timer.reset();
+
+				return;
+			}
+
+			if (comparePercent > minMergeThreshold) {
+				acceptableLots.push({
+					...l,
+					comparePercent
+				});
+			}
+		}
+
+		if (acceptableLots.length > 0) {
+			mostSimilarLot = acceptableLots.reduce((prev, current) =>
+				prev.comparePercent > current.comparePercent ? prev : current
+			);
+		}
+
+		donations.add({ ...donation, mostSimilarLot });
 	}
 
 	async function connectToTwitchSocket() {
@@ -127,6 +247,7 @@
 					type: 'LISTEN',
 					data: {
 						topics: [`channel-points-channel-v1.${twitchChannel}`],
+						// auth_token: '8d5170babd45d7f'
 						auth_token: twitchSession
 					}
 				})
@@ -138,13 +259,15 @@
 			rewardId = await fetch(`/api/twitch/rewards?broadcaster_id=${twitchChannel}`, {
 				method: 'POST',
 				headers: {
+					// Authorization: `Bearer 8d5170babd45d7f`
 					Authorization: `Bearer ${twitchSession}`
 				}
 			})
 				.then((res) => res.json())
-				.then((data) => data.data);
+				.then((data) => data.data[0].id);
 
 			console.log(rewardId);
+
 			heartbeat();
 			heartbeatInterval = setInterval(() => {
 				heartbeat();
@@ -157,10 +280,12 @@
 			if (message.type === 'RECONNECT') {
 				setTimeout(connectToTwitchSocket, reconnectInterval);
 			}
+
 			if (message.type === 'RESPONSE' && message.error === '') {
 				isConnectingToTwitch = false;
 			}
-			if (message.type === 'reward-redeemed' && rewardId === message.data.redemption.id) {
+
+			if (message.type === 'reward-redeemed' && rewardId === message.data.redemption.reward.id) {
 				const redeemedReward: ITwitchRedeemedReward = message.data;
 				const id = redeemedReward.redemption.id;
 				const username = redeemedReward.redemption.user.display_name;
@@ -168,7 +293,7 @@
 				const amount = redeemedReward.redemption.reward.cost;
 				const createdAt = redeemedReward.redemption.redeemed_at;
 
-				donations.add({
+				processDonation({
 					id,
 					username,
 					amount,
@@ -243,100 +368,8 @@
 				const donation: IDonationData = message.result.data.data;
 				const username = donation.username ?? 'Аноним';
 				const roundedAmount = Math.round(donation.amount_in_user_currency);
-				const isEnoughAmount = roundedAmount >= Number($stopWheelOnDonation.value);
-				const lotId = donation.message.match(/\B(\#[\d]+\b)(?!;)/);
-				const haveUrl = isUrl(donation.message);
 
-				if ($wheel.isSpinning && $addWheelSpinTimeOnDonation.isToggled) {
-					addSpinTime(roundedAmount);
-				}
-
-				if (lotId) {
-					const id = Number(lotId[0].replace('#', ''));
-
-					for (const l of $lots) {
-						if (l.id !== id) continue;
-
-						lots.addValue(id, roundedAmount, username);
-						events.add(`+${roundedAmount}: ${l.title}`);
-					}
-
-					if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughAmount) {
-						wheel.stop();
-						timer.reset();
-					}
-
-					return;
-				}
-
-				if (haveUrl) {
-					if (!$wheel.isSpinning) {
-						donations.add({
-							...donation,
-							amount_in_user_currency: roundedAmount,
-							username
-						});
-					} else {
-						lots.add(donation.message, roundedAmount, username);
-						events.add(`${donation.message}`, 'add');
-
-						if ($stopWheelOnDonation.isToggled && isEnoughAmount) {
-							wheel.stop();
-							timer.reset();
-						}
-					}
-
-					return;
-				}
-
-				const minMergeTreshold = 40;
-				const maxMergeTreshold = 60;
-
-				let acceptableLots = [];
-				let mostSimilarLot = null;
-
-				for (const l of $lots) {
-					const comparePercent = compareStrings(donation.message, l.title);
-
-					if (comparePercent > maxMergeTreshold) {
-						lots.addValue(l.id, roundedAmount, username);
-						events.add(`+${roundedAmount}: ${l.title}`);
-						acceptableLots = [];
-
-						if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughAmount) {
-							wheel.stop();
-							timer.reset();
-						}
-
-						return;
-					} else if ($stopWheelOnDonation.isToggled && $wheel.isSpinning && isEnoughAmount) {
-						lots.add(donation.message, roundedAmount, username);
-						events.add(`${donation.message}`, 'add');
-
-						wheel.stop();
-						timer.reset();
-
-						return;
-					} else if (comparePercent > minMergeTreshold) {
-						acceptableLots.push({
-							...l,
-							comparePercent
-						});
-					}
-				}
-
-				if (acceptableLots.length > 0) {
-					mostSimilarLot = acceptableLots.reduce((prev, current) =>
-						prev.comparePercent > current.comparePercent ? prev : current
-					);
-				}
-
-				donations.add({
-					...donation,
-					amount_in_user_currency: roundedAmount,
-					username,
-					mostSimilarLot
-				});
+				processDonation({ ...donation, username, amount_in_user_currency: roundedAmount });
 			}
 		});
 		donationAlertsWebSocket.addEventListener('close', () => {
@@ -348,18 +381,20 @@
 	}
 </script>
 
-<div class="layout" transition:fade>
+<div class="layout">
 	<div class="layout-section layout-section_left">
 		<h1 style="font-size: 28px;">Правила Аукциона</h1>
 		<!-- <h2 style="font-size: 28px;">По умолчанию</h2> -->
+		{#if $additionSpinTime.isToggled}
+			<h3 style="font-size: 28px; text-align: center;">
+				Продлениe прокрута <br />
+				{$additionSpinTimePrice.value}
+				{$additionSpinTimePrice.valueAttribute}
+			</h3>
+		{/if}
 		<h3 style="white-space: break-spaces; font-size: 24px;">
 			{JSON.parse(JSON.stringify($textRules))}
 		</h3>
-		<!-- <h2>
-			Сумма для доп. времени прокрута
-			{$addWheelSpinTimeMinDonationPriceStep.value}
-			{$addWheelSpinTimeMinDonationPriceStep.valueAttribute}
-		</h2> -->
 	</div>
 	<div class="layout-section layout-section_center">
 		<div class="layout-section-wrapper">
@@ -444,6 +479,7 @@
 			padding: 20px;
 		}
 		&-section-wrapper {
+			position: relative;
 			display: flex;
 			justify-content: center;
 			flex: 1 1 0;

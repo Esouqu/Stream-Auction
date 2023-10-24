@@ -1,20 +1,22 @@
 <script lang="ts">
-	import Dropdown from '$lib/components/Dropdown.svelte';
+	import Input from '$lib/components/Input.svelte';
 	import Setting from '$lib/components/Setting.svelte';
 	import Textarea from '$lib/components/Textarea.svelte';
 	import {
-		stopWheelOnDonation,
+		stopSpin,
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
 		textRules,
 		timerStarterTime,
-		addWheelSpinTimeOnDonation,
-		addWheelSpinTimeMinDonationPrice
+		additionSpinTime,
+		additionSpinTimePrice,
+		additionSpinTimePriceStep
 	} from '$lib/stores/settings';
 	import timer from '$lib/stores/timer';
-	import { fly } from 'svelte/transition';
+	import wheel from '$lib/stores/wheel';
+	import { slide } from 'svelte/transition';
 
-	let presets: string[] = ['По умолчанию'];
+	// $: timer.setInitialTime($timerStarterTime.value * 1000 * 60);
 </script>
 
 <svelte:head>
@@ -23,65 +25,66 @@
 
 <section class="settings-section">
 	<!-- <Dropdown options={presets} /> -->
-
-	<Textarea id="rules-setting" bind:value={$textRules} />
+	<Textarea id="rules-setting" bind:value={$textRules} placeholder="Мои правила аукциона" />
 	<div class="toggles-wrapper">
-		<Setting
-			id={1}
-			bind:isToggled={$stopWheelOnDonation.isToggled}
-			bind:value={$stopWheelOnDonation.value}
-			description={$stopWheelOnDonation.description}
-			valueKey={$stopWheelOnDonation.valueAttribute}
-		/>
-		<Setting
-			id={2}
-			bind:isToggled={$addWheelSpinTimeOnDonation.isToggled}
-			bind:value={$addWheelSpinTimeOnDonation.value}
-			description={$addWheelSpinTimeOnDonation.description}
-			valueKey={$addWheelSpinTimeOnDonation.valueAttribute}
-		/>
-		<Setting
-			id={3}
-			bind:isToggled={$addWheelSpinTimeMinDonationPrice.isToggled}
-			bind:value={$addWheelSpinTimeMinDonationPrice.value}
-			description={$addWheelSpinTimeMinDonationPrice.description}
-			valueKey={$addWheelSpinTimeMinDonationPrice.valueAttribute}
-		/>
-		<!-- <Setting
-			id={4}
-			bind:isToggled={$addWheelSpinTimeMinDonationPriceStep.isToggled}
-			bind:value={$addWheelSpinTimeMinDonationPriceStep.value}
-			description={$addWheelSpinTimeMinDonationPriceStep.description}
-			valueKey={$addWheelSpinTimeMinDonationPriceStep.valueAttribute}
-		/> -->
-		<Setting
-			id={5}
-			bind:isToggled={$addTimeOnNewItem.isToggled}
-			bind:value={$addTimeOnNewItem.value}
-			description={$addTimeOnNewItem.description}
-			valueKey={$addTimeOnNewItem.valueAttribute}
-		/>
-		<Setting
-			id={6}
-			bind:isToggled={$addTimeOnNewLeader.isToggled}
-			bind:value={$addTimeOnNewLeader.value}
-			description={$addTimeOnNewLeader.description}
-			valueKey={$addTimeOnNewLeader.valueAttribute}
-		/>
-		<Setting
-			id={7}
-			bind:isToggled={$timerStarterTime.isToggled}
-			bind:value={$timerStarterTime.value}
-			description={$timerStarterTime.description}
-			valueKey={$timerStarterTime.valueAttribute}
-			callback={() => timer.setInitialTime(Number($timerStarterTime.value) * 1000 * 60)}
-		/>
+		<div class="toggles toggles_wheel">
+			<Setting
+				id={0}
+				description={$stopSpin.description}
+				bind:isToggled={$stopSpin.isToggled}
+				bind:value={$stopSpin.value}
+			/>
+			<Setting
+				id={1}
+				description={$additionSpinTime.description}
+				bind:isToggled={$additionSpinTime.isToggled}
+				bind:value={$additionSpinTime.value}
+			/>
+			{#if $additionSpinTime.isToggled}
+				<div
+					style="display: flex; flex-direction: column; gap: 10px; padding-left: 15px;"
+					transition:slide={{ duration: 200, axis: 'y' }}
+				>
+					<Setting
+						id={2}
+						description={$additionSpinTimePrice.description}
+						bind:value={$additionSpinTimePrice.value}
+					/>
+					<Setting
+						id={3}
+						description={$additionSpinTimePriceStep.description}
+						bind:value={$additionSpinTimePriceStep.value}
+					/>
+				</div>
+			{/if}
+		</div>
+		<div class="toggles toggles_timer">
+			<Setting
+				id={4}
+				description={$timerStarterTime.description}
+				bind:isToggled={$timerStarterTime.isToggled}
+				bind:value={$timerStarterTime.value}
+				isDisabled={$wheel.isSpinning}
+				callback={() => timer.setInitialTime($timerStarterTime.value * 1000 * 60)}
+			/>
+			<Setting
+				id={5}
+				description={$addTimeOnNewItem.description}
+				bind:isToggled={$addTimeOnNewItem.isToggled}
+				bind:value={$addTimeOnNewItem.value}
+			/>
+			<Setting
+				id={6}
+				description={$addTimeOnNewLeader.description}
+				bind:isToggled={$addTimeOnNewLeader.isToggled}
+				bind:value={$addTimeOnNewLeader.value}
+			/>
+		</div>
 	</div>
 </section>
 
 <style lang="scss">
 	.settings-section {
-		position: absolute;
 		display: flex;
 		flex: 1;
 		flex-direction: column;
@@ -91,6 +94,25 @@
 	.toggles-wrapper {
 		display: flex;
 		flex-direction: column;
+		gap: 30px;
+	}
+	.toggles {
+		display: flex;
+		flex-direction: column;
 		gap: 10px;
+
+		&::before {
+			content: '';
+			margin: 8px 0;
+			font-size: 24px;
+			font-weight: 600;
+		}
+
+		&_wheel::before {
+			content: 'Колесо';
+		}
+		&_timer::before {
+			content: 'Таймер';
+		}
 	}
 </style>

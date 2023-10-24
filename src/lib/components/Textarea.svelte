@@ -1,17 +1,11 @@
 <script lang="ts">
 	export let id: string;
 	export let value: string;
-	//   (Без видосов, не больше 2-ух часов, мб с горстинкой):
-
-	// Желательно твич френдли;
-	// Можно кино старше 1990 года (но не до 1960), если на КП или ИМБД больше 20к оценок;
-	// Без жести и пиздецового артхауса;
-	// Желательно донатить под своим ником;
-	// 15 мин, каждый лот +30 сек, перебив +1 мин
+	export let placeholder: string;
 </script>
 
 <div class="textarea-wrapper">
-	<textarea class="textarea" {id} rows="10" bind:value spellcheck="false" />
+	<textarea class="textarea" {id} rows="10" bind:value spellcheck="false" {placeholder} />
 </div>
 
 <style lang="scss">
