@@ -13,10 +13,11 @@
 	class="icon-button"
 	class:icon-button_text={text}
 	class:icon-button_black={color === 'black'}
+	class:icon-button_white={color === 'white'}
+	style="--btn-shadow-c: {shadowColor}"
 	on:click|stopPropagation
 >
 	<img
-		style="--icon-sc: {shadowColor}"
 		class:shadowed={!!shadowColor}
 		src={getIcon(icon, color)}
 		alt="Icon button"
@@ -47,6 +48,7 @@
 
 		&_text {
 			width: auto;
+			text-shadow: 0 3px 0 var(--btn-shadow-c);
 
 			& div {
 				display: flex;
@@ -67,9 +69,21 @@
 				height: 100%;
 			}
 		}
-		&_black:hover {
-			background-color: rgba(0, 0, 0, 0.1) !important;
+		&_black {
+			color: black;
+
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.1) !important;
+			}
 		}
+		&_white {
+			color: white;
+
+			&:hover {
+				background-color: rgba(255, 255, 255, 0.1) !important;
+			}
+		}
+
 		&:hover {
 			background-color: rgba(255, 255, 255, 0.1);
 		}
@@ -82,7 +96,7 @@
 			object-fit: contain;
 
 			&.shadowed {
-				filter: drop-shadow(0px 2px 0px var(--icon-sc, black));
+				filter: drop-shadow(0px 2px 0px var(--btn-shadow-c, black));
 			}
 		}
 	}

@@ -6,6 +6,7 @@
 	import type { ILot } from '$lib/interfaces';
 
 	export let id: number | string;
+	export let type: 'Twitch' | 'Donation Alerts';
 	export let message: string;
 	export let username: string;
 	export let amount: number;
@@ -43,12 +44,14 @@
 <div
 	class="donation-wrapper"
 	class:dragged={isDragged}
+	class:twitch={type === 'Twitch'}
+	class:donation-alerts={type === 'Donation Alerts'}
 	on:dragstart={(e) => handleDragStart(e)}
 	on:dragend={() => (isDragged = false)}
-	aria-hidden
-	draggable="true"
 	in:fly={{ y: 100 }}
 	out:fade
+	aria-hidden
+	draggable="true"
 >
 	<div class="donation">
 		<div class="donation__info">
@@ -60,17 +63,23 @@
 		<div class="donation-buttons-wrapper">
 			<Button
 				icon="listAddItem"
-				color="black"
-				shadowColor="#F9A148"
+				color={type === 'Twitch' ? 'white' : 'black'}
+				shadowColor={type === 'Twitch' ? '#4b00bd' : '#F9A148'}
 				on:click={(e) => handleAdd(e)}
 			/>
 			{#if mostSimilarLot}
-				<Button icon="plus" color="black" text={mostSimilarLot.title} on:click={handleAddSimilar} />
+				<Button
+					icon="plus"
+					color={type === 'Twitch' ? 'white' : 'black'}
+					shadowColor={type === 'Twitch' ? '#4b00bd' : '#F9A148'}
+					text={mostSimilarLot.title}
+					on:click={handleAddSimilar}
+				/>
 			{/if}
 			<Button
 				icon="delete"
-				color="black"
-				shadowColor="#F9A148"
+				color={type === 'Twitch' ? 'white' : 'black'}
+				shadowColor={type === 'Twitch' ? '#4b00bd' : '#F9A148'}
 				on:click={() => donations.remove(id)}
 			/>
 		</div>
@@ -84,28 +93,54 @@
 		display: flex;
 		flex-direction: column;
 		padding: 20px;
-		color: black;
 
-		&__description {
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 3;
-			text-shadow: 0px 2px 0px #f9a148;
-			font-weight: 700;
-			overflow: hidden;
-		}
 		&-wrapper {
 			position: relative;
 			width: 375px;
 			border-radius: 10px;
-			box-shadow: 0 0 0 0 #909090;
+			box-shadow: 0 2px 4px black;
 			transform: scale(1);
 			line-height: 18px;
-			background-color: var(--color-orange);
+
 			transition: 0.2s;
 			will-change: transform;
 			user-select: none;
 			cursor: grab;
+
+			&.donation-alerts {
+				color: black;
+				background-color: var(--color-orange);
+
+				&::before {
+					background-image: url('/src/lib/assets/donationalerts_background.png');
+				}
+				&::after {
+					background-color: var(--color-orange);
+				}
+				& .donation__description {
+					text-shadow: 0px 3px 0px #f9a148;
+				}
+				& .donation__info p {
+					text-shadow: 0px 3px 0px #f9a148;
+				}
+			}
+			&.twitch {
+				color: white;
+				background-color: var(--color-purple);
+
+				&::before {
+					background-image: url('/src/lib/assets/twitch_background.png');
+				}
+				&::after {
+					background-color: var(--color-purple);
+				}
+				& .donation__description {
+					text-shadow: 0px 3px 0px #4b00bd;
+				}
+				& .donation__info p {
+					text-shadow: 0px 3px 0px #4b00bd;
+				}
+			}
 
 			&::before {
 				content: '';
@@ -148,7 +183,17 @@
 
 			&:hover {
 				transform: scale(1.05);
+				box-shadow: 0 2px 10px black;
 			}
+		}
+
+		&__description {
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 3;
+			text-shadow: 0px 2px 0px #f9a148;
+			font-weight: 700;
+			overflow: hidden;
 		}
 
 		&-buttons-wrapper {

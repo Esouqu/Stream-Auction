@@ -8,10 +8,12 @@
 	import { page } from '$app/stores';
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
+	import getIcon from '$lib/icons';
 
 	const routes: IRoute[] = [
 		{ id: 0, title: 'Лоты', icon: listIcon, url: '/' },
 		{ id: 1, title: 'Колесо', icon: pieIcon, url: '/wheel' },
+		// { id: 2, title: 'Множитель', icon: getIcon('bomb'), url: '/multiplier' },
 		// { id: 2, title: 'События', icon: eventIcon, url: '/events' },
 		{ id: 2, title: 'Настройки', icon: settingsIcon, url: '/settings' }
 	];
@@ -113,10 +115,6 @@
 			&:not(.active) {
 				cursor: pointer;
 				opacity: 0.2;
-			}
-
-			& img {
-				filter: invert(1) brightness(130%);
 			}
 		}
 

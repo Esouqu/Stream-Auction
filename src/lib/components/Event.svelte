@@ -8,6 +8,7 @@
 	export let id: number;
 	export let message: string = '+60 сек. к таймеру';
 	export let type: eventTypes = null;
+	export let donationType: 'Twitch' | 'Donation Alerts';
 
 	onMount(() => {
 		setTimeout(() => {
@@ -16,7 +17,13 @@
 	});
 </script>
 
-<div class="event" in:fly={{ y: 100 }} out:fade>
+<div
+	class="event"
+	class:twitch={donationType === 'Twitch'}
+	class:donation-alerts={donationType === 'Donation Alerts'}
+	in:fly={{ y: 100 }}
+	out:fade
+>
 	<div class="event-inner-wrapper">
 		{#if type}
 			<div class="event-icon-wrapper">
@@ -35,7 +42,16 @@
 		align-items: center;
 		width: 375px;
 		border-radius: 10px;
+		box-shadow: 0 2px 4px black;
+		color: white;
 		background-color: var(--color-orange);
+
+		&.donation-alerts {
+			background-color: var(--color-orange);
+		}
+		&.twitch {
+			background-color: var(--color-purple);
+		}
 
 		&-inner-wrapper {
 			display: flex;
@@ -50,6 +66,7 @@
 			width: 100%;
 			line-break: anywhere;
 			font-size: 18px;
+			font-weight: 700;
 			text-overflow: ellipsis;
 			overflow: hidden;
 		}
