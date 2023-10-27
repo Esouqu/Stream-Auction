@@ -304,8 +304,10 @@
 		font-weight: bold;
 		text-align: center;
 		text-transform: uppercase;
+		text-overflow: ellipsis;
 		color: white;
 		background-color: rgba(0, 0, 0, 0.5);
+		overflow: hidden;
 
 		&-donators {
 			display: flex;
