@@ -31,12 +31,14 @@
 			<Setting
 				id={0}
 				description={$stopSpin.description}
+				attribute={$stopSpin.valueAttribute}
 				bind:isToggled={$stopSpin.isToggled}
 				bind:value={$stopSpin.value}
 			/>
 			<Setting
 				id={1}
 				description={$additionSpinTime.description}
+				attribute={$additionSpinTime.valueAttribute}
 				bind:isToggled={$additionSpinTime.isToggled}
 				bind:value={$additionSpinTime.value}
 			/>
@@ -48,11 +50,13 @@
 					<Setting
 						id={2}
 						description={$additionSpinTimePrice.description}
+						attribute={$additionSpinTimePrice.valueAttribute}
 						bind:value={$additionSpinTimePrice.value}
 					/>
 					<Setting
 						id={3}
 						description={$additionSpinTimePriceStep.description}
+						attribute={$additionSpinTimePriceStep.valueAttribute}
 						bind:value={$additionSpinTimePriceStep.value}
 					/>
 				</div>
@@ -62,6 +66,7 @@
 			<Setting
 				id={4}
 				description={$timerStarterTime.description}
+				attribute={$timerStarterTime.valueAttribute}
 				bind:isToggled={$timerStarterTime.isToggled}
 				bind:value={$timerStarterTime.value}
 				isDisabled={$wheel.isSpinning}
@@ -70,12 +75,14 @@
 			<Setting
 				id={5}
 				description={$addTimeOnNewItem.description}
+				attribute={$addTimeOnNewItem.valueAttribute}
 				bind:isToggled={$addTimeOnNewItem.isToggled}
 				bind:value={$addTimeOnNewItem.value}
 			/>
 			<Setting
 				id={6}
 				description={$addTimeOnNewLeader.description}
+				attribute={$addTimeOnNewLeader.valueAttribute}
 				bind:isToggled={$addTimeOnNewLeader.isToggled}
 				bind:value={$addTimeOnNewLeader.value}
 			/>
