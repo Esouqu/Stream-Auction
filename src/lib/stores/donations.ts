@@ -11,10 +11,20 @@ function createDonations() {
     update((donations) => donations.filter((don) => don.id !== id));
   }
 
+  function setValue(id: number, value: number) {
+    update((donations) => donations.map((donation) => {
+      if (donation.id !== id) return donation;
+
+
+      return { ...donation, amount: value, amount_in_user_currency: value };
+    }));
+  }
+
   return {
     subscribe,
     add,
     remove,
+    setValue
   }
 }
 

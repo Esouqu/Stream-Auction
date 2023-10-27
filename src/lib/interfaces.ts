@@ -33,6 +33,7 @@ export interface IAuthTokenData {
 
 export interface IDonationData {
   id: number | string;
+  type: 'Twitch' | 'Donation Alerts';
   username: string;
   amount: number;
   amount_in_user_currency: number;

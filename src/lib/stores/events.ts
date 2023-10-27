@@ -4,7 +4,8 @@ import { writable } from 'svelte/store';
 interface IEvent {
   id: number;
   message: string;
-  type: eventTypes
+  type: eventTypes;
+  donationType: 'Twitch' | 'Donation Alerts';
 }
 
 function createEvents() {
@@ -12,10 +13,10 @@ function createEvents() {
 
   let id = 0;
 
-  function add(message: string, type: eventTypes = null) {
+  function add(message: string, donationType: 'Twitch' | 'Donation Alerts', type: eventTypes = null,) {
     id += 1;
 
-    update((messages) => [...messages, { id, message, type }]);
+    update((messages) => [...messages, { id, message, type, donationType }]);
   }
 
   function remove(id: number) {

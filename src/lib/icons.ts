@@ -11,8 +11,11 @@ import listRemoveIcon from '$lib/assets/list_remove_icon.svg';
 import infoIcon from '$lib/assets/donators_list_icon.svg';
 import plusIcon from '$lib/assets/add_icon.svg';
 import plusIconBlack from '$lib/assets/add_icon_black.svg';
-import trashcan from '$lib/assets/trashcan_icon.svg';
-import visibility from '$lib/assets/visibility_off_icon.svg';
+import trashcanIcon from '$lib/assets/trashcan_icon.svg';
+import visibilityIcon from '$lib/assets/visibility_off_icon.svg';
+import bombIcon from '$lib/assets/bomb_icon.svg';
+import bombIconBlack from '$lib/assets/bomb_icon_black.svg';
+import helpIcon from '$lib/assets/help_icon.svg';
 
 export type iconTypes =
   | 'listAddItem'
@@ -26,7 +29,9 @@ export type iconTypes =
   | 'info'
   | 'plus'
   | 'trashcan'
-  | 'visibility';
+  | 'visibility'
+  | 'bomb'
+  | 'help';
 
 export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'white') {
   switch (icon) {
@@ -49,9 +54,13 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
     case 'info':
       return infoIcon;
     case 'trashcan':
-      return trashcan;
+      return trashcanIcon;
     case 'visibility':
-      return visibility;
+      return visibilityIcon;
+    case 'help':
+      return helpIcon;
+    case 'bomb':
+      return color === 'white' ? bombIcon : bombIconBlack;
     case 'plus':
       return color === 'white' ? plusIcon : plusIconBlack;
     default:

@@ -44,7 +44,7 @@ export function shuffleArray<T>(array: T[]): T[] {
 }
 
 export function getTotal(values: number[]) {
-  return values.reduce((a, b) => a + b, 0);
+  return values.reduce((sum, amount) => sum + amount, 0);
 }
 
 export function compareStrings(str1: string, str2: string) {

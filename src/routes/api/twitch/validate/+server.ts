@@ -1,19 +1,14 @@
-import { redirect, type RequestHandler } from "@sveltejs/kit";
+import type { RequestHandler } from "@sveltejs/kit";
 import axios from "axios";
 
-export const GET: RequestHandler = async ({ fetch }) => {
-  const session = await fetch('/api/twitch/session').then((res) => res.json());
+export const GET: RequestHandler = async ({ cookies }) => {
+  const session = cookies.get('twitchSession');
 
-  if (!session) throw redirect(302, '/');
+  if (!session) return new Response('No twitch session available', { status: 401 });
 
-  const isValid = await axios.get('https://id.twitch.tv/oauth2/validate', {
+  const validatedToken = await axios.get('https://id.twitch.tv/oauth2/validate', {
     headers: { 'Authorization': `Bearer ${session}` }
   }).then((res) => res);
 
-  if (isValid.status === 200) {
-    return new Response(JSON.stringify(isValid.data), { status: isValid.status });
-  } else {
-    await fetch('/api/twitch/refresh').then((res) => res.json()).then((data) => data);
-    return new Response(JSON.stringify(isValid.data), { status: isValid.status });
-  }
+  return new Response(JSON.stringify(validatedToken.data), { status: 200 });
 };

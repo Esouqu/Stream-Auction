@@ -7,9 +7,11 @@ interface ISocketTokenData {
   }[]
 }
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
-  const session = await fetch('/api/da/session').then((res) => res.json()).then((data) => data);
+export const POST: RequestHandler = async ({ request, cookies }) => {
+  const session = cookies.get('daSession');
   const body = await request.json();
+
+  if (!session) return new Response('No donation alerts session available', { status: 401 });
 
   const url = 'https://www.donationalerts.com/api/v1/centrifuge/subscribe';
   const data = await axios.post<ISocketTokenData>(url, body, {
