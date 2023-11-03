@@ -529,7 +529,7 @@
 				justify-content: space-between;
 				padding: 30px 0;
 				box-shadow: 0px 4px 15px black;
-				background-color: rgb(20 20 20 / 40%);
+				background-color: rgb(20 20 20 / 70%);
 				overflow: hidden;
 			}
 			&_right {
@@ -565,7 +565,7 @@
 		}
 	}
 	.navigation-wrapper {
-		padding: 50px 0 0 0;
+		padding: 60px 0 0 0;
 	}
 
 	.integrations-wrapper {
@@ -577,7 +577,7 @@
 		min-width: 350px;
 		max-width: 350px;
 		box-shadow: 0px 3px 8px black;
-		background-color: rgb(20 20 20 / 40%);
+		background-color: rgb(20 20 20 / 70%);
 
 		&::before {
 			content: 'Интеграции';
