@@ -41,10 +41,16 @@
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
 	$: $lots, addCountdownTime();
+	$: isWheelSpinning = wheel.isSpinning;
 
 	onMount(() => {
+		const bgImage = localStorage.getItem('bgImage');
 		const validationInterval = 1000 * 60 * 60;
 		let validationIntervalId: NodeJS.Timeout;
+
+		if (bgImage) {
+			document.querySelector('body')!.style.backgroundImage = `url(${bgImage})`;
+		}
 
 		validationIntervalId = setInterval(async () => {
 			await fetch('/api/twitch/validate');
