@@ -503,6 +503,7 @@
 			justify-content: center;
 			flex: 1 1 0;
 			width: 100%;
+			overflow: hidden;
 		}
 		&-section {
 			position: relative;
