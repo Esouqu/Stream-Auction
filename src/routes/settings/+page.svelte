@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FileUploader from '$lib/components/FileUploader.svelte';
 	import Input from '$lib/components/Input.svelte';
 	import Setting from '$lib/components/Setting.svelte';
 	import Textarea from '$lib/components/Textarea.svelte';
@@ -16,7 +17,7 @@
 	import wheel from '$lib/stores/wheel';
 	import { slide } from 'svelte/transition';
 
-	// $: timer.setInitialTime($timerStarterTime.value * 1000 * 60);
+	// $: isWheelSpinning = wheel.isSpinning;
 </script>
 
 <svelte:head>
@@ -27,6 +28,10 @@
 	<!-- <Dropdown options={presets} /> -->
 	<Textarea id="rules-setting" bind:value={$textRules} placeholder="Мои правила аукциона" />
 	<div class="toggles-wrapper">
+		<div>
+			<h2>Фоновое Изображение</h2>
+			<FileUploader />
+		</div>
 		<div class="toggles toggles_wheel">
 			<Setting
 				id={0}
@@ -43,10 +48,7 @@
 				bind:value={$additionSpinTime.value}
 			/>
 			{#if $additionSpinTime.isToggled}
-				<div
-					style="display: flex; flex-direction: column; gap: 10px; padding-left: 15px;"
-					transition:slide={{ duration: 200, axis: 'y' }}
-				>
+				<div class="toggles-options" transition:slide={{ duration: 200, axis: 'y' }}>
 					<Setting
 						id={2}
 						description={$additionSpinTimePrice.description}
@@ -69,7 +71,6 @@
 				attribute={$timerStarterTime.valueAttribute}
 				bind:isToggled={$timerStarterTime.isToggled}
 				bind:value={$timerStarterTime.value}
-				isDisabled={$wheel.isSpinning}
 				callback={() => timer.setInitialTime($timerStarterTime.value * 1000 * 60)}
 			/>
 			<Setting
@@ -96,7 +97,10 @@
 		flex: 1;
 		flex-direction: column;
 		gap: 20px;
-		padding: 30px;
+		padding: 0 30px;
+		scrollbar-gutter: stable;
+		overflow-x: hidden;
+		overflow-y: auto;
 	}
 	.toggles-wrapper {
 		display: flex;
@@ -107,6 +111,25 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
+
+		&-options {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			padding-left: 15px;
+
+			&::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 3px;
+				height: 100%;
+				border-radius: 10px;
+				background-color: var(--color-orange);
+			}
+		}
 
 		&::before {
 			content: '';
