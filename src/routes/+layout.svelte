@@ -164,7 +164,6 @@
 		}
 
 		if (donation.message.toLowerCase().includes(donationStopWord)) {
-			console.log(donation.message.toLowerCase());
 			const replacedMessage = donation.message.toLowerCase().replace('#bomb', '');
 			donations.add({ ...donation, message: replacedMessage });
 
