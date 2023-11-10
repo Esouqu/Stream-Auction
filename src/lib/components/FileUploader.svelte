@@ -1,4 +1,5 @@
 <script lang="ts">
+	import backgroundImage from '$lib/stores/backgroundImage';
 	import TextButton from './TextButton.svelte';
 
 	let error = '';
@@ -6,14 +7,13 @@
 	function handleClear() {
 		if (!localStorage.getItem('bgImage')) return;
 
-		const backgroundElement = document.querySelector('body');
-		backgroundElement!.style.backgroundImage = '';
+		backgroundImage.clear();
 		localStorage.removeItem('bgImage');
 	}
 
 	function handleFileInput(e: Event) {
 		const target = e.target as HTMLInputElement;
-		const backgroundElement = document.querySelector('body');
+
 		error = '';
 
 		if (!target.files) return;
@@ -30,7 +30,7 @@
 
 			const imageUrl = e.target?.result;
 
-			backgroundElement!.style.backgroundImage = `url(${imageUrl})`;
+			backgroundImage.set(`url(${imageUrl})`);
 			localStorage.setItem('bgImage', JSON.stringify(imageUrl));
 		};
 
@@ -43,7 +43,7 @@
 		<p class="file-uploader-error">{error}</p>
 	{/if}
 	<input type="file" id="file-uploader" accept="image/*" on:change={(e) => handleFileInput(e)} />
-	<TextButton --text-b-fs="14px" text="Очистить" on:click={handleClear} />
+	<TextButton --text-b-fs="14px" text="Убрать Фон" on:click={handleClear} />
 </div>
 
 <style lang="scss">

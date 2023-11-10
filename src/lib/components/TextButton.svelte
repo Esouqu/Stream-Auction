@@ -29,6 +29,7 @@
 		border: 0;
 		border-radius: 10px;
 		box-shadow: 0 2px 2px black;
+		line-height: 1;
 		font-size: var(--text-b-fs, 16px);
 		font-weight: 700;
 		text-transform: uppercase;

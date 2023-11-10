@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-	<title>Аукцион</title>
+	<title>Лоты - Аукцион</title>
 </svelte:head>
 
 <section class="auction-section">
@@ -24,9 +24,10 @@
 	</div>
 	<div style="position: relative; display: flex; flex: 1 1 0; flex-direction: column;">
 		<div class="utils-row">
+			<p>Всего:</p>
 			{#if isTotalShown}
 				<p transition:slide={{ duration: 200, axis: 'x' }}>
-					Всего: {total}
+					{total}
 				</p>
 			{/if}
 			<Button icon="visibility" on:click={() => (isTotalShown = !isTotalShown)} />
@@ -40,7 +41,7 @@
 				{#each sortedLots as lot (lot.id)}
 					{@const percent = (lot.value / getTotal($lots.map((item) => item.value))) * 100}
 
-					<li animate:flip={{ duration: 200 }} transition:fly={{ duration: 200 }}>
+					<li animate:flip={{ duration: 200 }}>
 						<Lot {...lot} value={String(lot.value)} {percent} />
 					</li>
 				{/each}

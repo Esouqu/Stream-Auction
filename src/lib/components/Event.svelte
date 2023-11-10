@@ -1,13 +1,13 @@
 <script lang="ts">
 	import getIcon from '$lib/icons';
-	import type { eventTypes } from '$lib/interfaces';
+	import type { EventType } from '$lib/interfaces';
 	import events from '$lib/stores/events';
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 
 	export let id: number;
 	export let message: string = '+60 сек. к таймеру';
-	export let type: eventTypes = null;
+	export let type: EventType = null;
 	export let donationType: 'Twitch' | 'Donation Alerts';
 
 	onMount(() => {

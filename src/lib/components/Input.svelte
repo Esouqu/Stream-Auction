@@ -7,22 +7,19 @@
 	export let type: 'text' | 'number';
 	export let placeholder: string;
 	export let isDisabled = false;
-	export let isDefault = true;
+	export let isPreventInput = false;
 	export let colorStyle: 'white' | 'default' = 'default';
-	export let callback: (() => void) | null = null;
+	export let onEnter: (() => void) | null = null;
 
 	const pathName = $page.url.pathname;
 
 	function handleInput(e: Event) {
-		if (!isDefault) return;
+		if (isPreventInput) return;
+
 		const target = e.target as HTMLInputElement;
 
 		if (type === 'number') {
-			value = target.value;
-
-			const parsedValue = value.match(/\d+|[\+]|[\-]/g)?.join('');
-
-			value = parsedValue ?? '';
+			parseInput(target);
 		} else {
 			value = target.value;
 		}
@@ -32,59 +29,22 @@
 		const target = e.target as HTMLInputElement;
 		const isConfirmKey = e.code === 'Enter';
 
-		if (!callback || !isConfirmKey) return;
+		if (!onEnter || !isConfirmKey) return;
 
 		if (type === 'number') {
-			value = target.value;
-			parseCalculation();
+			parseInput(target);
 		} else {
 			value = target.value;
 		}
 
-		callback();
+		onEnter();
 		target.blur();
 	}
 
-	function handleBlur(e: Event) {
-		const target = e.target as HTMLInputElement;
-
-		if (!callback) return;
-
-		if (type === 'number') {
-			value = target.value;
-			parseCalculation();
-		} else {
-			value = target.value;
-		}
-
-		callback();
-	}
-
-	function parseCalculation() {
-		const parsedValue = value.match(/\d+|[\+]|[\-]/g)?.join('');
-
+	function parseInput(target: HTMLInputElement) {
+		value = target.value;
+		const parsedValue = value.match(/\d+/g)?.join('');
 		value = parsedValue ?? '';
-
-		if (value.includes('+')) {
-			const values = value.split('+');
-			const sum = values.reduce((a, b) => Number(a) + Number(b), 0);
-
-			value = String(sum);
-		}
-		if (value.includes('-')) {
-			const values = value.split('-').map((v) => Number(v));
-			const sum = values.reduce((a, b) => {
-				const numValue = a - b;
-
-				if (isNaN(numValue) || numValue < 0) {
-					return 0;
-				}
-
-				return numValue;
-			}, 0);
-
-			value = String(sum);
-		}
 	}
 </script>
 
@@ -94,11 +54,9 @@
 		id="input-{id}-{pathName}"
 		class="input"
 		class:input_white={colorStyle === 'white'}
-		name="input-{id}-{pathName}"
 		{placeholder}
 		{value}
 		spellcheck="false"
-		on:blur={(e) => handleBlur(e)}
 		on:keydown={(e) => handleKeyDown(e)}
 		on:input|preventDefault={(e) => handleInput(e)}
 		disabled={isDisabled}

@@ -3,21 +3,16 @@
 	import Button from './Button.svelte';
 	import Input from './Input.svelte';
 
-	let newLotText: string;
-	let newLotValue: string;
+	let text: string;
+	let value: string;
 
-	function addItemOrValue() {
-		if (!newLotText || !newLotValue) return;
-		const lot = $lots.find(({ title }) => title.toLowerCase() === newLotText.toLowerCase());
+	function addItem() {
+		if (!text || !value) return;
 
-		if (lot) {
-			lots.addValue(lot.id, Number(newLotValue));
-		} else {
-			lots.add(newLotText, Number(newLotValue));
-		}
+		lots.add(text, Number(value));
 
-		newLotText = '';
-		newLotValue = '';
+		text = '';
+		value = '';
 	}
 </script>
 
@@ -27,8 +22,8 @@
 		type="text"
 		id="add-lot-text"
 		placeholder="Название лота"
-		bind:value={newLotText}
-		callback={addItemOrValue}
+		bind:value={text}
+		onEnter={addItem}
 	/>
 	<Input
 		--input-w="100px"
@@ -36,10 +31,10 @@
 		type="number"
 		id="add-lot-value"
 		placeholder="Сумма"
-		bind:value={newLotValue}
-		callback={addItemOrValue}
+		bind:value
+		onEnter={addItem}
 	/>
-	<Button icon="listAddItem" on:click={addItemOrValue} />
+	<Button icon="listAddItem" on:click={addItem} />
 </div>
 
 <style lang="scss">

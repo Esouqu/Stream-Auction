@@ -12,16 +12,9 @@ export interface ILot {
 }
 
 export interface IPieItem extends ILot {
-  shortTitle: string;
   percent: string;
   startAngle: number;
-  middleAngle: number;
   endAngle: number;
-  startPoint: IPoint;
-  middlePoint: IPoint;
-  endPoint: IPoint;
-  largeArcFlag: number;
-  isCircle: boolean;
 }
 
 export interface IAuthTokenData {
@@ -129,4 +122,5 @@ export interface ISetting {
   options: ISettingOption[];
 }
 
-export type eventTypes = 'add' | 'time' | null;
+export type EventType = 'add' | 'time' | null;
+export type BomberTileType = 'bomb' | 'coin';

@@ -1,62 +1,18 @@
-import { writable } from 'svelte/store';
-import confetti from 'canvas-confetti';
+import { get, writable } from 'svelte/store';
 
-function fireConfetti() {
-  const count = 200;
-  const defaults = {
-    origin: { y: 0.75 }
-  };
-
-  function fire(particleRatio: number, opts: confetti.Options) {
-    confetti({
-      ...defaults,
-      ...opts,
-      particleCount: Math.floor(count * particleRatio),
-      shapes: ['circle'],
-      scalar: 2 / 2
-    });
-  }
-
-  fire(0.25, {
-    spread: 26,
-    startVelocity: 55
-  });
-  fire(0.2, {
-    spread: 60
-  });
-  fire(0.35, {
-    spread: 100,
-    decay: 0.91,
-    scalar: 0.8
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 25,
-    decay: 0.92,
-    scalar: 1.2
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 45
-  });
-}
-
-interface IWheelStore {
-  isSpinning: boolean;
-  spinStartDateTime: number;
-  angle: number;
-  normalizedAngle: number;
-  spinDuration: number;
+export enum WHEEL_STATE {
+  WAITING,
+  SPINNING,
+  WINNING,
 }
 
 function createWheel() {
-  const { subscribe, update } = writable<IWheelStore>({
-    isSpinning: false,
-    spinStartDateTime: 0,
+  const { subscribe, update } = writable({
     angle: 0,
     normalizedAngle: 0,
-    spinDuration: 10,
   });
+  const state = writable(WHEEL_STATE.WAITING);
+  const spinDuration = writable(10);
 
   const maxSpeed = 5;
   const accelerationTime = 0.1;
@@ -71,59 +27,80 @@ function createWheel() {
   function giveMoment(currentTime: number) {
     if (!spinStartTime) spinStartTime = currentTime;
 
+    const duration = get(spinDuration);
+    const elapsedTime = currentTime - spinStartTime;
+    const progress = Math.min(elapsedTime / duration, 1);
+
+    if (progress >= 1 || get(state) === WHEEL_STATE.WINNING) {
+      stop();
+
+      return;
+    }
+
+    if (progress <= accelerationTime) {
+      speed = maxSpeed * (progress / accelerationTime);
+    } else if (progress > accelerationTime && progress <= generalTime) {
+      const slowdownProgress = (progress - accelerationTime) / slowDownTime;
+      speed = maxSpeed - slowdownProgress * (maxSpeed - 1);
+    } else {
+      const slowdownProgress =
+        (elapsedTime - duration * generalTime) / (duration * decelerationTime);
+      speed = 1 * (1 - slowdownProgress);
+    }
+
     update((state) => {
-      if (!state.isSpinning) {
-        spinStartTime = 0;
-        fireConfetti();
-
-        return { ...state, isSpinning: false };
-      }
-
-      const elapsedTime = currentTime - spinStartTime;
-      const progress = Math.min(elapsedTime / state.spinDuration, 1);
-
-      if (progress >= 1) {
-        spinStartTime = 0;
-        fireConfetti();
-
-        return { ...state, isSpinning: false };
-      } else if (progress <= accelerationTime) {
-        speed = maxSpeed * (progress / accelerationTime);
-      } else if (progress > accelerationTime && progress <= generalTime) {
-        const slowdownProgress = (progress - accelerationTime) / slowDownTime;
-        speed = maxSpeed - slowdownProgress * (maxSpeed - 1);
-      } else {
-        const slowdownProgress =
-          (elapsedTime - state.spinDuration * generalTime) / (state.spinDuration * decelerationTime);
-        speed = 1 * (1 - slowdownProgress);
-      }
-
-      const angleModulo = Math.abs(state.angle % 360);
-      const isClockwiseRotation = state.angle >= 0;
+      const angleModulo = Math.abs((state.angle + speed) % 360);
+      const isClockwiseRotation = (state.angle + speed) >= 0;
       const normalizedAngle = isClockwiseRotation ? 360 - angleModulo : angleModulo;
-      animationId = requestAnimationFrame(giveMoment);
 
       return { ...state, angle: state.angle + speed, normalizedAngle }
     });
+
+    animationId = requestAnimationFrame(giveMoment);
+
+    // update((state) => {
+    //   if (progress >= 1 || !get(isSpinning)) {
+    //     spinStartTime = 0;
+    //     fireConfetti();
+    //     stop();
+
+    //     return state;
+    //   } else if (progress <= accelerationTime) {
+    //     speed = maxSpeed * (progress / accelerationTime);
+    //   } else if (progress > accelerationTime && progress <= generalTime) {
+    //     const slowdownProgress = (progress - accelerationTime) / slowDownTime;
+    //     speed = maxSpeed - slowdownProgress * (maxSpeed - 1);
+    //   } else {
+    //     const slowdownProgress =
+    //       (elapsedTime - duration * generalTime) / (duration * decelerationTime);
+    //     speed = 1 * (1 - slowdownProgress);
+    //   }
+
+    //   const angleModulo = Math.abs(state.angle + speed % 360);
+    //   const isClockwiseRotation = state.angle + speed >= 0;
+    //   const normalizedAngle = isClockwiseRotation ? 360 - angleModulo : angleModulo;
+
+    //   animationId = requestAnimationFrame(giveMoment);
+
+    //   return { ...state, angle: state.angle + speed, normalizedAngle }
+    // });
   }
 
   function spin(ms: number) {
+    if (get(state) === WHEEL_STATE.SPINNING || get(spinDuration) < 1) return;
+
     const randomAngle = Math.floor(Math.random() * 360);
 
-    update((state) => {
-      if (state.isSpinning || state.spinDuration < 1) return state;
+    speed = maxSpeed;
+    state.set(WHEEL_STATE.SPINNING);
+    spinDuration.set(ms);
 
-      speed = maxSpeed;
-      requestAnimationFrame(giveMoment);
+    update(() => ({
+      angle: randomAngle,
+      normalizedAngle: 0,
+    }));
 
-      return {
-        isSpinning: true,
-        angle: randomAngle,
-        spinStartDateTime: new Date(Date.now()).getTime(),
-        normalizedAngle: 0,
-        spinDuration: ms
-      }
-    });
+    requestAnimationFrame(giveMoment);
   }
 
   function setAngle(deg: number) {
@@ -131,21 +108,28 @@ function createWheel() {
   }
 
   function addSpinDuration(ms: number) {
-    update((state) => ({ ...state, spinDuration: state.spinDuration + ms }))
+    spinDuration.update((current) => current + ms)
   }
 
   function stop() {
-    update((state) => {
-      return { ...state, isSpinning: false }
-    });
+    cancelAnimationFrame(animationId);
+    spinStartTime = 0;
+    state.set(WHEEL_STATE.WINNING);
+  }
+
+  function setState(newState: WHEEL_STATE) {
+    state.set(newState);
   }
 
   return {
     subscribe,
+    state,
+    spinDuration,
     spin,
     addSpinDuration,
     stop,
-    setAngle
+    setAngle,
+    setState
   }
 }
 

@@ -16,6 +16,7 @@ import visibilityIcon from '$lib/assets/visibility_off_icon.svg';
 import bombIcon from '$lib/assets/bomb_icon.svg';
 import bombIconBlack from '$lib/assets/bomb_icon_black.svg';
 import helpIcon from '$lib/assets/help_icon.svg';
+import emeraldIcon from '$lib/assets/emerald_icon.svg';
 
 export type iconTypes =
   | 'listAddItem'
@@ -31,7 +32,8 @@ export type iconTypes =
   | 'trashcan'
   | 'visibility'
   | 'bomb'
-  | 'help';
+  | 'help'
+  | 'emerald';
 
 export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'white') {
   switch (icon) {
@@ -59,6 +61,8 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
       return visibilityIcon;
     case 'help':
       return helpIcon;
+    case 'emerald':
+      return emeraldIcon;
     case 'bomb':
       return color === 'white' ? bombIcon : bombIconBlack;
     case 'plus':

@@ -98,10 +98,9 @@
 			position: relative;
 			width: 375px;
 			border-radius: 10px;
-			box-shadow: 0 2px 4px black;
 			transform: scale(1);
+			box-shadow: 0 2px 4px black;
 			line-height: 18px;
-
 			transition: 0.2s;
 			will-change: transform;
 			user-select: none;

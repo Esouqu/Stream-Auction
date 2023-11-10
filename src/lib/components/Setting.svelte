@@ -21,7 +21,7 @@
 				{id}
 				{attribute}
 				placeholder="Значение"
-				isDisabled={isToggled !== null ? !isToggled : false}
+				isDisabled={isToggled !== null ? !isToggled : isDisabled}
 				bind:value
 				on:input={callback}
 			/>

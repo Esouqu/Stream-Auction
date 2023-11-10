@@ -13,11 +13,8 @@
 	let newPresetName: string;
 	let isEditMode = false;
 
-	// $: console.log(newPresetName);
-
 	function handlePresetCreation() {
 		if (presetNameInput) {
-			// console.log('ok');
 			// presets.create(presetNameInput)
 		}
 
@@ -53,10 +50,9 @@
 					--input-w="90%"
 					id="presets-edit"
 					type="text"
-					isDefault={false}
 					placeholder="Название пресета"
 					bind:value={newPresetName}
-					callback={handlePresetCreation}
+					onEnter={handlePresetCreation}
 				/>
 			{:else}
 				{selectedOption !== '' ? selectedOption : 'Нет доступных пресетов'}

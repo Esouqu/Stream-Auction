@@ -1,3 +1,4 @@
+import confetti from "canvas-confetti";
 import type { ILot } from "./interfaces";
 
 export const getRandomColor = (() => {
@@ -23,6 +24,10 @@ export const getRandomColor = (() => {
 
   return getColor;
 })();
+
+export function toRadians(degrees: number) {
+  return (degrees * Math.PI) / 180;
+}
 
 export function polarToCartesian(radius: number, angleInDegrees: number) {
   const radians = (angleInDegrees - 90) * Math.PI / 180;
@@ -82,50 +87,12 @@ export function compareStrings(str1: string, str2: string) {
   return Math.round(similarity);
 }
 
-export function calculateShortTitle(title: string, maxLength: number): string {
+export function getShortenedText(title: string, maxLength: number): string {
   return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
 }
 
 export function getPercentFromTotal(value: number, total: number, decimals: number = 1) {
   return ((value / total) * 100).toFixed(decimals);
-}
-
-export function createPie(items: ILot[], radius: number) {
-  const total = getTotal(items.map((item) => item.value));
-  const maxTitleLength = Number(((radius / 100) * 5.75).toFixed(2));
-
-  let startAngle: number;
-  let endAngle: number;
-
-  return items.map((item, idx) => {
-    const deg = (item.value / total) * 360;
-
-    startAngle = idx && endAngle;
-    endAngle = !idx ? deg : startAngle + deg;
-
-    const isCircle = endAngle - startAngle === 360;
-    const start = polarToCartesian(radius, startAngle);
-    const end = polarToCartesian(radius, endAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
-    const middleAngle = (startAngle + endAngle) / 2;
-    const middle = polarToCartesian(radius, middleAngle);
-    // const color = colors[3][idx % colors[3].length];
-    // const colorsBetween = Math.floor(colors[3].length / (items.length - 1));
-
-    return {
-      ...item,
-      shortTitle: calculateShortTitle(item.title, maxTitleLength),
-      percent: getPercentFromTotal(item.value, total),
-      startAngle,
-      middleAngle,
-      endAngle,
-      startPoint: start,
-      middlePoint: middle,
-      endPoint: end,
-      largeArcFlag,
-      isCircle
-    };
-  });
 }
 
 export function formatTime(ms: number) {
@@ -155,4 +122,82 @@ export function getRandomInRange(min: number | string, max: number | string) {
   const maxNum = Number(max);
 
   return Math.floor(Math.random() * (maxNum - minNum + 1) + minNum);
+}
+
+export function getGrayscaleColor(color: string) {
+  // Remove the "#" symbol from the color string
+  color = color.slice(1);
+
+  // Extract the RGB values
+  const red = parseInt(color.substring(0, 2), 16);
+  const green = parseInt(color.substring(2, 4), 16);
+  const blue = parseInt(color.substring(4, 6), 16);
+
+  // Calculate the grayscale value
+  const grayscale = 0.299 * red + 0.587 * green + 0.114 * blue;
+
+  // Convert the grayscale value back to hexadecimal
+  const grayscaleHex = '#' + Math.round(grayscale).toString(16).repeat(3);
+
+  // Return the grayscale color
+  return grayscaleHex;
+}
+
+export function modifyBrightness(color: string, brightnessFactor: number) {
+  const hex = color.slice(1); // Remove the leading #
+  const red = parseInt(hex.slice(0, 2), 16);
+  const green = parseInt(hex.slice(2, 4), 16);
+  const blue = parseInt(hex.slice(4, 6), 16);
+
+  const modifiedRed = Math.round(red * brightnessFactor);
+  const modifiedGreen = Math.round(green * brightnessFactor);
+  const modifiedBlue = Math.round(blue * brightnessFactor);
+
+  const modifiedHex = (
+    (modifiedRed < 16 ? '0' : '') + modifiedRed.toString(16) +
+    (modifiedGreen < 16 ? '0' : '') + modifiedGreen.toString(16) +
+    (modifiedBlue < 16 ? '0' : '') + modifiedBlue.toString(16)
+  );
+
+  return '#' + modifiedHex;
+}
+
+export function fireConfetti() {
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.75 }
+  };
+
+  function fire(particleRatio: number, opts: confetti.Options) {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio),
+      shapes: ['circle'],
+      scalar: 2 / 2
+    });
+  }
+
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55
+  });
+  fire(0.2, {
+    spread: 60
+  });
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45
+  });
 }

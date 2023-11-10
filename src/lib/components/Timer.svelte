@@ -2,17 +2,18 @@
 	import timer from '$lib/stores/timer';
 	import { formatTime } from '$lib/utils';
 	import Button from './Button.svelte';
-	import wheel from '$lib/stores/wheel';
+	import wheel, { WHEEL_STATE } from '$lib/stores/wheel';
 
 	export let timeToAdd: number = 60000;
 
 	$: currentTime = formatTime($timer.timeRemaining);
+	$: wheelState = wheel.state;
 </script>
 
 <div class="timer">
 	<p class="timer__time">{currentTime.min}:{currentTime.sec}:{currentTime.ms}</p>
 	<div class="timer-buttons-wrapper">
-		{#if $wheel.isSpinning}
+		{#if $wheelState === WHEEL_STATE.SPINNING}
 			<h3>Идет прокрут колеса</h3>
 		{:else}
 			{#if !$timer.isRunning}

@@ -3,7 +3,6 @@
 	import Input from './Input.svelte';
 	import Button from './Button.svelte';
 	import donations from '$lib/stores/donations';
-	import Popup from './Popup.svelte';
 
 	export let id: number;
 	export let title: string;
@@ -14,7 +13,13 @@
 
 	let isHovered = false;
 	let valueToAdd: string;
-	let isPopupShown = false;
+
+	function addValue() {
+		if (!valueToAdd) return;
+
+		lots.addValue(id, Number(valueToAdd));
+		valueToAdd = '';
+	}
 
 	function handleDrop(e: DragEvent) {
 		const data = e.dataTransfer?.getData('application/json');
@@ -56,37 +61,34 @@
 	>
 		<Input
 			--input-w-w="100%"
-			type="text"
 			id="lot-text-{id}"
-			bind:value={title}
+			type="text"
 			placeholder="Название лота"
-			callback={() => lots.setTitle(id, title)}
-			isDefault={false}
+			onEnter={() => lots.setTitle(id, title)}
+			bind:value={title}
 		/>
 		<Input
 			--input-w="100px"
 			--input-text-al="center"
-			type="number"
 			id="lot-value-{id}"
-			bind:value
+			type="number"
 			placeholder="Сумма"
-			callback={() => lots.setValue(id, Number(value))}
-			isDefault={false}
+			onEnter={() => lots.setValue(id, Number(value))}
+			isPreventInput={true}
+			bind:value
+		/>
+		<Button icon="plus" on:click={addValue} />
+		<Input
+			--input-w="100px"
+			--input-text-al="center"
+			id="lot-add-value-{id}"
+			type="number"
+			placeholder="Сумма"
+			onEnter={addValue}
+			bind:value={valueToAdd}
 		/>
 		<div class="lot__percent">{Math.round(percent)}%</div>
 		<div class="lot-buttons-wrapper">
-			<!-- <Popup bind:isShown={isPopupShown}>
-				<div class="lot-donators">
-					{#if donators.length > 0}
-						{#each donators as donator}
-							<span>{donator}</span>
-						{/each}
-					{:else}
-						Добавлен в ручную
-					{/if}
-				</div>
-			</Popup> -->
-			<!-- <Button icon="info" on:click={() => (isPopupShown = !isPopupShown)} /> -->
 			<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
 		</div>
 	</div>
@@ -99,12 +101,7 @@
 		gap: 10px;
 		border-radius: 10px;
 		animation: blink 1s ease-in-out forwards;
-		/* 
-		&-donators {
-			display: flex;
-			flex-direction: column;
-			gap: 10px;
-		} */
+
 		&::before {
 			content: attr(data-lot-id);
 			display: flex;

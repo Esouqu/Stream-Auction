@@ -3,9 +3,9 @@ import { writable } from 'svelte/store';
 
 export const textRules = writable('');
 export const stopSpin = writable({
-  isToggled: false,
+  isToggled: true,
   description: 'Останавливать колесо при донате',
-  value: 3000,
+  value: 5000,
   valueAttribute: 'руб.',
 });
 
@@ -61,13 +61,13 @@ export const additionSpinTime = writable({
 });
 export const additionSpinTimePrice = writable({
   isToggled: null,
-  description: 'Минимальная сумма доната для продления прокрута колеса',
+  description: 'Минимальная сумма добавления',
   value: 30,
   valueAttribute: 'руб.',
 });
 export const additionSpinTimePriceStep = writable({
   isToggled: null,
-  description: 'Сумма увеличения минимального доната за каждое продление прокрута',
+  description: 'Увеличениe минимальной суммы за каждое добавление',
   value: 10,
   valueAttribute: 'руб.',
 });

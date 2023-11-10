@@ -8,7 +8,6 @@
 	import donations from '$lib/stores/donations';
 	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_Color.svg';
 	import twitchIcon from '$lib/assets/twitch-logo/TwitchGlitchPurple.svg';
-	import Switch from '$lib/components/Switch.svelte';
 	import {
 		addTimeOnNewItem,
 		addTimeOnNewLeader,
@@ -19,16 +18,18 @@
 		textRules
 	} from '$lib/stores/settings';
 	import Popup from '$lib/components/Popup.svelte';
-	import { fade } from 'svelte/transition';
 	import lots from '$lib/stores/lots';
 	import { compareStrings, isUrl } from '$lib/utils';
-	import wheel from '$lib/stores/wheel';
+	import wheel, { WHEEL_STATE } from '$lib/stores/wheel';
 	import timer from '$lib/stores/timer';
-	import TextButton from '$lib/components/TextButton.svelte';
 	import Event from '$lib/components/Event.svelte';
 	import events from '$lib/stores/events';
 	import { onMount } from 'svelte';
 	import Integration from '$lib/components/Integration.svelte';
+	import backgroundImage from '$lib/stores/backgroundImage';
+
+	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
+	const donationStopWord = '#bomb';
 
 	let activeRoute: IRoute;
 	let daSession: string = $page.data.daSession;
@@ -38,10 +39,9 @@
 	let isTwitchToggled = false;
 	let donationAlertsWebSocket: WebSocket;
 	let twitchWebSocket: WebSocket;
-	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
 	$: $lots, addCountdownTime();
-	$: isWheelSpinning = wheel.isSpinning;
+	$: wheelState = wheel.state;
 
 	onMount(() => {
 		const bgImage = localStorage.getItem('bgImage');
@@ -49,7 +49,7 @@
 		let validationIntervalId: NodeJS.Timeout;
 
 		if (bgImage) {
-			document.querySelector('body')!.style.backgroundImage = `url(${bgImage})`;
+			backgroundImage.set(`url(${bgImage})`);
 		}
 
 		validationIntervalId = setInterval(async () => {
@@ -65,12 +65,12 @@
 		const newItemTime = $addTimeOnNewItem.value;
 		const newLeaderTime = $addTimeOnNewLeader.value;
 
-		if ($addTimeOnNewItem.isToggled && !$wheel.isSpinning) {
+		if ($addTimeOnNewItem.isToggled && $wheelState !== WHEEL_STATE.SPINNING) {
 			lots.onNewItem(() => {
 				timer.add(Number(newItemTime) * 1000);
 			});
 		}
-		if ($addTimeOnNewLeader.isToggled && !$wheel.isSpinning) {
+		if ($addTimeOnNewLeader.isToggled && $wheelState !== WHEEL_STATE.SPINNING) {
 			lots.onNewLeader(() => {
 				timer.add(Number(newLeaderTime) * 1000);
 			});
@@ -128,7 +128,7 @@
 			donations.add(donation);
 		}
 
-		if ($stopSpin.isToggled && $wheel.isSpinning && isEnoughAmount) {
+		if ($stopSpin.isToggled && $wheelState === WHEEL_STATE.SPINNING && isEnoughAmount) {
 			wheel.stop();
 			timer.reset();
 		}
@@ -137,7 +137,7 @@
 	function precessUrlDonation(donation: IDonationData) {
 		const isEnoughAmount = donation.amount >= Number($stopSpin.value);
 
-		if (!$wheel.isSpinning) {
+		if ($wheelState !== WHEEL_STATE.SPINNING) {
 			donations.add({
 				...donation,
 				amount_in_user_currency: donation.amount
@@ -159,15 +159,17 @@
 		const haveUrl = isUrl(donation.message);
 		const isEnoughAmount = amount >= Number($stopSpin.value);
 
-		if ($wheel.isSpinning && $additionSpinTime.isToggled) {
+		if ($wheelState === WHEEL_STATE.SPINNING && $additionSpinTime.isToggled) {
 			addSpinTime(amount);
 		}
 
-		// if (donation.message.includes('#mult')) {
-		// 	donations.add({ ...donation });
+		if (donation.message.toLowerCase().includes(donationStopWord)) {
+			console.log(donation.message.toLowerCase());
+			const replacedMessage = donation.message.toLowerCase().replace('#bomb', '');
+			donations.add({ ...donation, message: replacedMessage });
 
-		// 	return;
-		// }
+			return;
+		}
 
 		if (lotId) {
 			processIdDonation(lotId, { ...donation, amount_in_user_currency: amount });
@@ -195,7 +197,7 @@
 				events.add(`+${amount}: ${l.title}`, donation.type);
 				acceptableLots = [];
 
-				if ($stopSpin.isToggled && $wheel.isSpinning && isEnoughAmount) {
+				if ($stopSpin.isToggled && $wheelState === WHEEL_STATE.SPINNING && isEnoughAmount) {
 					wheel.stop();
 					timer.reset();
 				}
@@ -211,7 +213,7 @@
 			}
 		}
 
-		if ($stopSpin.isToggled && $wheel.isSpinning && isEnoughAmount) {
+		if ($stopSpin.isToggled && $wheelState === WHEEL_STATE.SPINNING && isEnoughAmount) {
 			lots.add(donation.message, amount, donation.username);
 			events.add(`${donation.message}`, donation.type, 'add');
 
@@ -410,12 +412,14 @@
 	}
 </script>
 
-<div class="layout">
+<div class="layout" style="background-image: {$backgroundImage};">
 	<div class="layout-section layout-section_left">
 		<h1 style="font-size: 28px;">Правила Аукциона</h1>
-		<!-- <h2 style="font-size: 28px;">По умолчанию</h2> -->
+		<h3 style="font-size: 20px; text-align: center;">
+			Добавьте <b>#bomb</b> в сообщении доната, чтобы не добавлять его автоматически
+		</h3>
 		{#if $stopSpin.isToggled}
-			<h3 style="font-size: 24px; text-align: center;">
+			<h3 style="font-size: 20px; text-align: center;">
 				Остановить колесо <br />
 				добавив ваш вариант <br />
 				{$stopSpin.value}
@@ -423,7 +427,7 @@
 			</h3>
 		{/if}
 		{#if $additionSpinTime.isToggled}
-			<h3 style="font-size: 24px; text-align: center;">
+			<h3 style="font-size: 20px; text-align: center;">
 				Продлить прокрут колеса <br />
 				{$additionSpinTimePrice.value}
 				{$additionSpinTimePrice.valueAttribute}
@@ -467,6 +471,21 @@
 					authCallback={() => goto('/api/twitch/auth')}
 				/>
 			</div>
+			<!-- <button
+				type="button"
+				on:click={() =>
+					donations.add({
+						id: 1,
+						type: 'Twitch',
+						username: 'Tester',
+						message: 'Testing',
+						amount: 300,
+						amount_in_user_currency: 300,
+						currency: 'RUB',
+						mostSimilarLot: null,
+						created_at: ''
+					})}>DONATE</button
+			> -->
 			<div class="donations-scroll-wrapper">
 				<div class="donations-wrapper" data-donations-queue={$donations.length}>
 					{#each $donations as { id, type, username, message, amount, amount_in_user_currency, currency, mostSimilarLot }}
@@ -494,6 +513,9 @@
 	.layout {
 		display: grid;
 		grid-template-columns: 1fr minmax(960px, 1fr) 1fr;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
 
 		&-wrapper {
 			display: flex;

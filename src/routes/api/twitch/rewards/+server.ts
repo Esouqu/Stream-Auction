@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ cookies, url }) => {
   const session = cookies.get('twitchSession');
   const broadcasterId = url.searchParams.get('broadcaster_id');
   const rewardsUrl = `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${broadcasterId}`;
-  // const rewardsUrl = `http://localhost:8080/mock/channel_points/custom_rewards?broadcaster_id=${broadcasterId}`;
+
   let reward;
 
   if (!session) return new Response('No twitch session available', { status: 401 });
@@ -32,7 +32,9 @@ export const POST: RequestHandler = async ({ cookies, url }) => {
   const response = await axios.post(rewardsUrl, {
     title: 'Stream Auction - Бесплатный Заказ',
     cost: 10,
-    is_user_input_required: true
+    is_user_input_required: true,
+    is_global_cooldown_enabled: true,
+    global_cooldown_seconds: 120,
   }, {
     headers: {
       'Authorization': `Bearer ${session}`,

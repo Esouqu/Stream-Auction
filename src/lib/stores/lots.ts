@@ -3,61 +3,24 @@ import type { ILot } from "$lib/interfaces";
 import { getRandomColor } from "$lib/utils";
 import { writable } from "svelte/store";
 
-const tempLots = [
-  {
-    id: 1,
-    title: 'Гуррен Лаганн',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-    color: getRandomColor(colors[4]),
-  },
-  {
-    id: 2,
-    title: 'Холоп 2 (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-    color: getRandomColor(colors[4]),
-  },
-  {
-    id: 3,
-    title: 'Самая большая луна (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-    color: getRandomColor(colors[4]),
-  },
-  {
-    id: 4,
-    title: 'Гардемарины 1787. Мир (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-    color: getRandomColor(colors[4]),
-  },
-  {
-    id: 5,
-    title: 'Гладиатор',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-    color: getRandomColor(colors[4]),
-  },
-  {
-    id: 6,
-    title: 'Дворец (2023)',
-    value: Math.floor(Math.random() * 100),
-    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-    color: getRandomColor(colors[4]),
-  },
-];
+// const tempLots = Array.from(new Array(20), (_, id) => {
+//   return {
+//     id,
+//     title: 'test',
+//     value: Math.floor(Math.random() * 100),
+//     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+//     color: getRandomColor(colors[4]),
+//   }
+// });;
+
 
 function createLots() {
-
-  // need to shuffleArray
-
   const { subscribe, update } = writable<ILot[]>([]);
 
-  // let id = tempLots.length;
-  // let color = getRandomColor(colors[4]);
-  // let previousLotsAmount = tempLots.length;
-  // let previousLeader = tempLots[0].id;
+  // let id = 120;
+  // let color = '';
+  // let previousLotsAmount = 0;
+  // let previousLeader = 0;
   let id = 0;
   let color = '';
   let previousLotsAmount = 0;

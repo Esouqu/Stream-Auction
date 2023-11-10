@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import Addlot from '$lib/components/Addlot.svelte';
-	import WheelOfRandom from '$lib/components/WheelOfRandom.svelte';
+	import Wheel from '$lib/components/Wheel.svelte';
+	import { fly } from 'svelte/transition';
 </script>
 
 <svelte:head>
@@ -8,9 +10,9 @@
 </svelte:head>
 
 <section class="wheel-section">
-	<Addlot />
+	<!-- <Addlot /> -->
 	<div style="display: flex; align-items: center; flex: 1 1 0;">
-		<WheelOfRandom />
+		<Wheel />
 	</div>
 </section>
 

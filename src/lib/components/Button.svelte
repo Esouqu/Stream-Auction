@@ -5,6 +5,7 @@
 	export let icon: iconTypes;
 	export let text: string = '';
 	export let color: 'white' | 'black' = 'white';
+	export let isDisabled: boolean = false;
 	export let shadowColor: string | null = null;
 </script>
 
@@ -15,6 +16,7 @@
 	class:icon-button_black={color === 'black'}
 	class:icon-button_white={color === 'white'}
 	style="--btn-shadow-c: {shadowColor}"
+	disabled={isDisabled}
 	on:click|stopPropagation
 >
 	<img
@@ -36,7 +38,7 @@
 		justify-content: center;
 		align-items: center;
 		gap: 10px;
-		width: var(--button-size, 40px);
+		min-width: var(--button-size, 40px);
 		height: var(--button-size, 40px);
 		padding: var(--button-p, 5px);
 		border: none;
@@ -44,6 +46,7 @@
 		background-color: transparent;
 		opacity: 1;
 		transition: 0.2s;
+		user-select: none;
 		cursor: pointer;
 
 		&_text {
@@ -89,6 +92,9 @@
 		}
 		&:active {
 			opacity: 0.7;
+		}
+		&:disabled {
+			opacity: 0.3;
 		}
 
 		& img {

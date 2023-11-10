@@ -13,9 +13,9 @@
 	const routes: IRoute[] = [
 		{ id: 0, title: 'Лоты', icon: listIcon, url: '/' },
 		{ id: 1, title: 'Колесо', icon: pieIcon, url: '/wheel' },
-		// { id: 2, title: 'Множитель', icon: getIcon('bomb'), url: '/multiplier' },
+		{ id: 2, title: 'Бомбер', icon: getIcon('bomb'), url: '/bomber' },
 		// { id: 2, title: 'События', icon: eventIcon, url: '/events' },
-		{ id: 2, title: 'Настройки', icon: settingsIcon, url: '/settings' }
+		{ id: 3, title: 'Настройки', icon: settingsIcon, url: '/settings' }
 	];
 
 	export let activeRoute: IRoute | undefined = routes.find((r) => r.url === $page.route.id);
@@ -122,6 +122,8 @@
 			display: flex;
 
 			& img {
+				width: 100%;
+				object-fit: contain;
 				transition: 0.2s;
 			}
 		}
