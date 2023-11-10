@@ -414,9 +414,6 @@
 <div class="layout" style="background-image: {$backgroundImage};">
 	<div class="layout-section layout-section_left">
 		<h1 style="font-size: 28px;">Правила Аукциона</h1>
-		<h3 style="font-size: 20px; text-align: center;">
-			Добавьте <b>#bomb</b> в сообщении доната, чтобы не добавлять его автоматически
-		</h3>
 		{#if $stopSpin.isToggled}
 			<h3 style="font-size: 20px; text-align: center;">
 				Остановить колесо <br />
