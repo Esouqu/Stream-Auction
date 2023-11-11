@@ -87,7 +87,7 @@
 			onEnter={addValue}
 			bind:value={valueToAdd}
 		/>
-		<div class="lot__percent">{Math.round(percent)}%</div>
+		<div class="lot__percent">{Number(percent.toFixed(1))}%</div>
 		<div class="lot-buttons-wrapper">
 			<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
 		</div>
