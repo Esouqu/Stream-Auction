@@ -10,6 +10,8 @@
 	export let isPreventInput = false;
 	export let colorStyle: 'white' | 'default' = 'default';
 	export let onEnter: (() => void) | null = null;
+	export let onInput: (() => void) | null = null;
+	export let onBlur: (() => void) | null = null;
 
 	const pathName = $page.url.pathname;
 
@@ -23,6 +25,8 @@
 		} else {
 			value = target.value;
 		}
+
+		if (onInput) onInput();
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -39,6 +43,20 @@
 
 		onEnter();
 		target.blur();
+	}
+
+	function handleBlur(e: Event) {
+		const target = e.target as HTMLInputElement;
+
+		if (!onBlur) return;
+
+		if (type === 'number') {
+			parseInput(target);
+		} else {
+			value = target.value;
+		}
+
+		onBlur();
 	}
 
 	function parseInput(target: HTMLInputElement) {
@@ -59,6 +77,7 @@
 		spellcheck="false"
 		on:keydown={(e) => handleKeyDown(e)}
 		on:input|preventDefault={(e) => handleInput(e)}
+		on:blur|preventDefault={(e) => handleBlur(e)}
 		disabled={isDisabled}
 	/>
 	{#if valueKey}

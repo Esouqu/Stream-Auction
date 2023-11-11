@@ -163,12 +163,12 @@
 			addSpinTime(amount);
 		}
 
-		if (donation.message.toLowerCase().includes(donationStopWord)) {
-			const replacedMessage = donation.message.toLowerCase().replace('#bomb', '');
-			donations.add({ ...donation, message: replacedMessage });
+		// if (donation.message.toLowerCase().includes(donationStopWord)) {
+		// 	const replacedMessage = donation.message.toLowerCase().replace('#bomb', '');
+		// 	donations.add({ ...donation, message: replacedMessage });
 
-			return;
-		}
+		// 	return;
+		// }
 
 		if (lotId) {
 			processIdDonation(lotId, { ...donation, amount_in_user_currency: amount });

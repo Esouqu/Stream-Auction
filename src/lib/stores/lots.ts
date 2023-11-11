@@ -17,11 +17,8 @@ import { writable } from "svelte/store";
 function createLots() {
   const { subscribe, update } = writable<ILot[]>([]);
 
-  // let id = 120;
-  // let color = '';
-  // let previousLotsAmount = 0;
-  // let previousLeader = 0;
   let id = 0;
+  // let id = 120;
   let color = '';
   let previousLotsAmount = 0;
   let previousLeader = 0;

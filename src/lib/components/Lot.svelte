@@ -65,6 +65,8 @@
 			type="text"
 			placeholder="Название лота"
 			onEnter={() => lots.setTitle(id, title)}
+			onInput={() => lots.setTitle(id, title)}
+			onBlur={() => lots.setTitle(id, title)}
 			bind:value={title}
 		/>
 		<Input
@@ -74,6 +76,7 @@
 			type="number"
 			placeholder="Сумма"
 			onEnter={() => lots.setValue(id, Number(value))}
+			onBlur={() => lots.setValue(id, Number(value))}
 			isPreventInput={true}
 			bind:value
 		/>
