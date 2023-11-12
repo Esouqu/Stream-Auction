@@ -119,7 +119,6 @@
 			}
 
 			context.fill();
-			// context.strokeStyle = color;
 			context.lineWidth = 2;
 			context.stroke();
 		}

@@ -17,7 +17,6 @@
 		stopSpin,
 		textRules
 	} from '$lib/stores/settings';
-	import Popup from '$lib/components/Popup.svelte';
 	import lots from '$lib/stores/lots';
 	import { compareStrings, isUrl } from '$lib/utils';
 	import wheel, { WHEEL_STATE } from '$lib/stores/wheel';
@@ -29,7 +28,7 @@
 	import backgroundImage from '$lib/stores/backgroundImage';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
-	const donationStopWord = '#bomb';
+	const donationStopWord = '#stop';
 
 	let activeRoute: IRoute;
 	let daSession: string = $page.data.daSession;
@@ -52,11 +51,13 @@
 			backgroundImage.set(`url(${bgImage})`);
 		}
 
-		validationIntervalId = setInterval(async () => {
-			await fetch('/api/twitch/validate');
-		}, validationInterval);
+		if (twitchSession) {
+			validationIntervalId = setInterval(async () => {
+				await fetch('/api/twitch/validate');
+			}, validationInterval);
 
-		return () => clearInterval(validationIntervalId);
+			return () => clearInterval(validationIntervalId);
+		}
 	});
 
 	function addCountdownTime() {
@@ -273,7 +274,6 @@
 		}
 
 		twitchWebSocket.addEventListener('open', async () => {
-			// console.log('Twitch WebSocket connection opened');
 			twitchWebSocket.send(
 				JSON.stringify({
 					type: 'LISTEN',
@@ -290,7 +290,6 @@
 			}, pingIntervalInMin);
 		});
 		twitchWebSocket.addEventListener('message', (event) => {
-			// console.log(JSON.parse(event.data));
 			const message = JSON.parse(event.data);
 
 			if (message.type === 'RECONNECT') {
@@ -332,8 +331,6 @@
 			}
 		});
 		twitchWebSocket.addEventListener('close', () => {
-			// console.log('WebSocket connection closed');
-
 			clearInterval(heartbeatInterval);
 		});
 		twitchWebSocket.addEventListener('error', (event) => {
@@ -402,9 +399,6 @@
 				});
 			}
 		});
-		donationAlertsWebSocket.addEventListener('close', () => {
-			// console.log('WebSocket connection closed');
-		});
 		donationAlertsWebSocket.addEventListener('error', (event) => {
 			console.error('WebSocket error:', event);
 		});
@@ -413,7 +407,7 @@
 
 <div class="layout" style="background-image: {$backgroundImage};">
 	<div class="layout-section layout-section_left">
-		<h1 style="font-size: 28px;">Правила Аукциона</h1>
+		<h1 style="font-size: 28px; text-align: center;">Правила Аукциона</h1>
 		{#if $stopSpin.isToggled}
 			<h3 style="font-size: 20px; text-align: center;">
 				Остановить колесо <br />
@@ -429,8 +423,8 @@
 				{$additionSpinTimePrice.valueAttribute}
 			</h3>
 		{/if}
-		<h3 style="white-space: break-spaces; font-size: 24px;">
-			{JSON.parse(JSON.stringify($textRules))}
+		<h3 style="white-space: break-spaces; font-size: 20px;">
+			{$textRules}
 		</h3>
 	</div>
 	<div class="layout-section layout-section_center">

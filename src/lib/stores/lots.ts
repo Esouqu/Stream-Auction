@@ -11,14 +11,13 @@ import { writable } from "svelte/store";
 //     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
 //     color: getRandomColor(colors[4]),
 //   }
-// });;
-
+// });
 
 function createLots() {
   const { subscribe, update } = writable<ILot[]>([]);
 
   let id = 0;
-  // let id = 120;
+  // let id = tempLots.length;
   let color = '';
   let previousLotsAmount = 0;
   let previousLeader = 0;

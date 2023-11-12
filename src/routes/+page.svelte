@@ -66,7 +66,7 @@
 		flex-direction: column;
 		flex: 1 1 0;
 		gap: 10px;
-		padding: 0 30px;
+		padding: 5px 30px;
 		margin: 0;
 		color: white;
 		list-style-type: none;

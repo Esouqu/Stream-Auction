@@ -57,33 +57,6 @@ function createWheel() {
     });
 
     animationId = requestAnimationFrame(giveMoment);
-
-    // update((state) => {
-    //   if (progress >= 1 || !get(isSpinning)) {
-    //     spinStartTime = 0;
-    //     fireConfetti();
-    //     stop();
-
-    //     return state;
-    //   } else if (progress <= accelerationTime) {
-    //     speed = maxSpeed * (progress / accelerationTime);
-    //   } else if (progress > accelerationTime && progress <= generalTime) {
-    //     const slowdownProgress = (progress - accelerationTime) / slowDownTime;
-    //     speed = maxSpeed - slowdownProgress * (maxSpeed - 1);
-    //   } else {
-    //     const slowdownProgress =
-    //       (elapsedTime - duration * generalTime) / (duration * decelerationTime);
-    //     speed = 1 * (1 - slowdownProgress);
-    //   }
-
-    //   const angleModulo = Math.abs(state.angle + speed % 360);
-    //   const isClockwiseRotation = state.angle + speed >= 0;
-    //   const normalizedAngle = isClockwiseRotation ? 360 - angleModulo : angleModulo;
-
-    //   animationId = requestAnimationFrame(giveMoment);
-
-    //   return { ...state, angle: state.angle + speed, normalizedAngle }
-    // });
   }
 
   function spin(ms: number) {
