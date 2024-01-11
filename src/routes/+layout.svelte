@@ -332,11 +332,7 @@
 	<div class="layout-section layout-section_center">
 		<Card --card-flex="1" --card-justify="end" --card-p="30px 20px">
 			{#key previousRoute}
-				<div
-					class="layout-section-wrapper"
-					in:fly={{ x: getFlyDirection()?.forward, duration: 300 }}
-					out:fly={{ x: getFlyDirection()?.backward, duration: 300, easing: cubicOut }}
-				>
+				<div class="layout-section-wrapper">
 					<slot />
 				</div>
 			{/key}
