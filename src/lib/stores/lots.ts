@@ -153,11 +153,12 @@ function createLots() {
       }
     }
 
-    if (acceptableLots.length > 0) {
-      return acceptableLots.reduce((prev, current) =>
-        prev.comparePercent > current.comparePercent ? prev : current
-      );
-    }
+    // if (acceptableLots.length > 0) {
+    //   console.log(acceptableLots)
+    //   return acceptableLots.reduce((prev, current) =>
+    //     prev.comparePercent > current.comparePercent ? prev : current
+    //   );
+    // }
   }
 
   function _detectNewLeader(items: ILot[], item: ILot) {
