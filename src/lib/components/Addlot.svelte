@@ -2,38 +2,40 @@
 	import lots from '$lib/stores/lots';
 	import Button from './Button.svelte';
 	import Input from './Input.svelte';
+	import NumberInput from './NumberInput.svelte';
 
 	let text: string;
-	let value: string;
+	let value: number;
 
 	function addItem() {
 		if (!text || !value) return;
 
-		lots.add(text, Number(value));
+		lots.add(text, value);
 
 		text = '';
-		value = '';
+		value = 0;
 	}
 </script>
 
 <div class="add-lot">
-	<Input
-		--input-w="300px"
-		type="text"
-		id="add-lot-text"
-		placeholder="Название лота"
-		bind:value={text}
-		onEnter={addItem}
-	/>
-	<Input
-		--input-w="100px"
-		--input-text-al="center"
-		type="number"
-		id="add-lot-value"
-		placeholder="Сумма"
-		bind:value
-		onEnter={addItem}
-	/>
+	<div style="display: flex;">
+		<Input
+			--input-w="300px"
+			type="text"
+			id="add-lot-text"
+			placeholder="Название лота"
+			bind:value={text}
+			onEnter={addItem}
+		/>
+		<NumberInput
+			--input-w="100px"
+			--input-text-al="center"
+			id="add-lot-value"
+			placeholder="Сумма"
+			onEnter={addItem}
+			bind:value
+		/>
+	</div>
 	<Button icon="listAddItem" on:click={addItem} />
 </div>
 
@@ -43,6 +45,5 @@
 		align-items: center;
 		justify-content: center;
 		gap: 10px;
-		padding: 0px;
 	}
 </style>

@@ -1,7 +1,7 @@
-import { writable } from "svelte/store";
+import storable from "./storable";
 
 function createBackgroundImage() {
-  const { subscribe, set } = writable('');
+  const { subscribe, set } = storable('', 'backgroundImage');
 
   function clear() {
     set('');

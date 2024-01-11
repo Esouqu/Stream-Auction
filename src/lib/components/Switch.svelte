@@ -1,7 +1,4 @@
 <script lang="ts">
-	type colorTypes = 'purple' | 'orange';
-
-	export let color: colorTypes;
 	export let isToggled = false;
 	export let isDisabled = false;
 	export let on: (() => void) | null = null;
@@ -16,13 +13,11 @@
 </script>
 
 <button
-	class="switch"
-	class:toggled={isToggled}
-	class:switch_purple={color === 'purple'}
-	class:switch_orange={color === 'orange'}
 	type="button"
-	on:click={onToggle}
+	class="switch"
+	class:enabled={isToggled}
 	disabled={isDisabled}
+	on:click={onToggle}
 />
 
 <style lang="scss">
@@ -33,17 +28,11 @@
 		padding: 0;
 		border: 0;
 		border-radius: 30px;
-		background-color: gray;
+		background-color: var(--neutral);
 		opacity: 1;
 		transition: 0.2s;
 		cursor: pointer;
 
-		&_purple.toggled {
-			background-color: var(--color-purple);
-		}
-		&_orange.toggled {
-			background-color: var(--color-orange);
-		}
 		&:disabled {
 			opacity: 0.5;
 			cursor: default;
@@ -61,7 +50,9 @@
 			background-color: white;
 			transition: 0.2s;
 		}
-		&.toggled {
+		&.enabled {
+			background-color: var(--primary-50);
+
 			&::after {
 				left: 60%;
 			}

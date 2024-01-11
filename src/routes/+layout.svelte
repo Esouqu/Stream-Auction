@@ -1,36 +1,34 @@
 <script lang="ts">
+	import type { IDonationData, IRoute, ITwitchRedeemedReward } from '$lib/interfaces';
+	import { onMount } from 'svelte';
+	import { flip } from 'svelte/animate';
+	import { fade, fly, slide } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { NAVIGATION_ROUTES } from '$lib/constants';
+	import { getTotal } from '$lib/utils';
+	import lots from '$lib/stores/lots';
+	import donations from '$lib/stores/donations';
+	import backgroundImage from '$lib/stores/backgroundImage';
 	import Donation from '$lib/components/Donation.svelte';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import Timer from '$lib/components/Timer.svelte';
-	import type { IDonationData, IRoute, ITwitchRedeemedReward } from '$lib/interfaces';
-	import donations from '$lib/stores/donations';
-	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_Color.svg';
-	import twitchIcon from '$lib/assets/twitch-logo/TwitchGlitchPurple.svg';
-	import {
-		addTimeOnNewItem,
-		addTimeOnNewLeader,
-		additionSpinTimePrice,
-		additionSpinTimePriceStep,
-		additionSpinTime,
-		stopSpin,
-		textRules
-	} from '$lib/stores/settings';
-	import lots from '$lib/stores/lots';
-	import { compareStrings, isUrl } from '$lib/utils';
-	import wheel, { WHEEL_STATE } from '$lib/stores/wheel';
-	import timer from '$lib/stores/timer';
-	import Event from '$lib/components/Event.svelte';
-	import events from '$lib/stores/events';
-	import { onMount } from 'svelte';
 	import Integration from '$lib/components/Integration.svelte';
-	import backgroundImage from '$lib/stores/backgroundImage';
+	import Button from '$lib/components/Button.svelte';
+	import Card from '$lib/components/Card.svelte';
+	import Snackbar from '$lib/components/Snackbar.svelte';
+	import TransitionContainer from '$lib/components/TransitionContainer.svelte';
+	import TestKit from '$lib/components/TestKit.svelte';
+	import LotPreview from '$lib/components/LotPreview.svelte';
+	import textRules from '$lib/stores/textRules';
+	import Textarea from '$lib/components/Textarea.svelte';
+	import subscribeStores from '$lib/stores/storesBus';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
-	const donationStopWord = '#stop';
 
 	let activeRoute: IRoute;
+	let previousRoute: IRoute;
 	let daSession: string = $page.data.daSession;
 	let twitchSession: string = $page.data.twitchSession;
 	let isConnectingToDonationAlerts = false;
@@ -39,17 +37,21 @@
 	let donationAlertsWebSocket: WebSocket;
 	let twitchWebSocket: WebSocket;
 
-	$: $lots, addCountdownTime();
-	$: wheelState = wheel.state;
+	let isTotalShown = false;
+	let isTextRulesEditable = false;
+
+	$: stopSpinAction = donations.stopSpinAction;
+	$: continueSpinAction = donations.continueSpinAction;
+	$: currentSpinPrice = donations.currentSpinPrice;
+	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
+	$: topLots = sortedLots.slice(0, 10);
+	$: total = getTotal($lots.map((l) => l.value));
 
 	onMount(() => {
-		const bgImage = localStorage.getItem('bgImage');
 		const validationInterval = 1000 * 60 * 60;
 		let validationIntervalId: NodeJS.Timeout;
 
-		if (bgImage) {
-			backgroundImage.set(`url(${bgImage})`);
-		}
+		subscribeStores();
 
 		if (twitchSession) {
 			validationIntervalId = setInterval(async () => {
@@ -60,34 +62,18 @@
 		}
 	});
 
-	function addCountdownTime() {
-		if (!$timer.isRunning) return;
+	function getFlyDirection() {
+		if (!previousRoute || !activeRoute) return;
 
-		const newItemTime = $addTimeOnNewItem.value;
-		const newLeaderTime = $addTimeOnNewLeader.value;
+		const diff = Math.abs(previousRoute.id - activeRoute.id);
+		const isPastRouteSmaller = previousRoute.id < activeRoute.id;
+		const baseDistance = 300;
+		const moveDistance = baseDistance * diff;
 
-		if ($addTimeOnNewItem.isToggled && $wheelState !== WHEEL_STATE.SPINNING) {
-			lots.onNewItem(() => {
-				timer.add(Number(newItemTime) * 1000);
-			});
-		}
-		if ($addTimeOnNewLeader.isToggled && $wheelState !== WHEEL_STATE.SPINNING) {
-			lots.onNewLeader(() => {
-				timer.add(Number(newLeaderTime) * 1000);
-			});
-		}
-	}
-
-	function addSpinTime(donationValue: number) {
-		const time = $additionSpinTime.value;
-		const currentMinDonation = Number($additionSpinTimePrice.value);
-		const minDonationStep = Number($additionSpinTimePriceStep.value);
-
-		if (donationValue < currentMinDonation) return;
-
-		$additionSpinTimePrice.value = currentMinDonation + minDonationStep;
-		timer.add(Number(time) * 1000);
-		wheel.addSpinDuration(Number(time) * 1000);
+		return {
+			forward: isPastRouteSmaller ? moveDistance : -moveDistance,
+			backward: isPastRouteSmaller ? -moveDistance : moveDistance
+		};
 	}
 
 	function twitchSwitchOn() {
@@ -108,128 +94,6 @@
 		} else {
 			goto('/api/da/auth');
 		}
-	}
-
-	function processIdDonation(lotId: RegExpMatchArray, donation: IDonationData) {
-		const id = Number(lotId[0].replace('#', ''));
-		const amount = donation.amount_in_user_currency;
-		const isEnoughAmount = amount >= Number($stopSpin.value);
-		let isAdded = false;
-
-		for (const l of $lots) {
-			if (l.id !== id) continue;
-
-			lots.addValue(id, amount, donation.username);
-			events.add(`+${amount}: ${l.title}`, donation.type);
-
-			isAdded = true;
-		}
-
-		if (!isAdded) {
-			donations.add(donation);
-		}
-
-		if ($stopSpin.isToggled && $wheelState === WHEEL_STATE.SPINNING && isEnoughAmount) {
-			wheel.stop();
-			timer.reset();
-		}
-	}
-
-	function precessUrlDonation(donation: IDonationData) {
-		const isEnoughAmount = donation.amount >= Number($stopSpin.value);
-
-		if ($wheelState !== WHEEL_STATE.SPINNING) {
-			donations.add({
-				...donation,
-				amount_in_user_currency: donation.amount
-			});
-		} else {
-			lots.add(donation.message, donation.amount, donation.username);
-			events.add(`${donation.message}`, donation.type, 'add');
-
-			if ($stopSpin.isToggled && isEnoughAmount) {
-				wheel.stop();
-				timer.reset();
-			}
-		}
-	}
-
-	function processDonation(donation: IDonationData) {
-		const amount = donation.amount_in_user_currency;
-		const lotId = donation.message.match(/\B(\#[\d]+\b)(?!;)/);
-		const haveUrl = isUrl(donation.message);
-		const isEnoughAmount = amount >= Number($stopSpin.value);
-
-		if ($wheelState === WHEEL_STATE.SPINNING && $additionSpinTime.isToggled) {
-			addSpinTime(amount);
-		}
-
-		// if (donation.message.toLowerCase().includes(donationStopWord)) {
-		// 	const replacedMessage = donation.message.toLowerCase().replace('#bomb', '');
-		// 	donations.add({ ...donation, message: replacedMessage });
-
-		// 	return;
-		// }
-
-		if (lotId) {
-			processIdDonation(lotId, { ...donation, amount_in_user_currency: amount });
-
-			return;
-		}
-
-		if (haveUrl) {
-			precessUrlDonation({ ...donation, amount_in_user_currency: amount });
-
-			return;
-		}
-
-		const minMergeThreshold = 40;
-		const maxMergeThreshold = 60;
-
-		let acceptableLots = [];
-		let mostSimilarLot = null;
-
-		for (const l of $lots) {
-			const comparePercent = compareStrings(donation.message, l.title);
-
-			if (comparePercent > maxMergeThreshold) {
-				lots.addValue(l.id, amount, donation.username);
-				events.add(`+${amount}: ${l.title}`, donation.type);
-				acceptableLots = [];
-
-				if ($stopSpin.isToggled && $wheelState === WHEEL_STATE.SPINNING && isEnoughAmount) {
-					wheel.stop();
-					timer.reset();
-				}
-
-				return;
-			}
-
-			if (comparePercent > minMergeThreshold) {
-				acceptableLots.push({
-					...l,
-					comparePercent
-				});
-			}
-		}
-
-		if ($stopSpin.isToggled && $wheelState === WHEEL_STATE.SPINNING && isEnoughAmount) {
-			lots.add(donation.message, amount, donation.username);
-			events.add(`${donation.message}`, donation.type, 'add');
-
-			wheel.stop();
-			timer.reset();
-
-			return;
-		}
-
-		if (acceptableLots.length > 0) {
-			mostSimilarLot = acceptableLots.reduce((prev, current) =>
-				prev.comparePercent > current.comparePercent ? prev : current
-			);
-		}
-
-		donations.add({ ...donation, mostSimilarLot });
 	}
 
 	async function getCustomRewardId(twitchChannel: number) {
@@ -312,20 +176,21 @@
 					const redeemedReward: ITwitchRedeemedReward = data.data;
 					const id = redeemedReward.redemption.id;
 					const username = redeemedReward.redemption.user.display_name;
-					const input = redeemedReward.redemption.user_input;
+					const message = redeemedReward.redemption.user_input;
 					const amount = redeemedReward.redemption.reward.cost;
 					const createdAt = redeemedReward.redemption.redeemed_at;
 
-					processDonation({
+					donations.add({
 						id,
 						type: 'Twitch',
 						username,
 						amount,
 						amount_in_user_currency: amount,
-						message: input,
-						currency: '',
+						message,
+						currency: 'TP',
 						created_at: createdAt.toString(),
-						mostSimilarLot: null
+						mostSimilarLot: null,
+						isInstant: false
 					});
 				}
 			}
@@ -391,11 +256,17 @@
 				const username = donation.username ?? 'Аноним';
 				const roundedAmount = Math.round(donation.amount_in_user_currency);
 
-				processDonation({
-					...donation,
+				donations.add({
+					id: donation.id,
 					type: 'Donation Alerts',
 					username,
-					amount_in_user_currency: roundedAmount
+					amount: donation.amount,
+					amount_in_user_currency: roundedAmount,
+					message: donation.message,
+					currency: donation.currency,
+					created_at: donation.created_at,
+					mostSimilarLot: null,
+					isInstant: false
 				});
 			}
 		});
@@ -407,146 +278,178 @@
 
 <div class="layout" style="background-image: {$backgroundImage};">
 	<div class="layout-section layout-section_left">
-		<h1 style="font-size: 28px; text-align: center;">Правила Аукциона</h1>
-		{#if $stopSpin.isToggled}
-			<h3 style="font-size: 20px; text-align: center;">
-				Остановить колесо <br />
-				добавив ваш вариант <br />
-				{$stopSpin.value}
-				{$stopSpin.valueAttribute}
-			</h3>
-		{/if}
-		{#if $additionSpinTime.isToggled}
-			<h3 style="font-size: 20px; text-align: center;">
-				Продлить прокрут колеса <br />
-				{$additionSpinTimePrice.value}
-				{$additionSpinTimePrice.valueAttribute}
-			</h3>
-		{/if}
-		<h3 style="white-space: break-spaces; font-size: 20px;">
-			{$textRules}
-		</h3>
+		<div class="layout-wrapper">
+			{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
+				<Card --card-flex="0 1 auto" --card-gap="10px" --card-title-size="28px" title="Возможности">
+					<Snackbar>
+						<span>Остановить колесо, добавив ваш вариант</span>
+						{#if $stopSpinAction.isEnabled}
+							<span>{$stopSpinAction.price} Руб</span>
+						{:else}
+							<span>Х</span>
+						{/if}
+					</Snackbar>
+					<Snackbar>
+						<span>Продлить кручение колеса</span>
+						{#if $continueSpinAction.isEnabled}
+							<TransitionContainer trigger={$currentSpinPrice}>
+								<span>{$currentSpinPrice} Руб</span>
+							</TransitionContainer>
+						{:else}
+							<span>Х</span>
+						{/if}
+					</Snackbar>
+				</Card>
+			{/if}
+			<Card
+				--card-justify="center"
+				--card-flex="1 1 0"
+				--card-title-size="28px"
+				title={activeRoute?.url === NAVIGATION_ROUTES.WHEEL ? 'Топ 10' : 'Правила'}
+			>
+				{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
+					<div style="width: 100%;">
+						{#each topLots as { id, title, color, contrastColor, value } (id)}
+							{@const percent = (value / total) * 100}
+							<div class="lot-preview-wrapper" animate:flip={{ duration: 200 }}>
+								<LotPreview {id} {title} {color} {contrastColor} {percent} />
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<Textarea
+						id="rules"
+						placeholder="Написать правила..."
+						isEditable={isTextRulesEditable}
+						shouldFocus={isTextRulesEditable}
+						bind:value={$textRules}
+					/>
+				{/if}
+			</Card>
+		</div>
 	</div>
 	<div class="layout-section layout-section_center">
-		<div class="layout-section-wrapper">
-			<slot />
-		</div>
-		<div class="navigation-wrapper">
-			<Navigation bind:activeRoute />
-		</div>
+		<Card --card-flex="1" --card-justify="end" --card-p="30px 20px">
+			{#key previousRoute}
+				<div
+					class="layout-section-wrapper"
+					in:fly={{ x: getFlyDirection()?.forward, duration: 300 }}
+					out:fly={{ x: getFlyDirection()?.backward, duration: 300, easing: cubicOut }}
+				>
+					<slot />
+				</div>
+			{/key}
+			<div class="navigation-wrapper">
+				{#if activeRoute?.url === NAVIGATION_ROUTES.LOTS}
+					<div
+						style="position: absolute; left: 26px; display: flex; align-items: center;"
+						transition:fade={{ duration: 200 }}
+					>
+						<p>Общая сумма: &ThinSpace;</p>
+						{#if isTotalShown}
+							<p transition:slide={{ duration: 200, axis: 'x' }} aria-hidden>
+								{getTotal($lots.map((l) => l.value))}
+							</p>
+						{/if}
+						<Button icon="visibility" on:click={() => (isTotalShown = !isTotalShown)} />
+					</div>
+					<div
+						style="position: absolute; right: 26px; display: flex; align-items: center;"
+						transition:fade={{ duration: 200 }}
+					>
+						<p>Всего лотов: {$lots.length}</p>
+						<Button icon="trashcan" on:click={() => lots.removeAll()} />
+					</div>
+				{/if}
+				<Navigation bind:activeRoute on:routeswitch={(e) => (previousRoute = e.detail.from)} />
+			</div>
+		</Card>
 	</div>
 	<div class="layout-section layout-section_right">
 		<div class="layout-wrapper">
-			<Timer />
-			<div class="integrations-wrapper">
-				<Integration
-					name="Donation Alerts"
-					color="orange"
-					icon={daIcon}
-					onSwitchOn={daSwitchOn}
-					onSwitchOff={() => donationAlertsWebSocket.close()}
-					authCallback={() => goto('/api/da/auth')}
-					isDisabled={isConnectingToDonationAlerts}
-					isAuthorized={!!daSession}
-				/>
-				<Integration
-					name="Twitch"
-					color="purple"
-					icon={twitchIcon}
-					onSwitchOn={twitchSwitchOn}
-					onSwitchOff={() => twitchWebSocket.close()}
-					bind:isToggled={isTwitchToggled}
-					isDisabled={isConnectingToTwitch}
-					isAuthorized={!!twitchSession}
-					authCallback={() => goto('/api/twitch/auth')}
-				/>
-			</div>
-			<!-- <button
-				type="button"
-				on:click={() =>
-					donations.add({
-						id: 1,
-						type: 'Twitch',
-						username: 'Tester',
-						message: 'Testing',
-						amount: 300,
-						amount_in_user_currency: 300,
-						currency: 'RUB',
-						mostSimilarLot: null,
-						created_at: ''
-					})}>DONATE</button
-			> -->
-			<div class="donations-scroll-wrapper">
-				<div class="donations-wrapper" data-donations-queue={$donations.length}>
-					{#each $donations as { id, type, username, message, amount, amount_in_user_currency, currency, mostSimilarLot }}
-						<Donation
-							{id}
-							{type}
-							{username}
-							{message}
-							{amount}
-							{amount_in_user_currency}
-							{currency}
-							{mostSimilarLot}
-						/>
-					{/each}
-					{#each $events as event}
-						<Event {...event} />
+			<Card --card-w="100%">
+				<Timer />
+			</Card>
+			<Card --card-w="100%" --card-flex="0 1 auto" title="Интеграции">
+				<!-- <TestKit /> -->
+				<div class="integrations-wrapper">
+					<Integration
+						name="Donation Alerts"
+						onSwitchOn={daSwitchOn}
+						onSwitchOff={() => donationAlertsWebSocket.close()}
+						authCallback={() => goto('/api/da/auth')}
+						isDisabled={isConnectingToDonationAlerts}
+						isAuthorized={!!daSession}
+					/>
+					<Integration
+						name="Twitch"
+						onSwitchOn={twitchSwitchOn}
+						onSwitchOff={() => twitchWebSocket.close()}
+						bind:isToggled={isTwitchToggled}
+						isDisabled={isConnectingToTwitch}
+						isAuthorized={!!twitchSession}
+						authCallback={() => goto('/api/twitch/auth')}
+					/>
+				</div>
+			</Card>
+			<Card --card-flex="1 1 0" --card-flow="hidden auto" title="Очередь ({$donations.length})">
+				<div class="donations-wrapper">
+					{#each $donations as { created_at, ...donation } (donation.id)}
+						<div class="donation-wrapper" animate:flip={{ duration: 300 }}>
+							<Donation {...donation} />
+						</div>
 					{/each}
 				</div>
-			</div>
+			</Card>
 		</div>
 	</div>
 </div>
 
 <style lang="scss">
 	.layout {
-		display: grid;
-		grid-template-columns: 1fr minmax(960px, 1fr) 1fr;
+		position: relative;
+		display: flex;
+		width: 100%;
 		background-position: center;
 		background-repeat: no-repeat;
 		background-size: cover;
 
 		&-wrapper {
 			display: flex;
-			align-items: center;
 			flex-direction: column;
-			gap: 10px;
-			height: 100%;
+			gap: 20px;
 			padding: 20px;
+			height: 100%;
 		}
 		&-section-wrapper {
-			position: relative;
+			position: absolute;
+			top: 0;
+			z-index: 1;
 			display: flex;
-			justify-content: center;
 			flex: 1 1 0;
+			justify-content: center;
+			padding-top: 30px;
 			width: 100%;
+			height: calc(100% - 170px);
 			overflow: hidden;
 		}
 		&-section {
 			position: relative;
 			display: flex;
 			flex-direction: column;
-			align-items: center;
-			padding: 20px;
-			color: white;
+			color: var(--on-surface);
+			overflow: hidden;
 
 			&_left {
+				flex: 1 1 25%;
 				gap: 20px;
-				& h3 {
-					margin: 0;
-				}
 			}
 			&_center {
-				justify-content: space-between;
-				padding: 30px 0;
-				box-shadow: 0px 4px 15px black;
-				background-color: rgb(20 20 20 / 70%);
-				overflow: hidden;
+				flex: 1 1 50%;
 			}
 			&_right {
-				align-items: stretch;
-				padding: 0;
+				flex: 1 1 25%;
+				overflow: inherit;
 			}
 		}
 	}
@@ -554,49 +457,38 @@
 		&-wrapper {
 			display: flex;
 			flex-direction: column;
-			gap: 10px;
-
-			&::before {
-				content: 'Очередь (' attr(data-donations-queue) ')';
-				margin: 8px 0;
-				font-size: 18px;
-				font-weight: 600;
-				text-align: center;
-			}
-		}
-
-		&-scroll-wrapper {
-			display: flex;
-			justify-content: center;
-			align-items: start;
-			flex: 1 1 0;
-			padding: 20px;
-			overflow-y: auto;
-			overflow-x: hidden;
-			scrollbar-gutter: stable;
+			flex: 1;
+			align-items: center;
+			gap: 15px;
 		}
 	}
 	.navigation-wrapper {
-		padding: 60px 0 0 0;
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		width: 100%;
 	}
 
 	.integrations-wrapper {
+		position: relative;
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
 		align-items: center;
 		gap: 20px;
-		padding: 20px;
-		min-width: 350px;
-		max-width: 350px;
-		box-shadow: 0px 3px 8px black;
-		background-color: rgb(20 20 20 / 70%);
+		width: 100%;
+	}
 
-		&::before {
-			content: 'Интеграции';
-			margin: 0;
-			text-align: center;
-			font-size: 18px;
-			font-weight: 600;
+	.lot-preview-wrapper {
+		display: flex;
+		flex-direction: column;
+
+		&:not(:last-child)::after {
+			content: '';
+			width: 100%;
+			height: 1px;
+			background-color: var(--outline-variant);
 		}
 	}
 </style>

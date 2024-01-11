@@ -1,24 +1,65 @@
 <script lang="ts">
 	import lots from '$lib/stores/lots';
+	import donations from '$lib/stores/donations';
 	import Input from './Input.svelte';
 	import Button from './Button.svelte';
-	import donations from '$lib/stores/donations';
+	import NumberInput from './NumberInput.svelte';
+	import { slide } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import anime from 'animejs';
 
 	export let id: number;
 	export let title: string;
-	export let value: string;
-	export let donators: string[];
+	export let value: number;
 	export let percent: number;
 	export let color: string;
+	export let contrastColor: string;
 
+	let valueToAdd: number;
 	let isHovered = false;
-	let valueToAdd: string;
+	let isAddInputVisible = false;
+	let additionalInputElement: HTMLInputElement;
+	let element: HTMLDivElement;
+	let animation: anime.AnimeInstance;
+
+	onMount(() => {
+		return lots.lotValueChanged.subscribe((lot) => {
+			if (lot?.id === id) {
+				animate();
+			}
+		});
+	});
+
+	function animate() {
+		if (animation) {
+			animation.restart();
+		} else {
+			animation = anime({
+				targets: element,
+				scale: 1.05,
+				backgroundColor: color,
+				easing: 'easeOutCubic',
+				direction: 'alternate',
+				duration: 350
+			});
+		}
+	}
+
+	function showInput() {
+		isAddInputVisible = true;
+		setTimeout(() => additionalInputElement.focus(), 50);
+	}
+
+	function hideInputAndAddValue() {
+		isAddInputVisible = false;
+		addValue();
+	}
 
 	function addValue() {
-		if (!valueToAdd) return;
+		if (valueToAdd < 1) return;
 
 		lots.addValue(id, Number(valueToAdd));
-		valueToAdd = '';
+		valueToAdd = 0;
 	}
 
 	function handleDrop(e: DragEvent) {
@@ -49,16 +90,19 @@
 	}
 </script>
 
-{#key value}
-	<div
-		class="lot"
-		class:hovered={isHovered}
-		data-lot-id="#{id}"
-		on:dragover|preventDefault={(e) => handleDragOver(e)}
-		on:dragleave|preventDefault={(e) => handleDragLeave(e)}
-		on:drop|preventDefault={(e) => handleDrop(e)}
-		aria-hidden
-	>
+<div
+	style="--lot-color: {color};"
+	class="lot"
+	class:hovered={isHovered}
+	data-lot-id="#{id}"
+	aria-hidden
+	bind:this={element}
+	on:dragover|preventDefault={(e) => handleDragOver(e)}
+	on:dragleave|preventDefault={(e) => handleDragLeave(e)}
+	on:drop|preventDefault={(e) => handleDrop(e)}
+>
+	<span class="lot__id" style="color: {contrastColor}; background-color: {color};">#{id}</span>
+	<div class="lot-inputs-wrapper">
 		<Input
 			--input-w-w="100%"
 			id="lot-text-{id}"
@@ -69,81 +113,68 @@
 			onBlur={() => lots.setTitle(id, title)}
 			bind:value={title}
 		/>
-		<Input
-			--input-w="100px"
+		<NumberInput
+			--input-w="90px"
 			--input-text-al="center"
 			id="lot-value-{id}"
-			type="number"
 			placeholder="Сумма"
-			onEnter={() => lots.setValue(id, Number(value))}
-			onBlur={() => lots.setValue(id, Number(value))}
+			onEnter={() => lots.setValue(id, value)}
+			onBlur={() => lots.setValue(id, value)}
 			isPreventInput={true}
 			bind:value
 		/>
-		<Button icon="plus" on:click={addValue} />
-		<Input
-			--input-w="100px"
-			--input-text-al="center"
-			id="lot-add-value-{id}"
-			type="number"
-			placeholder="Сумма"
-			onEnter={addValue}
-			bind:value={valueToAdd}
-		/>
-		<div class="lot__percent">{Number(percent.toFixed(1))}%</div>
-		<div class="lot-buttons-wrapper">
-			<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
-		</div>
 	</div>
-{/key}
+	{#if isAddInputVisible}
+		<div style="display: flex;" transition:slide={{ axis: 'x', duration: 200 }}>
+			<NumberInput
+				--input-w="90px"
+				--input-text-al="center"
+				id="lot-add-value-{id}"
+				placeholder="Сумма"
+				onEnter={hideInputAndAddValue}
+				bind:element={additionalInputElement}
+				bind:value={valueToAdd}
+			/>
+		</div>
+	{/if}
+	<div class="lot__percent">{Number(percent.toFixed(1))}%</div>
+	<Button icon="plus" on:click={isAddInputVisible ? hideInputAndAddValue : showInput} />
+	<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
+</div>
 
 <style lang="scss">
 	.lot {
 		display: flex;
 		align-items: center;
-		gap: 10px;
 		border-radius: 10px;
-		animation: blink 1s ease-in-out forwards;
+		background-color: transparent;
 
-		&::before {
-			content: attr(data-lot-id);
+		&__id {
 			display: flex;
 			align-items: center;
-			justify-content: end;
-			border-radius: 10px;
-			min-width: 30px;
+			justify-content: center;
+			margin-right: 10px;
+			border-radius: 5px;
+			min-width: 60px;
 			height: 30px;
 			font-weight: bold;
 		}
 
-		&-buttons-wrapper {
-			position: relative;
+		&-inputs-wrapper {
 			display: flex;
+			flex: 1;
 		}
 
 		&__percent {
-			text-align: center;
 			min-width: 60px;
+			text-align: center;
 			font-variant-numeric: tabular-nums;
+			opacity: 0.5;
 		}
 
 		&.hovered {
-			outline: 2px solid white;
-		}
-	}
-
-	@keyframes blink {
-		0% {
-			scale: 1;
-			background-color: transparent;
-		}
-		30% {
-			scale: 1.025;
-			background-color: var(--color-purple);
-		}
-		100% {
-			scale: 1;
-			background-color: transparent;
+			z-index: 999;
+			outline: 3px solid white;
 		}
 	}
 </style>

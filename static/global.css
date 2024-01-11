@@ -27,15 +27,45 @@
 }
 
 :root {
-  --color-purple: #9146FF;
   --color-orange: #F57D07;
+  --donation-orange: #FF8E33;
+  --on-donation-orange: #502400;
+  --surface: #151218;
+  --surface-bright: #3B383E;
+  --inverse-surface: #E7E0E8;
+  --on-inverse-surface: #322F35;
+  --inverse-primary: #69548D;
+  --on-surface: #E7E0E8;
+  --on-surface-variant: #CBC4CF;
+  --surface-container: #211E24;
+  --surface-container-low: #1D1A20;
+  --surface-container-lower: #0F0D12;
+  --surface-container-high: #2C292F;
+  --surface-container-highest: #36343B;
+  --outline: #958E99;
+  --outline-variant: #49454E;
+  --color-purple: #9146FF;
+  --primary: #D5BBFC;
+  --on-primary: #3A255B;
+  --primary-container: #513C73;
+  --on-primary-container: #ECDCFF;
+  --primary-30: #5E00C1;
+  --primary-40: #7A26E7;
+  --primary-50: #934BFF;
+  --primary-60: #A974FF;
+  --primary-70: #BF98FF;
+  --neutral: #7A767A;
+  --error: #de3730;
+  --elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --elevation-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.30), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  --elevation-5: 0px 4px 4px 0px rgba(0, 0, 0, 0.30), 0px 8px 12px 6px rgba(0, 0, 0, 0.15);
 }
 
 body {
   display: flex;
   height: 100vh;
   font-family: 'San Francisco Pro', sans-serif;
-  background-color: #0a0a0a;
+  background-color: var(--surface-container-low);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -43,19 +73,33 @@ body {
   overflow: hidden;
 }
 
+a {
+  color: var(--primary-60);
+}
+
+h1::selection,
+h2::selection,
+h3::selection,
+p::selection,
+span::selection {
+  background-color: var(--primary-60);
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #505050;
+  border-radius: 5px;
+  background: var(--outline-variant);
 }
 
 ::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: var(--primary-60);
   transition: .2s;
-  background: var(--color-purple);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #af7cfc;
+  background-color: var(--primary-70);
 }

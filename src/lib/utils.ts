@@ -1,5 +1,4 @@
 import confetti from "canvas-confetti";
-import type { ILot } from "./interfaces";
 
 export const getRandomColor = (() => {
   let usedColors: string[] = [];
@@ -107,14 +106,11 @@ export function formatTime(ms: number) {
   };
 }
 
-export function isUrl(str: string) {
-  const replacedStr = str.replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}/g, '');
+export function extractUrl(str: string) {
+  const urlMatch = str.match(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}[^\s]+/g);
+  // const urlMatch = str.match(/(https?:\/\/[^\s]+)/);
 
-  if (replacedStr.length < str.length) {
-    return true
-  }
-
-  return false;
+  if (urlMatch) return urlMatch[0];
 }
 
 export function getRandomInRange(min: number | string, max: number | string) {
@@ -160,6 +156,27 @@ export function modifyBrightness(color: string, brightnessFactor: number) {
   );
 
   return '#' + modifiedHex;
+}
+
+export function getContrastColor(hexColor: string) {
+  if (hexColor.startsWith("#")) {
+    hexColor = hexColor.slice(1);
+  }
+
+  // Convert the hex color code to RGB values
+  const r = parseInt(hexColor.substring(0, 2), 16);
+  const g = parseInt(hexColor.substring(2, 4), 16);
+  const b = parseInt(hexColor.substring(4, 6), 16);
+
+  // Calculate the relative luminance using the formula for sRGB color space
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+
+  // Determine the appropriate contrast color based on the luminance
+  if (luminance > 0.5) {
+    return "#000000"; // Return black for lighter backgrounds
+  } else {
+    return "#ffffff"; // Return white for darker backgrounds
+  }
 }
 
 export function fireConfetti() {

@@ -1,26 +1,26 @@
 <script lang="ts">
 	import {
+		extractUrl,
 		fireConfetti,
 		getGrayscaleColor,
 		getPercentFromTotal,
 		getRandomInRange,
 		getShortenedText,
 		getTotal,
-		isUrl,
-		modifyBrightness,
-		toRadians
+		modifyBrightness
 	} from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import Input from './Input.svelte';
 	import lots from '$lib/stores/lots';
-	import wheel, { WHEEL_STATE } from '$lib/stores/wheel';
-	import timer from '$lib/stores/timer';
+	import wheel from '$lib/stores/wheel';
 	import type { ILot, IPieItem } from '$lib/interfaces';
-	import { radiansToDegrees } from '$lib/constants';
+	import { WHEEL_STATE, degreesToRadians, radiansToDegrees } from '$lib/constants';
 	import TextButton from './TextButton.svelte';
 	import winnerSound from '$lib/assets/sounds/winner_sound.wav';
-	import wheelSectionSound from '$lib/assets/sounds/wheel_section_sound.wav';
+	import NumberInput from './NumberInput.svelte';
+	import { beforeNavigate } from '$app/navigation';
+	import storable from '$lib/stores/storable';
+	// import wheelSectionSound from '$lib/assets/sounds/wheel_section_sound.wav';
 
 	const radius = 360;
 	const width = radius * 2;
@@ -37,40 +37,50 @@
 	// spinSound.preload;
 	// spinSound.volume = 0.2;
 
-	let canvas: HTMLCanvasElement;
-	let context: CanvasRenderingContext2D | null;
+	let spinDuration = 10;
+	let minSpinDuration = storable(1, 'minSpinDuration');
+	let maxSpinDuration = storable(10, 'maxSpinDuration');
+	let isNavigating = false;
+	let isDragging = false;
+	let isSettingsShown = false;
 	let draggingAngle = 0;
 	let draggingStartAngle = 0;
-	let isDragging = false;
-	let isSettingsShown = true;
 	let winner: IPieItem | null = null;
-	let spinDuration = '10';
-	let minSpinDuration = '150';
-	let maxSpinDuration = '250';
+
+	let canvas: HTMLCanvasElement;
+	let context: CanvasRenderingContext2D | null;
 	let wheelElement: HTMLElement;
 	let wheelWidth: number;
 	let wheelHeight: number;
 	let wheelX: number;
 	let wheelY: number;
 
-	$: pie = createPie($lots);
+	$: canvasRotation = isDragging && !isNavigating ? draggingAngle : $wheel.angle;
 	$: wheelState = wheel.state;
-	$: $wheelState, getWinner($wheel.normalizedAngle);
-	$: isDragging, $wheelState, drawChart(pie);
+	$: pie = createPie($lots);
+	$: $wheelState, isDragging, drawChart(pie);
+	$: {
+		if (!isNavigating) getWinner($wheel.normalizedAngle);
+	}
+
+	beforeNavigate(() => (isNavigating = true));
 
 	onMount(() => {
 		context = canvas.getContext('2d');
 
-		drawChart(pie);
 		onResize();
-	});
+		drawChart(pie);
 
-	function onResize() {
-		wheelWidth = wheelElement.getBoundingClientRect().width;
-		wheelHeight = wheelElement.getBoundingClientRect().height;
-		wheelX = wheelElement.getBoundingClientRect().x + wheelWidth / 2;
-		wheelY = wheelElement.getBoundingClientRect().y + wheelHeight / 2;
-	}
+		const unsubSpinStopped = wheel.spinStopped.subscribe(() => {
+			const lastPie = createPie($lots);
+
+			drawChart(lastPie);
+			getWinner($wheel.normalizedAngle, lastPie);
+			celebrate();
+		});
+
+		return unsubSpinStopped;
+	});
 
 	function celebrate() {
 		celebrationSound.load();
@@ -86,6 +96,7 @@
 
 		return items.map((item, idx) => {
 			const deg = (item.value / total) * 360;
+			const isUrl = extractUrl(item.title);
 
 			startAngle = idx && endAngle;
 			endAngle = !idx ? deg : startAngle + deg;
@@ -94,9 +105,68 @@
 				...item,
 				percent: getPercentFromTotal(item.value, total),
 				startAngle,
-				endAngle
+				endAngle,
+				isUrl: !!isUrl
 			};
 		});
+	}
+
+	function drawPieSliceText(title: string, color: string, startAngle: number, endAngle: number) {
+		if (!context || endAngle - startAngle < degreeCapForTextDisplay) return;
+
+		const shortTitle = getShortenedText(title, maxTitleLength);
+		const textAngle = (startAngle + endAngle) / 2; // Find the middle angle of the slice
+		const offsetFromCenter = 0.8; // 0 = right at the center | 1 = right on the edge
+		const textX =
+			offsetCenter + offsetCenter * offsetFromCenter * Math.cos(textAngle * degreesToRadians);
+		const textY =
+			offsetCenter + offsetCenter * offsetFromCenter * Math.sin(textAngle * degreesToRadians);
+
+		context.font = '700 20px sans-serif';
+		context.textBaseline = 'middle';
+		context.textAlign = 'start';
+		context.fillStyle = color;
+
+		context.save(); // Save the current canvas state
+		context.translate(textX, textY); // Move the canvas origin to the text position
+		context.rotate((textAngle + 180) * degreesToRadians); // Rotate the canvas by textAngle - 90 degrees
+		context.fillText(shortTitle, 0, 0);
+		context.restore(); // Restore the canvas state to remove the translation and rotation
+	}
+
+	function drawPieSlice(
+		startAngle: number,
+		endAngle: number,
+		color: string,
+		isWinner: boolean = false
+	) {
+		if (!context) return;
+
+		context.beginPath();
+		context.moveTo(offsetCenter, offsetCenter);
+		context.arc(
+			offsetCenter,
+			offsetCenter,
+			radius,
+			startAngle * degreesToRadians,
+			endAngle * degreesToRadians
+		);
+		context.closePath();
+
+		if ($wheelState !== WHEEL_STATE.WINNING || isDragging) {
+			context.fillStyle = color;
+			context.strokeStyle = 'white';
+		} else if (isWinner) {
+			context.fillStyle = color;
+			context.strokeStyle = color;
+		} else {
+			context.fillStyle = modifyBrightness(getGrayscaleColor(color), 0.4);
+			context.strokeStyle = modifyBrightness(getGrayscaleColor(color), 0.4);
+		}
+
+		context.fill();
+		context.lineWidth = 2;
+		context.stroke();
 	}
 
 	function drawChart(chartData: IPieItem[]) {
@@ -104,85 +174,55 @@
 
 		context.clearRect(0, 0, radius, radius);
 
-		for (const { id, color, startAngle, endAngle } of chartData) {
-			context.beginPath();
-			context.moveTo(offsetCenter, offsetCenter);
-			context.arc(offsetCenter, offsetCenter, radius, toRadians(startAngle), toRadians(endAngle));
-			context.closePath();
-
-			if (winner?.id === id || $wheelState !== WHEEL_STATE.WINNING || isDragging) {
-				context.fillStyle = color;
-				context.strokeStyle = $wheelState === WHEEL_STATE.SPINNING || isDragging ? 'white' : color;
-			} else {
-				context.strokeStyle = modifyBrightness(getGrayscaleColor(color), 0.4);
-				context.fillStyle = modifyBrightness(getGrayscaleColor(color), 0.4);
-			}
-
-			context.fill();
-			context.lineWidth = 2;
-			context.stroke();
-		}
-
-		context.fillStyle = 'black';
-		context.font = '700 20px sans-serif';
-		context.textBaseline = 'middle';
-		context.textAlign = 'start';
-
-		for (const { title, startAngle, endAngle } of chartData) {
-			const isBigEnough = endAngle - startAngle > degreeCapForTextDisplay;
-
-			if (!isBigEnough) continue;
-
-			const shortTitle = getShortenedText(title, maxTitleLength);
-			const textAngle = (startAngle + endAngle) / 2; // Find the middle angle of the slice
-			const textX = offsetCenter + offsetCenter * 0.8 * Math.cos(toRadians(textAngle)); // Move the title towards the center
-			const textY = offsetCenter + offsetCenter * 0.8 * Math.sin(toRadians(textAngle)); // Move the title towards the center
-
-			context.save(); // Save the current canvas state
-			context.translate(textX, textY); // Move the canvas origin to the text position
-			context.rotate(toRadians(textAngle + 180)); // Rotate the canvas by textAngle - 90 degrees
-			context.fillText(shortTitle, 0, 0);
-			context.restore(); // Restore the canvas state to remove the translation and rotation
-		}
-
-		if ($wheelState === WHEEL_STATE.WINNING) {
-			celebrate();
-			wheel.setState(WHEEL_STATE.WAITING);
+		for (const { id, color, startAngle, endAngle, title, contrastColor } of chartData) {
+			drawPieSlice(startAngle, endAngle, color, winner?.id === id);
+			drawPieSliceText(title, contrastColor, startAngle, endAngle);
 		}
 	}
 
-	function getWinner(angle: number) {
+	function getWinner(
+		angle: number,
+		targetPie: IPieItem[] = [...pie].sort((a, b) => a.startAngle - b.startAngle)
+	) {
 		if ($wheelState === WHEEL_STATE.WAITING) return;
 
-		for (const slice of pie) {
-			if (slice.startAngle <= angle && slice.endAngle >= angle) {
-				// if (winner?.id !== slice.id) {
-				// 	spinSound.load();
-				// 	spinSound.play();
-				// }
+		let left = 0;
+		let right = targetPie.length - 1;
 
+		while (left <= right) {
+			const mid = Math.floor((left + right) / 2);
+			const slice = targetPie[mid];
+
+			if (slice.startAngle <= angle && slice.endAngle >= angle) {
 				winner = slice;
+				break;
+			} else if (slice.startAngle > angle) {
+				right = mid - 1;
+			} else {
+				left = mid + 1;
 			}
 		}
 	}
 
-	function handleWheelSpin() {
-		const secondsToSpin = Number(spinDuration) * 1000;
-
+	function startSpin() {
 		isSettingsShown = false;
 
-		timer.reset();
-		timer.setTime(secondsToSpin);
-		timer.start();
-		wheel.spin(secondsToSpin);
 		drawChart(pie);
+		wheel.startSpin(spinDuration * 1000);
 	}
 
-	function handleLotDeletion() {
+	function deleteWinner() {
 		if (!winner) return;
 
 		lots.remove(winner.id);
 		winner = null;
+	}
+
+	function onResize() {
+		wheelWidth = wheelElement.getBoundingClientRect().width;
+		wheelHeight = wheelElement.getBoundingClientRect().height;
+		wheelX = wheelElement.getBoundingClientRect().x + wheelWidth / 2;
+		wheelY = wheelElement.getBoundingClientRect().y + wheelHeight / 2;
 	}
 
 	function onRelease() {
@@ -203,9 +243,12 @@
 	function onGrab(x: number, y: number) {
 		if ($wheelState === WHEEL_STATE.SPINNING) return;
 
+		onResize();
+
 		winner = null;
 		isDragging = true;
 		draggingStartAngle = calculateAngle(x, y);
+		wheelState.set(WHEEL_STATE.WAITING);
 	}
 
 	function calculateAngle(currentX: number, currentY: number) {
@@ -217,128 +260,111 @@
 	}
 </script>
 
-<svelte:window on:mousemove={(e) => onMove(e.clientX, e.clientY)} on:mouseup={onRelease} />
+<svelte:window
+	on:mousemove={(e) => onMove(e.clientX, e.clientY)}
+	on:mouseup={onRelease}
+	on:resize={onResize}
+/>
 
 <div
-	class="wheel"
 	style="
-    --wheel-outline: {winner?.color};
-    --wheel-h: {width - 10}px; --wheel-w: {width - 10}px;
-    --wheel-rot: {isDragging ? draggingAngle : $wheel.angle}deg;
-  "
+		display: contents;
+		--wheel-h: {width - 10}px;
+		--wheel-w: {width - 10}px;
+	"
 >
-	{#if winner !== null}
-		<div class="winner" transition:fade={{ duration: 200 }}>
-			{#if isUrl(winner.title)}
-				<a href={winner.title} target="_blank" style="color: var(--color-orange);">
-					{winner.title} ({winner.percent}%)
-				</a>
-				{#if winner.donators.length > 1}
+	<div class="wheel">
+		{#if winner !== null && !isNavigating}
+			{@const title = `${winner.title} (${winner.percent}%)`}
+
+			<div class="winner" transition:fade={{ duration: 200 }}>
+				{#if winner.isUrl}
+					<a href={winner.title} target="_blank">
+						{title}
+					</a>
+				{:else}
+					<span>
+						{title}
+					</span>
+				{/if}
+				{#if winner.donators.length > 0}
 					<div class="winner-donators">
 						Заказавшие: {winner.donators.join(', ')}
 					</div>
 				{/if}
-			{:else}
-				<span>
-					{winner.title} ({winner.percent}%)
-				</span>
-				{#if winner.donators.length > 1}
-					<div class="winner-donators">
-						Заказавшие: {winner.donators.join(', ')}
-					</div>
-				{/if}
-			{/if}
-		</div>
-	{/if}
-	{#if isSettingsShown && $wheelState !== WHEEL_STATE.SPINNING}
-		<div class="wheel-settings-wrapper" transition:fade={{ duration: 200 }}>
-			<!-- {#if $wheelState !== WHEEL_STATE.SPINNING} -->
-			<div
-				class="winner-buttons-wrapper"
-				class:spaced={winner !== null}
-				transition:fade={{ duration: 200 }}
-			>
-				<div class="interactables-wrapper" style="display: flex; flex-direction: row; gap: 5px;">
-					<div style="display: flex; flex-direction: column; gap: 5px;">
-						<Input
-							--input-fw="700"
-							--input-w="100px"
-							--input-text-al="center"
+			</div>
+		{/if}
+		{#if isSettingsShown && $wheelState !== WHEEL_STATE.SPINNING}
+			<div class="wheel-settings-wrapper" transition:fade={{ duration: 200 }}>
+				<div class="winner-options" class:spaced={winner !== null}>
+					<div style="display: flex; flex-direction: row;">
+						<NumberInput
+							--input-w="90px"
 							id="spin-min"
-							placeholder="Мин"
-							type="number"
-							bind:value={minSpinDuration}
-							colorStyle="white"
+							suffix="Сек"
+							label="Минимум"
+							isFilled={true}
+							bind:value={$minSpinDuration}
 						/>
-						<Input
-							--input-fw="700"
-							--input-w="100px"
-							--input-text-al="center"
+						<NumberInput
+							--input-w="90px"
 							id="spin-max"
-							placeholder="Макс"
-							type="number"
-							bind:value={maxSpinDuration}
-							colorStyle="white"
+							suffix="Сек"
+							label="Максимум"
+							isFilled={true}
+							bind:value={$maxSpinDuration}
+						/>
+						<NumberInput
+							--input-w="90px"
+							id="spin-time"
+							suffix="Сек"
+							label="Длительность"
+							isFilled={true}
+							bind:value={spinDuration}
 						/>
 					</div>
 					<TextButton
 						text="Сгенерировать"
-						on:click={() =>
-							(spinDuration = String(getRandomInRange(minSpinDuration, maxSpinDuration)))}
+						on:click={() => (spinDuration = getRandomInRange($minSpinDuration, $maxSpinDuration))}
 					/>
-					<Input
-						--input-fw="700"
-						--input-w="100px"
-						--input-text-al="center"
-						id="spin-time"
-						placeholder="Секунды"
-						type="number"
-						bind:value={spinDuration}
-						colorStyle="white"
-					/>
-				</div>
-				<div class="interactables-wrapper" style="display: flex; gap: 5px; flex-direction: column;">
-					<div>
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
 						<TextButton
-							--text-b-fs="18px"
 							text="Ролл"
-							color="orange"
-							on:click={handleWheelSpin}
+							color="purple"
 							isDisabled={$lots.length < 1}
+							on:click={startSpin}
 						/>
 						<TextButton
-							--text-b-fs="18px"
 							text="Удалить Лот"
 							color="red"
-							on:click={handleLotDeletion}
 							isDisabled={winner === null}
+							on:click={deleteWinner}
 						/>
 					</div>
 				</div>
 			</div>
-			<!-- {/if} -->
+		{/if}
+		{#if $wheelState !== WHEEL_STATE.SPINNING && !isDragging}
+			<div class="hide-button-wrapper">
+				<TextButton
+					text={isSettingsShown ? 'Скрыть' : 'Показать'}
+					on:click={() => (isSettingsShown = !isSettingsShown)}
+				/>
+			</div>
+		{/if}
+		<svg id="pointer" viewBox="0 10 20 60">
+			<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="buttonface" />
+		</svg>
+		<div
+			style="--wheel-rotation: {canvasRotation}deg; --wheel-outline: {winner?.color}"
+			class="wheel-canvas-wrapper"
+			class:disabled={$wheelState === WHEEL_STATE.SPINNING}
+			aria-hidden
+			bind:this={wheelElement}
+			on:mousedown={(e) => onGrab(e.clientX, e.clientY)}
+		>
+			<canvas bind:this={canvas} width={width + offset} height={width + offset} />
 		</div>
-	{/if}
-
-	{#if $wheelState !== WHEEL_STATE.SPINNING && !isDragging}
-		<div style="position: absolute; bottom: 10%; left: 50%; z-index: 2; translate: -50% -10%;">
-			<TextButton
-				text={isSettingsShown ? 'Скрыть' : 'Показать'}
-				on:click={() => (isSettingsShown = !isSettingsShown)}
-			/>
-		</div>
-	{/if}
-	<svg viewBox="0 10 20 60" id="pointer">
-		<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="buttonface" />
-	</svg>
-	<div
-		class="wheel-canvas-wrapper"
-		style="rotate: {isDragging ? draggingAngle : $wheel.angle}deg;"
-		aria-hidden
-		on:mousedown={(e) => onGrab(e.clientX, e.clientY)}
-		bind:this={wheelElement}
-	>
-		<canvas bind:this={canvas} width={width + offset} height={width + offset} />
 	</div>
 </div>
 
@@ -349,7 +375,7 @@
 		left: 50%;
 		z-index: 3;
 		width: 90%;
-		padding: 10px 0;
+		padding: 10px;
 		translate: -50% -50%;
 		font-size: 24px;
 		font-weight: bold;
@@ -360,6 +386,10 @@
 		background-color: rgba(0, 0, 0, 0.5);
 		overflow: hidden;
 
+		& a {
+			color: var(--primary-70);
+		}
+
 		&-donators {
 			display: flex;
 			justify-content: center;
@@ -368,24 +398,16 @@
 			font-size: 20px;
 			text-transform: none;
 		}
-		&-buttons-wrapper {
+
+		&-options {
 			display: flex;
 			flex-direction: column;
-			justify-content: center;
-			align-items: center;
 			gap: 10px;
+			translate: 0;
+			transition: translate 0.2s ease-in-out;
 
-			& .interactables-wrapper {
-				translate: 0;
-				transition: translate 0.2s ease-in-out;
-			}
 			&.spaced {
-				& .interactables-wrapper:nth-child(1) {
-					translate: 0 -150%;
-				}
-				& .interactables-wrapper:nth-child(2) {
-					translate: 0 150%;
-				}
+				translate: 0 100%;
 			}
 		}
 	}
@@ -406,23 +428,38 @@
 			position: absolute;
 			top: 50%;
 			left: 50%;
+			z-index: 2;
 			translate: -50% -50%;
 			display: flex;
 			justify-content: center;
 			align-items: center;
 			border-radius: 50%;
-			z-index: 2;
-			background-color: rgb(20 20 20 / 60%);
 			width: calc(var(--wheel-w) + 20px);
 			height: calc(var(--wheel-h) + 20px);
+			background-color: rgb(20 20 20 / 60%);
 		}
 
 		&-canvas-wrapper {
 			display: flex;
+			transform: rotate(var(--wheel-rotation, 0)) translateZ(0);
+			cursor: grab;
+
+			&.disabled {
+				cursor: default;
+
+				&:active {
+					cursor: default;
+				}
+			}
 
 			& canvas {
 				rotate: -90deg;
 			}
+
+			&:active {
+				cursor: grabbing;
+			}
+
 			&::after {
 				content: '';
 				position: absolute;
@@ -435,9 +472,17 @@
 				box-shadow: 0 2px 10px 10px black;
 				outline: 10px solid var(--wheel-outline, buttonface);
 				transition: outline 0.2s linear;
-				/* animation: pulse 0.5s ease-out alternate infinite; */
+				animation: pulse 0.5s ease-out alternate infinite;
 				pointer-events: none;
 			}
 		}
+	}
+
+	.hide-button-wrapper {
+		position: absolute;
+		bottom: 10%;
+		left: 50%;
+		z-index: 2;
+		translate: -50% -10%;
 	}
 </style>

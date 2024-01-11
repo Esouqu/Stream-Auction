@@ -1,10 +1,9 @@
 <script lang="ts">
 	import getIcon from '$lib/icons';
-	import type { BomberTileType } from '$lib/interfaces';
 
 	// export let position: IPoint;
 	export let id: number;
-	export let type: BomberTileType;
+	export let type: 'bomb' | 'coin';
 	export let isFlipped: boolean;
 	export let isDisabled: boolean = false;
 	export let isInteractable: boolean = true;

@@ -17,6 +17,8 @@ import bombIcon from '$lib/assets/bomb_icon.svg';
 import bombIconBlack from '$lib/assets/bomb_icon_black.svg';
 import helpIcon from '$lib/assets/help_icon.svg';
 import emeraldIcon from '$lib/assets/emerald_icon.svg';
+import moreIcon from '$lib/assets/more_icon.svg';
+import editIcon from '$lib/assets/edit_icon.svg';
 
 export type iconTypes =
   | 'listAddItem'
@@ -33,7 +35,9 @@ export type iconTypes =
   | 'visibility'
   | 'bomb'
   | 'help'
-  | 'emerald';
+  | 'emerald'
+  | 'more'
+  | 'edit';
 
 export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'white') {
   switch (icon) {
@@ -63,10 +67,14 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
       return helpIcon;
     case 'emerald':
       return emeraldIcon;
+    case 'edit':
+      return editIcon;
     case 'bomb':
       return color === 'white' ? bombIcon : bombIconBlack;
     case 'plus':
       return color === 'white' ? plusIcon : plusIconBlack;
+    case 'more':
+      return moreIcon;
     default:
       return '';
   }

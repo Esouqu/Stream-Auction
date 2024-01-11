@@ -1,6 +1,13 @@
-export interface IPoint {
-  x: number;
-  y: number;
+export interface IRoute {
+  id: number;
+  title: string;
+  icon: string;
+  url: string;
+}
+
+export interface ICountdownTimerState {
+  isRunning: boolean;
+  timeRemaining: number;
 }
 
 export interface ILot {
@@ -8,6 +15,7 @@ export interface ILot {
   title: string;
   value: number;
   color: string;
+  contrastColor: string;
   donators: string[];
 }
 
@@ -15,6 +23,7 @@ export interface IPieItem extends ILot {
   percent: string;
   startAngle: number;
   endAngle: number;
+  isUrl: boolean;
 }
 
 export interface IAuthTokenData {
@@ -22,25 +31,6 @@ export interface IAuthTokenData {
   expires_in: number;
   access_token: string;
   refresh_token: string;
-}
-
-export interface IDonationData {
-  id: number | string;
-  type: 'Twitch' | 'Donation Alerts';
-  username: string;
-  amount: number;
-  amount_in_user_currency: number;
-  currency: string;
-  message: string;
-  created_at: string;
-  mostSimilarLot: ILot | null;
-}
-
-export interface IRoute {
-  id: number;
-  title: string;
-  icon: string;
-  url: string;
 }
 
 export interface IDonationAlertsUserData {
@@ -52,6 +42,40 @@ export interface IDonationAlertsUserData {
   email: string | null;
   language: string;
   socket_connection_token: string
+}
+
+export interface IDonationDataFull {
+  id: number | string;
+  type: 'Twitch' | 'Donation Alerts';
+  isInstant: boolean;
+  username: string;
+  amount: number;
+  amount_in_user_currency: number;
+  currency: string;
+  message: string;
+  created_at: string;
+  mostSimilarLot: ILot | null;
+  name: string,
+  message_type: string,
+  paying_system: string,
+  is_shown: boolean,
+  recipient_name: string,
+  recipient: string,
+  shown_at: string,
+  reason: string,
+}
+
+export interface IDonationData {
+  id: number | string;
+  type: 'Twitch' | 'Donation Alerts';
+  isInstant: boolean;
+  username: string;
+  amount: number;
+  amount_in_user_currency: number;
+  currency: string;
+  message: string;
+  created_at: string;
+  mostSimilarLot: ILot | null;
 }
 
 export interface ITwitchUserData {
@@ -108,19 +132,3 @@ export interface ITwitchRedeemedReward {
     status: 'FULFILLED' | 'UNFULFILLED'
   }
 }
-
-export interface ISettingOption {
-  id: number;
-  title: string;
-  value: number;
-  attribute: string
-}
-
-export interface ISetting {
-  isToggled: boolean;
-  description: string;
-  options: ISettingOption[];
-}
-
-export type EventType = 'add' | 'time' | null;
-export type BomberTileType = 'bomb' | 'coin';

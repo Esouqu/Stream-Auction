@@ -4,37 +4,42 @@
 
 	export let id: number | string;
 	export let description: string;
-	export let value: number | undefined = undefined;
-	export let attribute: string | null = null;
-	export let isToggled: boolean | null = null;
+	export let value: number = 0;
+	export let suffix: string = '';
+	export let isToggled = false;
+	export let haveInput = true;
+	export let haveToggle = true;
 	export let isDisabled = false;
-	export let callback: (() => void) | null = null;
+	export let onEnter: (() => void) | null = null;
+	export let onInput: (() => void) | null = null;
+	export let onBlur: (() => void) | null = null;
+	export let toggleOn: (() => void) | null = null;
+	export let toggleOff: (() => void) | null = null;
 </script>
 
 <div class="setting">
 	<p>{description}</p>
 	<div class="setting-inputs">
-		{#if value !== undefined}
-			<NumberInput
-				--input-w="100px"
-				--input-text-al="center"
-				{id}
-				{attribute}
-				placeholder="Значение"
-				isDisabled={isToggled !== null ? !isToggled : isDisabled}
-				bind:value
-				on:input={callback}
-			/>
-		{/if}
-		{#if isToggled !== null}
-			<Switch
-				color="orange"
-				on={() => (isToggled = true)}
-				off={() => (isToggled = false)}
-				bind:isToggled
-				bind:isDisabled
-			/>
-		{/if}
+		<div style="grid-column: 1;">
+			{#if haveInput}
+				<NumberInput
+					--input-w="90px"
+					{id}
+					{suffix}
+					{onEnter}
+					{onBlur}
+					{onInput}
+					placeholder="Значение"
+					isDisabled={isDisabled || (haveToggle && !isToggled)}
+					bind:value
+				/>
+			{/if}
+		</div>
+		<div style="grid-column: 2;">
+			{#if haveToggle}
+				<Switch on={toggleOn} off={toggleOff} bind:isToggled bind:isDisabled />
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -44,20 +49,20 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 20px;
-		min-height: 34px;
+		min-height: 42px;
 
 		&-inputs {
-			display: flex;
+			display: grid;
+			grid-template-columns: 1fr 48px;
 			align-items: center;
-			gap: 10px;
+			gap: 30px;
 		}
 		& p {
 			flex: 1 1 0;
 			margin: 0;
 			max-width: 650px;
 			line-height: 1;
-			font-size: 18px;
-			font-weight: 500;
+			font-size: 16px;
 		}
 	}
 </style>

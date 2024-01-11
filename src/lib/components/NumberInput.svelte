@@ -3,93 +3,207 @@
 
 	export let id: number | string;
 	export let value: number = 0;
-	export let attribute: string | null = null;
-	export let placeholder: string = 'Значение';
+	export let suffix: string | null = null;
+	export let label: string | null = null;
+	export let placeholder: string = '';
+	export let element: HTMLInputElement | null = null;
 	export let isDisabled = false;
-	export let colorStyle: 'white' | 'default' = 'default';
+	export let isFilled = false;
+	export let isPreventInput = false;
+	export let onEnter: (() => void) | null = null;
+	export let onInput: (() => void) | null = null;
+	export let onBlur: (() => void) | null = null;
 
 	const pathName = $page.url.pathname;
+
+	function handleInput(e: Event) {
+		if (isPreventInput) return;
+
+		const target = e.target as HTMLInputElement;
+
+		value = Number(target.value);
+
+		if (onInput) onInput();
+	}
+
+	function handleKeyDown(e: KeyboardEvent) {
+		const target = e.target as HTMLInputElement;
+		const isConfirmKey = e.code === 'Enter';
+
+		if (!onEnter || !isConfirmKey) return;
+
+		value = Number(target.value);
+
+		onEnter();
+		target.blur();
+	}
+
+	function handleBlur(e: Event) {
+		const target = e.target as HTMLInputElement;
+
+		if (!onBlur) return;
+
+		value = Number(target.value);
+
+		onBlur();
+	}
 </script>
 
-<div class="input-wrapper">
+<div
+	class="input-wrapper"
+	class:disabled={isDisabled}
+	class:filled={isFilled}
+	class:labeled={label}
+	data-suffix={suffix}
+>
+	{#if label}
+		<fieldset class="input-fieldset">
+			<legend class="input-legend">
+				<span>{label}</span>
+			</legend>
+		</fieldset>
+	{/if}
 	<input
 		type="number"
-		id="number-input-{id}-{pathName}"
+		id="input-number-{id}-{pathName}"
 		class="input"
-		class:input_white={colorStyle === 'white'}
-		spellcheck="false"
-		{placeholder}
-		bind:value
-		on:blur
-		on:keydown
-		on:input
 		disabled={isDisabled}
+		{placeholder}
+		{value}
+		bind:this={element}
+		on:keydown={handleKeyDown}
+		on:input|preventDefault={handleInput}
+		on:blur|preventDefault={handleBlur}
 	/>
-	{#if attribute}
-		<span>{attribute}</span>
-	{/if}
 </div>
 
 <style lang="scss">
 	.input {
-		width: var(--input-w, 100%);
-		padding: 7px 0;
-		border: none;
-		border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+		position: relative;
+		padding: 10.5px;
+		border: 1px solid var(--outline);
+		border-radius: 5px;
 		outline: 0;
+		width: var(--input-w, 100%);
 		line-height: 1;
-		font-weight: var(--input-fw);
-		text-overflow: ellipsis;
 		text-align: var(--input-text-al, start);
+		text-overflow: ellipsis;
 		text-decoration: none;
+		color: var(--on-surface);
 		background-color: transparent;
-		color: white;
-		transition: 0.2s;
+		transition: outline 0.2s, border-color 0.2s;
 		overflow: hidden;
+
+		&-fieldset {
+			position: absolute;
+			inset: -5px 0px 0px;
+			margin: 0px;
+			padding: 0px 8px;
+			border: 1px solid var(--outline);
+			border-radius: 5px;
+			outline: 0;
+			min-width: 0%;
+			text-align: left;
+			transition: outline-color 0.2s, border-color 0.2s;
+			overflow: hidden;
+			user-select: none;
+		}
+
+		&-legend {
+			display: block;
+			float: unset;
+			padding: 0 2px;
+			width: auto;
+			max-width: 100%;
+			height: 11px;
+			font-size: 0.75em;
+			color: var(--on-surface-variant);
+			transition: max-width 100ms cubic-bezier(0, 0, 0.2, 1) 50ms;
+			white-space: nowrap;
+			overflow: hidden;
+		}
 
 		&-wrapper {
 			position: relative;
 			display: flex;
 			gap: 10px;
-			width: var(--input-w-w, auto);
+			width: var(--input-w-w, min-content);
 
-			& span {
-				display: flex;
-				justify-content: start;
-				align-items: center;
+			&.disabled {
+				opacity: 0.5;
+			}
+
+			&.filled {
+				&:not(.labeled) {
+					background-color: var(--surface-container-highest);
+				}
+				& .input {
+					&:focus {
+						border-color: var(--primary);
+					}
+
+					&:hover:not(:focus):not(:disabled) {
+						border-color: white;
+					}
+				}
+			}
+
+			&.labeled {
+				& .input {
+					border: 1px solid transparent;
+
+					&:hover {
+						border-color: transparent !important;
+					}
+					&:focus {
+						border: 1px solid transparent;
+					}
+				}
+
+				&:hover {
+					& .input-fieldset {
+						border-color: white;
+					}
+				}
+
+				&:has(.input:focus) .input-fieldset {
+					border: 3px solid var(--primary);
+				}
+
+				& .input-fieldset {
+					background-color: var(--surface-container-highest);
+				}
+
+				& .input {
+					outline: 0;
+				}
+			}
+
+			&::after {
+				content: attr(data-suffix);
+				position: absolute;
+				top: 52%;
+				right: 10px;
+				z-index: 999;
+				translate: 0 -50%;
 				font-size: 14px;
-				text-transform: uppercase;
-			}
-		}
-
-		&_white {
-			border-bottom: 2px solid rgba(0, 0, 0, 0.3);
-			color: black;
-			background-color: buttonface;
-
-			&:focus {
-				border-bottom: 2px solid var(--color-purple);
-			}
-
-			&:hover:not(:focus):not(:disabled) {
-				border-bottom: 2px solid rgb(0, 0, 0);
+				text-transform: capitalize;
+				opacity: 0.7;
 			}
 		}
 
 		&:focus {
-			border-bottom: 2px solid var(--color-purple);
+			z-index: 999;
+			outline: 3px solid var(--primary);
+			border-color: transparent;
 		}
 
 		&:hover:not(:focus):not(:disabled) {
-			border-bottom: 2px solid white;
-		}
-
-		&:disabled {
-			opacity: 0.5;
+			border-color: white;
 		}
 
 		&::selection {
-			background-color: #663399a8;
+			background-color: var(--primary-60);
 		}
 
 		&::-webkit-inner-spin-button {

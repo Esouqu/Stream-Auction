@@ -2,7 +2,7 @@
 	import lots from '$lib/stores/lots';
 	import donations from '$lib/stores/donations';
 	import Button from './Button.svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import type { ILot } from '$lib/interfaces';
 
 	export let id: number | string;
@@ -14,6 +14,7 @@
 	export let currency: string;
 	export let isDragged = false;
 	export let mostSimilarLot: ILot | null = null;
+	export let isInstant = false;
 
 	function handleAddSimilar(e: Event) {
 		e.stopPropagation();
@@ -46,98 +47,85 @@
 	class:dragged={isDragged}
 	class:twitch={type === 'Twitch'}
 	class:donation-alerts={type === 'Donation Alerts'}
-	on:dragstart={(e) => handleDragStart(e)}
+	draggable={!isInstant}
+	aria-hidden
+	on:dragstart={handleDragStart}
 	on:dragend={() => (isDragged = false)}
 	in:fly={{ y: 100 }}
-	out:fade
-	aria-hidden
-	draggable="true"
+	out:fly={{ x: 500 }}
 >
-	<div class="donation">
-		<div class="donation__info">
-			<p>{username}</p>
-			<p>{amount} {currency}</p>
-		</div>
-		<p class="donation__description">{message}</p>
+	<div class="donation" class:donation_small={isInstant}>
+		{#if isInstant}
+			<span>{message}</span>
+			<span>+{amount} {currency}</span>
+		{:else}
+			<div class="donation__info">
+				<p>{username}</p>
+				<p>{amount} {currency}</p>
+			</div>
+			<div>
+				<p class="donation__description">{message}</p>
+			</div>
 
-		<div class="donation-buttons-wrapper">
-			<Button
-				icon="listAddItem"
-				color={type === 'Twitch' ? 'white' : 'black'}
-				shadowColor={type === 'Twitch' ? '#4b00bd' : '#F9A148'}
-				on:click={(e) => handleAdd(e)}
-			/>
-			{#if mostSimilarLot}
+			<div class="donation-buttons-wrapper">
 				<Button
-					icon="plus"
+					icon="listAddItem"
 					color={type === 'Twitch' ? 'white' : 'black'}
-					shadowColor={type === 'Twitch' ? '#4b00bd' : '#F9A148'}
-					text={mostSimilarLot.title}
-					on:click={handleAddSimilar}
+					on:click={handleAdd}
 				/>
-			{/if}
-			<Button
-				icon="delete"
-				color={type === 'Twitch' ? 'white' : 'black'}
-				shadowColor={type === 'Twitch' ? '#4b00bd' : '#F9A148'}
-				on:click={() => donations.remove(id)}
-			/>
-		</div>
+				{#if mostSimilarLot}
+					<Button
+						icon="plus"
+						color={type === 'Twitch' ? 'white' : 'black'}
+						text={mostSimilarLot.title}
+						on:click={handleAddSimilar}
+					/>
+				{/if}
+				<Button
+					icon="delete"
+					color={type === 'Twitch' ? 'white' : 'black'}
+					on:click={() => donations.remove(id)}
+				/>
+			</div>
+		{/if}
 	</div>
 </div>
 
 <style lang="scss">
 	.donation {
 		position: relative;
-		z-index: 3;
+		z-index: 2;
 		display: flex;
 		flex-direction: column;
 		padding: 20px;
+		overflow: hidden;
+		cursor: grab;
 
 		&-wrapper {
 			position: relative;
-			width: 375px;
-			border-radius: 10px;
-			transform: scale(1);
-			box-shadow: 0 2px 4px black;
+			border-radius: 5px;
+			width: 360px;
+			box-shadow: var(--elevation-3);
 			line-height: 18px;
 			transition: 0.2s;
-			will-change: transform;
 			user-select: none;
-			cursor: grab;
 
 			&.donation-alerts {
-				color: black;
-				background-color: var(--color-orange);
+				color: var(--on-donation-orange);
+				background-color: var(--donation-orange);
 
 				&::before {
+					opacity: 0.1;
 					background-image: url('/src/lib/assets/donationalerts_background.png');
-				}
-				&::after {
-					background-color: var(--color-orange);
-				}
-				& .donation__description {
-					text-shadow: 0px 3px 0px #f9a148;
-				}
-				& .donation__info p {
-					text-shadow: 0px 3px 0px #f9a148;
 				}
 			}
 			&.twitch {
-				color: white;
-				background-color: var(--color-purple);
+				color: var(--on-primary-container);
+				background-color: var(--primary-50);
 
 				&::before {
+					opacity: 0.07;
 					background-image: url('/src/lib/assets/twitch_background.png');
-				}
-				&::after {
-					background-color: var(--color-purple);
-				}
-				& .donation__description {
-					text-shadow: 0px 3px 0px #4b00bd;
-				}
-				& .donation__info p {
-					text-shadow: 0px 3px 0px #4b00bd;
 				}
 			}
 
@@ -149,25 +137,11 @@
 				z-index: 1;
 				width: 100%;
 				height: 100%;
-				border-radius: 10px;
-				background-image: url('/src/lib/assets/donationalerts_background.png');
+				opacity: 0.1;
+				/* background-image: url('/src/lib/assets/donationalerts_background.png'); */
 				background-position: center center;
 				background-repeat: no-repeat;
 				/* background-size: contain; */
-			}
-
-			&::after {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				z-index: 2;
-				width: 100%;
-				height: 100%;
-				border-radius: 10px;
-				background-color: var(--color-orange);
-				opacity: 0.7;
-				backdrop-filter: blur(6px);
 			}
 
 			&.dragged {
@@ -176,22 +150,30 @@
 				transition: none;
 			}
 
-			&:active {
+			&:active :not(.donation_small) {
 				cursor: grabbing;
-			}
-
-			&:hover {
-				transform: scale(1.05);
-				box-shadow: 0 2px 10px black;
 			}
 		}
 
-		&__description {
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 3;
-			text-shadow: 0px 2px 0px #f9a148;
+		&_small {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			gap: 20px;
+			padding: 15px 10px;
+			font-size: 18px;
 			font-weight: 700;
+			user-select: none;
+			pointer-events: none;
+
+			& span:nth-child(1) {
+				text-overflow: ellipsis;
+				overflow: hidden;
+			}
+		}
+		&__description {
+			font-weight: 500;
+			letter-spacing: 0.2px;
+			overflow-wrap: break-word;
 			overflow: hidden;
 		}
 
@@ -210,7 +192,6 @@
 				margin: 0;
 				font-size: 18px;
 				font-weight: 800;
-				text-shadow: 0px 2px 0px #f9a148;
 			}
 		}
 	}

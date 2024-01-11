@@ -1,44 +1,81 @@
 <script lang="ts">
 	export let id: string;
 	export let value: string;
-	export let placeholder: string;
+	export let placeholder: string = '';
+	export let isEditable = false;
+	export let shouldFocus = false;
+
+	let element: HTMLTextAreaElement;
+
+	$: {
+		if (shouldFocus) {
+			element.focus();
+		}
+	}
 </script>
 
 <div class="textarea-wrapper">
-	<textarea class="textarea" {id} rows="10" bind:value spellcheck="false" {placeholder} />
+	<textarea
+		{id}
+		{placeholder}
+		class="textarea"
+		spellcheck="false"
+		readonly={!isEditable}
+		bind:this={element}
+		bind:value
+		on:blur={() => (isEditable = false)}
+		on:click={() => (isEditable = true)}
+	/>
 </div>
 
 <style lang="scss">
 	.textarea {
+		position: relative;
 		box-sizing: border-box;
 		width: 100%;
-		height: 200px;
+		height: auto;
 		padding: 10px;
-		border: 2px solid rgba(255, 255, 255, 0.3);
-		outline: 0;
-		font-size: 24px;
-		font-weight: bold;
-		line-height: 1;
+		border-radius: 5px;
+		border: 1px solid var(--outline);
+		outline: 0px solid transparent;
+		font-size: 20px;
+		font-weight: 600;
+		line-height: 26px;
+		letter-spacing: 0.2px;
 		text-overflow: ellipsis;
 		text-decoration: none;
 		white-space: break-spaces;
-		color: white;
+		color: var(--on-surface);
 		background-color: transparent;
 		transition: 0.2s;
 		resize: none;
+		cursor: default;
 
 		&-wrapper {
 			position: relative;
 			display: flex;
 			width: 100%;
+			height: 100%;
 		}
 
-		&:focus {
-			border: 2px solid var(--color-purple);
+		&:read-only {
+			border: 1px solid transparent;
 		}
 
-		&:hover:not(:focus):not(:disabled) {
-			border: 2px solid white;
+		&:focus:not(:disabled, :read-only) {
+			z-index: 999;
+			outline: 3px solid var(--primary);
+			border-color: transparent;
+		}
+
+		&:hover {
+			&:read-only {
+				background-color: var(--primary-container);
+			}
+
+			&:not(:disabled, :read-only) {
+				cursor: text;
+			}
 		}
 
 		&:disabled {
@@ -46,11 +83,11 @@
 		}
 
 		&::selection {
-			background-color: #663399a8;
+			background-color: var(--primary-60);
 		}
 
-		&::-webkit-inner-spin-button {
+		/* &::-webkit-inner-spin-button {
 			display: none;
-		}
+		} */
 	}
 </style>

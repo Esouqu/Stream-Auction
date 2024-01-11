@@ -58,11 +58,6 @@
 				{selectedOption !== '' ? selectedOption : 'Нет доступных пресетов'}
 			{/if}
 		</div>
-		<div class="dropdown-buttons-wrapper">
-			<Button icon="plus" on:click={() => (isEditMode = !isEditMode)} />
-			<Button icon="reset" />
-			<Button icon="delete" />
-		</div>
 	</div>
 	{#if isActive}
 		<ul
@@ -148,7 +143,7 @@
 		}
 		&__list {
 			position: absolute;
-			z-index: 99;
+			z-index: 999;
 			top: 40px;
 			left: 0;
 			margin: 0;

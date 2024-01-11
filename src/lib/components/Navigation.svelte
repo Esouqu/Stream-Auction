@@ -1,36 +1,36 @@
 <script lang="ts">
-	import pieIcon from '$lib/assets/pie_chart_icon.svg';
-	import listIcon from '$lib/assets/list_icon.svg';
-	import settingsIcon from '$lib/assets/settings_icon.svg';
-	import eventIcon from '$lib/assets/event_icon.svg';
 	import type { IRoute } from '$lib/interfaces';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { fade } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
-	import getIcon from '$lib/icons';
+	import { routes } from '$lib/constants';
+	import { createEventDispatcher } from 'svelte';
 
-	const routes: IRoute[] = [
-		{ id: 0, title: 'Лоты', icon: listIcon, url: '/' },
-		{ id: 1, title: 'Колесо', icon: pieIcon, url: '/wheel' },
-		// { id: 2, title: 'Бомбер', icon: getIcon('bomb'), url: '/bomber' },
-		// { id: 2, title: 'События', icon: eventIcon, url: '/events' },
-		{ id: 2, title: 'Настройки', icon: settingsIcon, url: '/settings' }
-	];
+	interface INavigationEvents {
+		routeswitch: {
+			from: IRoute;
+			to: IRoute;
+		};
+	}
 
+	const dispatch = createEventDispatcher<INavigationEvents>();
 	export let activeRoute: IRoute | undefined = routes.find((r) => r.url === $page.route.id);
 
-	function handleRouteClick(route: IRoute) {
-		if (activeRoute?.url === route.url) return;
+	function handleRouting(route: IRoute, event: MouseEvent) {
+		if (route.id === activeRoute?.id || event.ctrlKey || event.altKey || event.shiftKey) return;
 
+		const previousRoute = activeRoute;
 		activeRoute = route;
-		goto(route.url);
+
+		if (previousRoute) {
+			dispatch('routeswitch', { from: previousRoute, to: activeRoute });
+		}
 	}
 </script>
 
 <nav class="navigation">
 	{#key activeRoute}
-		<h2 transition:fade={{ duration: 300, easing: sineInOut }}>{activeRoute?.title}</h2>
+		<h2 in:fade={{ duration: 300, easing: sineInOut }}>{activeRoute?.title}</h2>
 	{/key}
 	{#if activeRoute}
 		<ul class="navigation-list" style="--select-left: {activeRoute?.id * 50}px">
@@ -40,8 +40,8 @@
 						href={route.url}
 						class="navigation__route"
 						class:active={route.url === activeRoute?.url}
-						on:click={() => handleRouteClick(route)}
 						draggable="false"
+						on:click={(e) => handleRouting(route, e)}
 					>
 						<div class="navigation-icon-wrapper">
 							<img src={route.icon} alt="Navigation route icon" draggable="false" />
@@ -56,9 +56,10 @@
 <style lang="scss">
 	.navigation {
 		position: relative;
+		margin-top: 40px;
 		border-radius: 10px;
 		box-shadow: inset 0 2px 4px black;
-		background-color: rgb(20 20 20 / 60%);
+		background-color: var(--surface-container);
 
 		& h2 {
 			position: absolute;
@@ -86,8 +87,8 @@
 				width: 50px;
 				height: 50px;
 				border-radius: 10px;
-				box-shadow: 0 2px 4px black;
-				background-color: var(--color-purple);
+				box-shadow: var(--elevation-1);
+				background-color: var(--primary-50);
 				transition: left 0.2s ease-in-out;
 			}
 		}
@@ -107,6 +108,7 @@
 			color: white;
 			user-select: none;
 			transition: opacity 0.3s;
+			cursor: default;
 
 			&:hover:not(.active) {
 				opacity: 0.7;
