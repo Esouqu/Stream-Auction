@@ -301,7 +301,6 @@
 				</Card>
 			{/if}
 			<Card
-				--card-justify="center"
 				--card-flex="1 1 0"
 				--card-title-size="28px"
 				title={activeRoute?.url === NAVIGATION_ROUTES.WHEEL ? 'Топ 10' : 'Правила'}
@@ -368,8 +367,8 @@
 				<Timer />
 			</Card>
 			<Card --card-w="100%" --card-flex="0 1 auto" title="Интеграции">
-				<TestKit />
-				<!-- <div class="integrations-wrapper">
+				<!-- <TestKit /> -->
+				<div class="integrations-wrapper">
 					<Integration
 						name="Donation Alerts"
 						onSwitchOn={daSwitchOn}
@@ -387,7 +386,7 @@
 						isAuthorized={!!twitchSession}
 						authCallback={() => goto('/api/twitch/auth')}
 					/>
-				</div> -->
+				</div>
 			</Card>
 			<Card --card-flex="1 1 0" --card-flow="hidden auto" title="Очередь ({$donations.length})">
 				<div class="donations-wrapper">
