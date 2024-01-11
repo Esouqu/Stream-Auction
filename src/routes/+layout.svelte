@@ -3,7 +3,6 @@
 	import { onMount } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { fade, fly, slide } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { NAVIGATION_ROUTES } from '$lib/constants';

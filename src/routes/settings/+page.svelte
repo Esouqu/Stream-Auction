@@ -4,6 +4,8 @@
 	import timer from '$lib/stores/timer';
 	import FileUploader from '$lib/components/FileUploader.svelte';
 	import Setting from '$lib/components/Setting.svelte';
+	import RangeSlider from '$lib/components/RangeSlider.svelte';
+	import transparency from '$lib/stores/transparency';
 
 	$: continueSpinAction = donations.continueSpinAction;
 	$: stopSpinAction = donations.stopSpinAction;
@@ -21,6 +23,13 @@
 	<div class="toggles-wrapper">
 		<div class="toggles toggles_bg">
 			<FileUploader />
+			<div class="transparency-slider">
+				<p>Прозрачность</p>
+				<div style="display: flex; align-items: center; gap: 20px;">
+					<RangeSlider min={0.1} max={1} step={0.05} bind:value={$transparency} />
+					<span style="width: 50px; text-align: end;">{$transparency}</span>
+				</div>
+			</div>
 		</div>
 		<div class="toggles toggles_timer">
 			<Setting
@@ -95,6 +104,19 @@
 		scrollbar-gutter: stable;
 		overflow-x: hidden;
 		overflow-y: auto;
+	}
+	.transparency-slider {
+		display: flex;
+		align-items: center;
+		margin-top: 10px;
+
+		& p {
+			flex: 1 1 0;
+			margin: 0;
+			max-width: 650px;
+			line-height: 1;
+			font-size: 16px;
+		}
 	}
 	.toggles-wrapper {
 		display: flex;

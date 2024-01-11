@@ -1,12 +1,18 @@
 <script lang="ts">
 	import backgroundImage from '$lib/stores/backgroundImage';
+	import transparency from '$lib/stores/transparency';
 
 	export let title: string = '';
 
 	$: isTransparent = !!$backgroundImage;
 </script>
 
-<div class="card" class:transparent={isTransparent} class:titless={!title}>
+<div
+	class="card"
+	class:transparent={isTransparent}
+	class:titless={!title}
+	style="--card-opacity: {$transparency};"
+>
 	{#if title}
 		<h3 class="card__title">
 			{title}
@@ -55,7 +61,7 @@
 		}
 
 		&.transparent::before {
-			opacity: 0.85;
+			opacity: var(--card-opacity);
 		}
 
 		&::before {

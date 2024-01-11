@@ -12,9 +12,10 @@
 <style lang="scss">
 	.range-slider {
 		appearance: none;
-		width: 100%;
+		width: 200px;
 		height: 25px;
 		border: 0;
+		border-radius: 50px;
 		outline: 0;
 		background: gray;
 		transition: box-shadow 0.2s ease-in-out;
@@ -23,7 +24,6 @@
 		&-wrapper {
 			display: flex;
 			border-radius: 50px;
-			rotate: -90deg;
 			overflow: hidden;
 		}
 
@@ -33,7 +33,7 @@
 			height: 25px;
 			padding: 10px;
 			border-radius: 50px;
-			box-shadow: -400px 0 0 360px var(--color-orange), inset 0 0 0 5px var(--color-orange);
+			box-shadow: -400px 0 0 360px var(--primary-50), inset 0 0 0 7px var(--primary-50);
 			background-color: white;
 			background-size: contain;
 			transition: box-shadow 0.2s ease-in-out;
