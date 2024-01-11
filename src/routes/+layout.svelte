@@ -24,7 +24,6 @@
 	import textRules from '$lib/stores/textRules';
 	import Textarea from '$lib/components/Textarea.svelte';
 	import subscribeStores from '$lib/stores/storesBus';
-	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
