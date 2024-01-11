@@ -301,7 +301,6 @@
 				</Card>
 			{/if}
 			<Card
-				--card-justify="center"
 				--card-flex="1 1 0"
 				--card-title-size="28px"
 				title={activeRoute?.url === NAVIGATION_ROUTES.WHEEL ? 'Топ 10' : 'Правила'}
