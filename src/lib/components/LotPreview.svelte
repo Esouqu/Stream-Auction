@@ -34,6 +34,7 @@
 			padding: 10px;
 			border-radius: 100px;
 			width: 100%;
+			white-space: nowrap;
 			text-overflow: ellipsis;
 			overflow: hidden;
 		}

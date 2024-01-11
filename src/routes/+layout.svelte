@@ -331,6 +331,8 @@
 		<Card --card-flex="1" --card-justify="end" --card-p="30px 20px">
 			{#key previousRoute}
 				<div class="layout-section-wrapper">
+					<!-- in:fly={{ x: getFlyDirection()?.forward, duration: 300 }}
+					out:fly={{ x: getFlyDirection()?.backward, duration: 300 }} -->
 					<slot />
 				</div>
 			{/key}

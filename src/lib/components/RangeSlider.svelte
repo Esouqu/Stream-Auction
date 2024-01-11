@@ -34,7 +34,7 @@
 			padding: 10px;
 			border-radius: 50px;
 			box-shadow: -400px 0 0 360px var(--primary-50), inset 0 0 0 7px var(--primary-50);
-			background-color: white;
+			background-color: var(--on-surface);
 			background-size: contain;
 			transition: box-shadow 0.2s ease-in-out;
 			user-select: none;

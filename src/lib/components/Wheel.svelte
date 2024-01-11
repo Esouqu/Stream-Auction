@@ -29,13 +29,8 @@
 	const degreeCapForTextDisplay = Number(((400 / 100) * 3).toFixed(2));
 	const maxTitleLength = Number(((radius / 100) * 5.75).toFixed(2));
 
-	const celebrationSound = new Audio(winnerSound);
-	celebrationSound.preload;
-	celebrationSound.volume = 0.2;
-
-	// const spinSound = new Audio(wheelSectionSound);
-	// spinSound.preload;
-	// spinSound.volume = 0.2;
+	let celebrationSound: HTMLAudioElement;
+	// let spinSound = new Audio(wheelSectionSound);
 
 	let spinDuration = 10;
 	let minSpinDuration = storable(1, 'minSpinDuration');
@@ -68,6 +63,7 @@
 	onMount(() => {
 		context = canvas.getContext('2d');
 
+		loadAudio();
 		onResize();
 		drawChart(pie);
 
@@ -81,6 +77,15 @@
 
 		return unsubSpinStopped;
 	});
+
+	function loadAudio() {
+		celebrationSound = new Audio(winnerSound);
+		celebrationSound.preload;
+		celebrationSound.volume = 0.2;
+
+		// spinSound.preload;
+		// spinSound.volume = 0.2;
+	}
 
 	function celebrate() {
 		celebrationSound.load();
@@ -381,6 +386,7 @@
 		font-weight: bold;
 		text-align: center;
 		text-transform: uppercase;
+		/* white-space: nowrap; */
 		text-overflow: ellipsis;
 		color: white;
 		background-color: rgba(0, 0, 0, 0.5);

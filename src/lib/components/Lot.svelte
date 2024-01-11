@@ -138,14 +138,17 @@
 		</div>
 	{/if}
 	<div class="lot__percent">{Number(percent.toFixed(1))}%</div>
-	<Button icon="plus" on:click={isAddInputVisible ? hideInputAndAddValue : showInput} />
-	<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
+	<div style="display: flex;">
+		<Button icon="plus" on:click={isAddInputVisible ? hideInputAndAddValue : showInput} />
+		<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
+	</div>
 </div>
 
 <style lang="scss">
 	.lot {
 		display: flex;
 		align-items: center;
+		gap: 10px;
 		border-radius: 10px;
 		background-color: transparent;
 
@@ -153,7 +156,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			margin-right: 10px;
+			/* margin-right: 10px; */
 			border-radius: 5px;
 			min-width: 60px;
 			height: 30px;

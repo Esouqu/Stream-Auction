@@ -3,6 +3,7 @@
 	import Input from './Input.svelte';
 	import NumberInput from './NumberInput.svelte';
 	import TextButton from './TextButton.svelte';
+	import Textarea from './Textarea.svelte';
 
 	let amount: number = 30;
 	let username: string = 'Tester';
@@ -14,7 +15,8 @@
 
 <div style="display: flex; gap: 5px; flex-direction: column; align-items: center;">
 	<Input --input-w="100%" id="lot-text-{888}" type="text" bind:value={username} />
-	<Input --input-w="100%" id="lot-text-{999}" type="text" bind:value={message} />
+	<!-- <Input --input-w="100%" id="lot-text-{999}" type="text" bind:value={message} /> -->
+	<Textarea bind:value={message} id="lot-text{999}" />
 	<NumberInput --input-w="90px" id="lot-value-{999}" suffix="Руб" bind:value={amount} />
 	<TextButton
 		text="Донат"
