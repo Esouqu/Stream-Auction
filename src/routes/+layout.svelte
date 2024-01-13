@@ -2,7 +2,7 @@
 	import type { IDonationData, IRoute, ITwitchRedeemedReward } from '$lib/interfaces';
 	import { onMount } from 'svelte';
 	import { flip } from 'svelte/animate';
-	import { fade, fly, slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { NAVIGATION_ROUTES } from '$lib/constants';
@@ -20,9 +20,8 @@
 	import TransitionContainer from '$lib/components/TransitionContainer.svelte';
 	import TestKit from '$lib/components/TestKit.svelte';
 	import LotPreview from '$lib/components/LotPreview.svelte';
-	import textRules from '$lib/stores/textRules';
-	import Textarea from '$lib/components/Textarea.svelte';
 	import subscribeStores from '$lib/stores/storesBus';
+	import Rules from '$lib/components/Rules.svelte';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
@@ -37,7 +36,6 @@
 	let twitchWebSocket: WebSocket;
 
 	let isTotalShown = false;
-	let isTextRulesEditable = false;
 
 	$: stopSpinAction = donations.stopSpinAction;
 	$: continueSpinAction = donations.continueSpinAction;
@@ -303,7 +301,7 @@
 			<Card
 				--card-flex="1 1 0"
 				--card-title-size="28px"
-				title={activeRoute?.url === NAVIGATION_ROUTES.WHEEL ? 'Топ 10' : 'Правила'}
+				title={activeRoute?.url === NAVIGATION_ROUTES.WHEEL ? 'Топ 10' : ''}
 			>
 				{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
 					<div style="width: 100%;">
@@ -315,13 +313,7 @@
 						{/each}
 					</div>
 				{:else}
-					<Textarea
-						id="rules"
-						placeholder="Написать правила..."
-						isEditable={isTextRulesEditable}
-						shouldFocus={isTextRulesEditable}
-						bind:value={$textRules}
-					/>
+					<Rules />
 				{/if}
 			</Card>
 		</div>
@@ -417,6 +409,7 @@
 			padding: 20px;
 			height: 100%;
 		}
+
 		&-section-wrapper {
 			position: absolute;
 			top: 0;
@@ -429,6 +422,7 @@
 			height: calc(100% - 170px);
 			overflow: hidden;
 		}
+
 		&-section {
 			position: relative;
 			display: flex;
@@ -449,6 +443,7 @@
 			}
 		}
 	}
+
 	.donations {
 		&-wrapper {
 			display: flex;
@@ -458,6 +453,7 @@
 			gap: 15px;
 		}
 	}
+
 	.navigation-wrapper {
 		position: relative;
 		display: flex;

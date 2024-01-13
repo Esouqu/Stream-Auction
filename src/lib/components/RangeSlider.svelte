@@ -3,10 +3,20 @@
 	export let min: number = 1;
 	export let max: number = 10;
 	export let step: number = 1;
+	export let isDisabled = false;
 </script>
 
 <div class="range-slider-wrapper">
-	<input id="level-range" class="range-slider" type="range" {min} {max} {step} bind:value />
+	<input
+		id="level-range"
+		class="range-slider"
+		type="range"
+		{min}
+		{max}
+		{step}
+		bind:value
+		disabled={isDisabled}
+	/>
 </div>
 
 <style lang="scss">
@@ -20,6 +30,14 @@
 		background: gray;
 		transition: box-shadow 0.2s ease-in-out;
 		user-select: none;
+
+		&:disabled {
+			opacity: 0.5;
+
+			&::-webkit-slider-thumb {
+				cursor: default;
+			}
+		}
 
 		&-wrapper {
 			display: flex;

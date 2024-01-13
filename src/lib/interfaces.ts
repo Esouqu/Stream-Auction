@@ -10,6 +10,11 @@ export interface ICountdownTimerState {
   timeRemaining: number;
 }
 
+export interface IPreset {
+  title: string;
+  text: string;
+}
+
 export interface ILot {
   id: number;
   title: string;

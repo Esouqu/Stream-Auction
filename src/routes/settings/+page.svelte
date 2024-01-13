@@ -6,6 +6,7 @@
 	import Setting from '$lib/components/Setting.svelte';
 	import RangeSlider from '$lib/components/RangeSlider.svelte';
 	import transparency from '$lib/stores/transparency';
+	import backgroundImage from '$lib/stores/backgroundImage';
 
 	$: continueSpinAction = donations.continueSpinAction;
 	$: stopSpinAction = donations.stopSpinAction;
@@ -26,7 +27,13 @@
 			<div class="transparency-slider">
 				<p>Прозрачность</p>
 				<div style="display: flex; align-items: center; gap: 20px;">
-					<RangeSlider min={0.1} max={1} step={0.05} bind:value={$transparency} />
+					<RangeSlider
+						min={0.1}
+						max={1}
+						step={0.05}
+						bind:value={$transparency}
+						isDisabled={!$backgroundImage}
+					/>
 					<span style="width: 50px; text-align: end;">{$transparency}</span>
 				</div>
 			</div>

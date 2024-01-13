@@ -6,9 +6,9 @@
 	export let id: number | string;
 	export let value: string = '';
 	export let type: 'text' | 'number';
-	export let isFilled = false;
 	export let placeholder: string = '';
 	export let suffix: string = '';
+	export let isFilled = false;
 	export let isDisabled = false;
 	export let isPreventInput = false;
 	export let element: HTMLInputElement | null = null;
@@ -101,12 +101,13 @@
 		outline: 0;
 		width: var(--input-w, 100%);
 		line-height: 1;
-		font-weight: var(--input-fw);
-		text-overflow: ellipsis;
+		font-size: var(--input-font-size, 16px);
+		font-weight: var(--input-font-weight, 400);
 		text-align: var(--input-text-al, start);
 		text-decoration: none;
-		background-color: transparent;
+		text-overflow: ellipsis;
 		color: var(--on-surface);
+		background-color: transparent;
 		transition: outline 0.2s, border-color 0.2s;
 		overflow: hidden;
 

@@ -47,7 +47,7 @@
 
 	function showInput() {
 		isAddInputVisible = true;
-		setTimeout(() => additionalInputElement.focus(), 50);
+		setTimeout(() => additionalInputElement.focus(), 100);
 	}
 
 	function hideInputAndAddValue() {

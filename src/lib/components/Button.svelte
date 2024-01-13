@@ -51,7 +51,6 @@
 
 		&_text {
 			width: auto;
-			text-shadow: 0 3px 0 var(--btn-shadow-c);
 
 			& div {
 				display: flex;
@@ -95,15 +94,12 @@
 		}
 		&:disabled {
 			opacity: 0.3;
+			pointer-events: none;
 		}
 
 		& img {
-			width: 100%;
+			/* width: 100%; */
 			object-fit: contain;
-
-			&.shadowed {
-				filter: drop-shadow(0px 2px 0px var(--btn-shadow-c, black));
-			}
 		}
 	}
 </style>
