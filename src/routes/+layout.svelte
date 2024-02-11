@@ -279,7 +279,7 @@
 <div class="layout" style="background-image: {$backgroundImage};">
 	<video
 		src={$backgroundVideo}
-		style="position: absolute; top: 0; left: 0; z-index: 0;"
+		style="position: absolute; top: 0; left: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover;"
 		preload="auto"
 		autoplay
 		muted
