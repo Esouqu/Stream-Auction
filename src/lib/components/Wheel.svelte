@@ -37,7 +37,7 @@
 	let maxSpinDuration = storable(10, 'maxSpinDuration');
 	let isNavigating = false;
 	let isDragging = false;
-	let isSettingsShown = false;
+	let isSettingsShown = true;
 	let draggingAngle = 0;
 	let draggingStartAngle = 0;
 	let winner: IPieItem | null = null;

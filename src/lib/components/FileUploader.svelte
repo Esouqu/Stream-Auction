@@ -1,5 +1,5 @@
 <script lang="ts">
-	import backgroundImage from '$lib/stores/backgroundImage';
+	import background from '$lib/stores/background';
 	import TextButton from './TextButton.svelte';
 
 	let error = '';
@@ -23,7 +23,7 @@
 
 			const imageUrl = e.target?.result;
 
-			backgroundImage.set(`url(${imageUrl})`);
+			background.setImage(`url(${imageUrl})`);
 		};
 
 		reader.readAsDataURL(image);
@@ -35,7 +35,6 @@
 		<p class="file-uploader-error">{error}</p>
 	{/if}
 	<input type="file" id="file-uploader" accept="image/*" on:change={(e) => handleFileInput(e)} />
-	<TextButton --text-b-fs="14px" text="Убрать Фон" on:click={() => backgroundImage.clear()} />
 </div>
 
 <style lang="scss">

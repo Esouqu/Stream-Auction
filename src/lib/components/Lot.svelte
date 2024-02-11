@@ -148,7 +148,7 @@
 	.lot {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		// gap: 10px;
 		border-radius: 10px;
 		background-color: transparent;
 

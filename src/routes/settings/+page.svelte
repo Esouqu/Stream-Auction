@@ -5,8 +5,11 @@
 	import FileUploader from '$lib/components/FileUploader.svelte';
 	import Setting from '$lib/components/Setting.svelte';
 	import RangeSlider from '$lib/components/RangeSlider.svelte';
-	import transparency from '$lib/stores/transparency';
-	import backgroundImage from '$lib/stores/backgroundImage';
+	import background from '$lib/stores/background';
+	import Input from '$lib/components/Input.svelte';
+	import TextButton from '$lib/components/TextButton.svelte';
+
+	let videoUrl: string;
 
 	$: continueSpinAction = donations.continueSpinAction;
 	$: stopSpinAction = donations.stopSpinAction;
@@ -14,6 +17,9 @@
 	$: baseTime = timer.baseTime;
 	$: itemAddedAction = timer.itemAddedAction;
 	$: leaderChangedAction = timer.leaderChangedAction;
+	$: backgroundImage = background.image;
+	$: backgroundVideo = background.video;
+	$: backgroundTransparency = background.transparency;
 </script>
 
 <svelte:head>
@@ -23,19 +29,39 @@
 <section class="settings-section">
 	<div class="toggles-wrapper">
 		<div class="toggles toggles_bg">
-			<FileUploader />
-			<div class="transparency-slider">
-				<p>Прозрачность</p>
-				<div style="display: flex; align-items: center; gap: 20px;">
+			<div class="bg-setting">
+				<p>Картинка</p>
+				<FileUploader />
+			</div>
+			<div class="bg-setting">
+				<p>Видео</p>
+				<Input
+					--input-w="100%"
+					--input-w-w="100%"
+					id="video-url"
+					type="text"
+					placeholder="Ссылка"
+					onEnter={() => background.setVideo(videoUrl)}
+					onInput={() => background.setVideo(videoUrl)}
+					onBlur={() => background.setVideo(videoUrl)}
+					bind:value={videoUrl}
+				/>
+			</div>
+			<div class="bg-setting">
+				<p>Прозрачность Интерфейса</p>
+				<div style="display: flex; align-items: center;">
 					<RangeSlider
 						min={0.1}
 						max={1}
 						step={0.05}
-						bind:value={$transparency}
-						isDisabled={!$backgroundImage}
+						isDisabled={!$backgroundImage && !$backgroundVideo}
+						bind:value={$backgroundTransparency}
 					/>
-					<span style="width: 50px; text-align: end;">{$transparency}</span>
+					<span style="width: 50px; text-align: end;">{$backgroundTransparency}</span>
 				</div>
+			</div>
+			<div style="margin-top: 20px;">
+				<TextButton --text-b-fs="14px" text="Убрать Фон" on:click={() => background.resetAll()} />
 			</div>
 		</div>
 		<div class="toggles toggles_timer">
@@ -112,18 +138,9 @@
 		overflow-x: hidden;
 		overflow-y: auto;
 	}
-	.transparency-slider {
+	.bg-setting {
 		display: flex;
-		align-items: center;
-		margin-top: 10px;
-
-		& p {
-			flex: 1 1 0;
-			margin: 0;
-			max-width: 650px;
-			line-height: 1;
-			font-size: 16px;
-		}
+		flex-direction: column;
 	}
 	.toggles-wrapper {
 		display: flex;
@@ -166,8 +183,10 @@
 		&_timer::before {
 			content: 'Таймер';
 		}
-		&_bg::before {
-			content: 'Фоновое Изображение';
+		&_bg {
+			&::before {
+				content: 'Фоновое Изображение';
+			}
 		}
 	}
 </style>

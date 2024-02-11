@@ -9,7 +9,6 @@
 	import { getTotal } from '$lib/utils';
 	import lots from '$lib/stores/lots';
 	import donations from '$lib/stores/donations';
-	import backgroundImage from '$lib/stores/backgroundImage';
 	import Donation from '$lib/components/Donation.svelte';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import Timer from '$lib/components/Timer.svelte';
@@ -22,6 +21,7 @@
 	import LotPreview from '$lib/components/LotPreview.svelte';
 	import subscribeStores from '$lib/stores/storesBus';
 	import Rules from '$lib/components/Rules.svelte';
+	import background from '$lib/stores/background';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
@@ -36,6 +36,7 @@
 	let twitchWebSocket: WebSocket;
 
 	let isTotalShown = false;
+	let isBackgroundVideoPaused = false;
 
 	$: stopSpinAction = donations.stopSpinAction;
 	$: continueSpinAction = donations.continueSpinAction;
@@ -43,6 +44,8 @@
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: topLots = sortedLots.slice(0, 10);
 	$: total = getTotal($lots.map((l) => l.value));
+	$: backgroundImage = background.image;
+	$: backgroundVideo = background.video;
 
 	onMount(() => {
 		const validationInterval = 1000 * 60 * 60;
@@ -274,6 +277,17 @@
 </script>
 
 <div class="layout" style="background-image: {$backgroundImage};">
+	<video
+		src={$backgroundVideo}
+		style="position: absolute; top: 0; left: 0; z-index: 0;"
+		preload="auto"
+		autoplay
+		muted
+		loop
+		bind:paused={isBackgroundVideoPaused}
+	>
+		<track kind="captions" />
+	</video>
 	<div class="layout-section layout-section_left">
 		<div class="layout-wrapper">
 			{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
