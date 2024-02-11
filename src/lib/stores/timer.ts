@@ -31,7 +31,7 @@ function createCountdownTimer() {
 
   function init() {
     wheel.state.subscribe((s) => wheelState = s);
-    wheel.spinStarted.subscribe(({ ms }) => startOnSpinStarted(ms));
+    wheel.spinStarted.subscribe(({ ms }) => _startOnSpinStarted(ms));
     wheel.spinStopped.subscribe(() => reset());
     wheel.spinExtended.subscribe(({ ms }) => add(ms));
     lots.itemAdded.subscribe(() => _addTimeOnItemAdded());
@@ -88,15 +88,13 @@ function createCountdownTimer() {
 
   function subtract(ms: number) {
     timer.update((state) => {
-      currentTime -= ms;
+      if (state.timeRemaining > 0) {
+        currentTime -= ms;
 
-      if (state.timeRemaining <= 0) {
-        reset();
-
-        return { timeRemaining: 0, isRunning: false }
+        return { ...state, timeRemaining: Math.max(0, state.timeRemaining - ms) };
+      } else {
+        return state;
       }
-
-      return { ...state, timeRemaining: Math.max(0, state.timeRemaining - ms) };
     });
   }
 
@@ -120,7 +118,7 @@ function createCountdownTimer() {
     timer.set({ timeRemaining: get(baseTimeInMs), isRunning: false });
   }
 
-  function startOnSpinStarted(ms: number) {
+  function _startOnSpinStarted(ms: number) {
     reset();
     setTime(ms);
     start();

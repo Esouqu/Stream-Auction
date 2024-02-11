@@ -41,9 +41,9 @@
 					id="video-url"
 					type="text"
 					placeholder="Ссылка"
-					onEnter={() => background.setVideo(videoUrl)}
-					onInput={() => background.setVideo(videoUrl)}
-					onBlur={() => background.setVideo(videoUrl)}
+					onEnter={() => videoUrl && background.setVideo(videoUrl)}
+					onInput={() => videoUrl && background.setVideo(videoUrl)}
+					onBlur={() => videoUrl && background.setVideo(videoUrl)}
 					bind:value={videoUrl}
 				/>
 			</div>
