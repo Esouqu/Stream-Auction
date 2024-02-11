@@ -21,7 +21,6 @@ function createPresets() {
   const { subscribe, set, update } = storable<IPreset[]>(initialPresets, 'presets');
 
   function remove(index: number) {
-    console.log(index)
     update((items) => items.filter((_, idx) => idx !== index));
   }
 
