@@ -45,7 +45,9 @@ function createCountdownTimer() {
       const remaining = currentTime - elapsedTime;
 
       if (remaining <= 0) {
-        reset();
+        currentTime = 0;
+        animationPausedTime = 0;
+        cancelAnimationFrame(animationId);
 
         return { timeRemaining: 0, isRunning: false };
       }
@@ -64,7 +66,7 @@ function createCountdownTimer() {
       requestAnimationFrame(tick);
 
       return { ...state, isRunning: true }
-    })
+    });
   }
 
   function pause() {
@@ -96,6 +98,14 @@ function createCountdownTimer() {
         return state;
       }
     });
+
+  }
+
+  function reset() {
+    currentTime = get(baseTimeInMs);
+    animationPausedTime = 0;
+    cancelAnimationFrame(animationId);
+    timer.set({ timeRemaining: get(baseTimeInMs), isRunning: false });
   }
 
   function setInitialTime(minutes: number) {
@@ -109,13 +119,6 @@ function createCountdownTimer() {
   function setTime(ms: number) {
     currentTime = ms;
     timer.update((state) => ({ ...state, timeRemaining: ms }));
-  }
-
-  function reset() {
-    currentTime = get(baseTimeInMs);
-    animationPausedTime = 0;
-    cancelAnimationFrame(animationId);
-    timer.set({ timeRemaining: get(baseTimeInMs), isRunning: false });
   }
 
   function _startOnSpinStarted(ms: number) {

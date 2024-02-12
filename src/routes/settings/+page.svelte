@@ -48,7 +48,7 @@
 				/>
 			</div>
 			<div class="bg-setting">
-				<p>Прозрачность Интерфейса</p>
+				<p>Прозрачность интерфейса</p>
 				<div style="display: flex; align-items: center;">
 					<RangeSlider
 						min={0.1}

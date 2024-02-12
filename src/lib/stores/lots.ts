@@ -1,4 +1,4 @@
-import { greenlessColors } from "$lib/colors";
+import colors from "$lib/colors";
 import type { IDonationData, ILot } from "$lib/interfaces";
 import { compareStrings, extractUrl, getContrastColor, getRandomColor } from "$lib/utils";
 import { get, writable } from "svelte/store";
@@ -7,7 +7,7 @@ import donations from "./donations";
 // import wordList from '../../../../words/words.json';
 
 // const tempLots = Array.from(new Array(55), (_, id) => {
-//   const color = getRandomColor(greenlessColors);
+//   const color = getRandomColor(colors);
 //   const contrastColor = getContrastColor(color);
 
 //   return {
@@ -25,7 +25,6 @@ function createLots() {
   const itemAdded = signal(writable<ILot | undefined>());
   const leaderChanged = signal(writable<ILot | undefined>());
   const lotValueChanged = signal(writable<{ id: number } | undefined>());
-  // const greenlessMode = storable(false, 'greenlessMode');
 
   // let generatedId = tempLots.length;
   let generatedId = 0;
@@ -41,7 +40,7 @@ function createLots() {
 
   function add(title: string, value: number, donator?: string) {
     generatedId += 1;
-    color = getRandomColor(greenlessColors);
+    color = getRandomColor(colors);
 
     const item: ILot = {
       id: generatedId,
@@ -178,21 +177,6 @@ function createLots() {
       add(donation.message, donation.amount_in_user_currency, donation.username);
     }
   }
-
-  // function refreshColors() {
-  //   const isGreenlessMode = get(greenlessMode);
-  //   const colorSet = isGreenlessMode ? greenlessColors : colors;
-
-  //   lots.update((items) => items.map((i) => {
-  //     color = getRandomColor(colorSet);
-
-  //     return {
-  //       ...i,
-  //       color,
-  //       contrastColor: getContrastColor(color)
-  //     }
-  //   }))
-  // }
 
   return {
     subscribe: lots.subscribe,

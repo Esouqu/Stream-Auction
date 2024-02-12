@@ -301,7 +301,7 @@
 						{/if}
 					</Snackbar>
 					<Snackbar>
-						<span>Продлить кручение колеса, добавив ваш вариант</span>
+						<span>Продлить кручение колеса</span>
 						{#if $continueSpinAction.isEnabled}
 							<TransitionContainer trigger={$currentSpinPrice}>
 								<span>{$currentSpinPrice} Руб</span>

@@ -70,6 +70,8 @@
 		const unsubSpinStopped = wheel.spinStopped.subscribe(() => {
 			const lastPie = createPie($lots);
 
+			isSettingsShown = true;
+
 			drawChart(lastPie);
 			getWinner($wheel.normalizedAngle, lastPie);
 			celebrate();
