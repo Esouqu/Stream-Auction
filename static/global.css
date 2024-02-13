@@ -64,7 +64,7 @@
 body {
   display: flex;
   height: 100vh;
-  font-family: 'San Francisco Pro', sans-serif;
+  font-family: 'San Francisco Pro', -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
   background-color: var(--surface-container-low);
   background-repeat: no-repeat;
   background-size: cover;
@@ -81,6 +81,7 @@ h1::selection,
 h2::selection,
 h3::selection,
 p::selection,
+a::selection,
 span::selection {
   background-color: var(--primary-60);
 }

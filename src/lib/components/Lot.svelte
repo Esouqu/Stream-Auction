@@ -137,8 +137,8 @@
 			/>
 		</div>
 	{/if}
-	<div class="lot__percent">{Number(percent.toFixed(1))}%</div>
-	<div style="display: flex;">
+	<div style="display: flex; align-items: center; margin-left: 10px;">
+		<span class="lot__percent">{Number(percent.toFixed(1))}%</span>
 		<Button icon="plus" on:click={isAddInputVisible ? hideInputAndAddValue : showInput} />
 		<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
 	</div>

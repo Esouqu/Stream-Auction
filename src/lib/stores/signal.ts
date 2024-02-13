@@ -1,6 +1,6 @@
 import type { Writable } from "svelte/store"
 
-// storeEvent will only call its subscribers for changes that happen
+// signal will only call its subscribers for changes that happen
 // after the call to subscribe
 function signal<T>(store: Writable<T>) {
   return {
