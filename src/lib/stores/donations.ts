@@ -59,6 +59,8 @@ function createDonations() {
       return [...donations, newDonation];
     });
 
+    const intensityDecreaseTime = 15;
+
     if (donation.amount_in_user_currency >= MIN_INTENSITY_VALUE) {
       intensityAmount.update((amount) => {
         const value = donation.amount_in_user_currency;
@@ -74,6 +76,18 @@ function createDonations() {
 
         return amount + toAdd > MAX_INTENSITY ? MAX_INTENSITY : amount + toAdd;
       });
+
+      const intensityIntervalId = setInterval(() => {
+        intensityAmount.update((amount) => {
+          if (amount < 1) {
+            clearInterval(intensityIntervalId);
+
+            return amount;
+          }
+
+          return amount - 1 > 0 ? amount - 1 : 0;
+        })
+      }, intensityDecreaseTime * 1000);
     } else {
       intensityAmount.update((amount) => amount - 1 > 0 ? amount - 1 : 0);
     }
