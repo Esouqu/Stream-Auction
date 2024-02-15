@@ -22,6 +22,7 @@ import donations from "./donations";
 
 function createLots() {
   const lots = writable<ILot[]>([]);
+
   const itemAdded = signal(writable<ILot | undefined>());
   const leaderChanged = signal(writable<ILot | undefined>());
   const lotValueChanged = signal(writable<{ id: number } | undefined>());

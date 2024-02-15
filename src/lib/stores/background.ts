@@ -3,7 +3,7 @@ import storable from "./storable";
 function createBackground() {
   const video = storable('', 'backgroundVideo');
   const image = storable('', 'backgroundImage');
-  const transparency = storable(0, 'transparency');
+  const transparency = storable(0.7, 'transparency');
 
   function resetAll() {
     image.set('');

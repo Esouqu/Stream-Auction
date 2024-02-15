@@ -50,13 +50,7 @@
 			<div class="bg-setting">
 				<p>Прозрачность интерфейса</p>
 				<div style="display: flex; align-items: center;">
-					<RangeSlider
-						min={0.1}
-						max={1}
-						step={0.05}
-						isDisabled={!$backgroundImage && !$backgroundVideo}
-						bind:value={$backgroundTransparency}
-					/>
+					<RangeSlider min={0.1} max={1} step={0.05} bind:value={$backgroundTransparency} />
 					<span style="width: 50px; text-align: end;">{$backgroundTransparency}</span>
 				</div>
 			</div>
