@@ -80,7 +80,7 @@ export interface IDonationData {
   currency: string;
   message: string;
   created_at: string;
-  mostSimilarLot: ILot | null;
+  mostSimilarLot?: ILot;
 }
 
 export interface ITwitchUserData {

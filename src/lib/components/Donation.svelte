@@ -13,12 +13,12 @@
 	export let amount_in_user_currency: number;
 	export let currency: string;
 	export let isDragged = false;
-	export let mostSimilarLot: ILot | null = null;
+	export let mostSimilarLot: ILot | undefined = undefined;
 	export let isInstant = false;
 
 	function handleAddSimilar(e: Event) {
-		e.stopPropagation();
 		if (!mostSimilarLot) return;
+		e.stopPropagation();
 
 		lots.addValue(mostSimilarLot.id, amount_in_user_currency, username);
 		donations.remove(id);
@@ -166,7 +166,8 @@
 			pointer-events: none;
 
 			& span:nth-child(1) {
-				text-overflow: ellipsis;
+				// text-overflow: ellipsis;
+				word-break: break-word;
 				overflow: hidden;
 			}
 		}

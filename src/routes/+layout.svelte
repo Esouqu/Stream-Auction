@@ -189,7 +189,7 @@
 						message,
 						currency: 'TP',
 						created_at: createdAt.toString(),
-						mostSimilarLot: null,
+						mostSimilarLot: undefined,
 						isInstant: false
 					});
 				}
@@ -265,7 +265,7 @@
 					message: donation.message,
 					currency: donation.currency,
 					created_at: donation.created_at,
-					mostSimilarLot: null,
+					mostSimilarLot: undefined,
 					isInstant: false
 				});
 			}

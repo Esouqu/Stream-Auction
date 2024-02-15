@@ -37,7 +37,6 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		gap: 10px;
 		min-width: var(--button-size, 40px);
 		height: var(--button-size, 40px);
 		padding: var(--button-p, 5px);
@@ -54,7 +53,7 @@
 
 			& div {
 				display: flex;
-				width: 100%;
+				padding-right: 5px;
 
 				& span {
 					display: inline-block;

@@ -9,6 +9,7 @@ import storable from './storable';
 interface IProcessedDonationData {
   donation: IDonationData;
   lot?: ILot;
+  mostSimilarLot?: ILot;
   spinSeconds: number;
   shouldStop: boolean;
   shouldContinue: boolean;
@@ -30,6 +31,7 @@ function createDonations() {
   }, 'continueSpinAction');
   const currentSpinPrice = writable(get(continueSpinAction).price);
 
+  const INSTANT_DONATION_DELETION_TIME = 7000;
   let wheelState: WHEEL_STATE;
 
   function init() {
@@ -40,14 +42,15 @@ function createDonations() {
     const processededDonation = processDonation(donation);
 
     if (processededDonation.isInstant) {
-      setTimeout(() => remove(donation.id), 5000);
+      setTimeout(() => remove(donation.id), INSTANT_DONATION_DELETION_TIME);
     }
 
     update((donations) => {
       const newDonation = {
         ...donation,
         isInstant: processededDonation.isInstant,
-        message: processededDonation.message
+        message: processededDonation.message,
+        mostSimilarLot: processededDonation.mostSimilarLot,
       };
 
       return [...donations, newDonation];
@@ -66,10 +69,12 @@ function createDonations() {
     const currentPrice = get(currentSpinPrice);
     const canStopSpin = isStopEnabled && donation.amount_in_user_currency >= stopSpinPrice;
     const canContinueSpin = isContinueEnabled && donation.amount_in_user_currency >= currentPrice;
+    const { findedLot, mostSimilarLot } = lots.getSimilarLot(donation.message);
 
     let data: IProcessedDonationData = {
       donation,
-      lot: lots.getSimilarLot(donation.message),
+      lot: findedLot,
+      mostSimilarLot,
       spinSeconds,
       shouldStop: false,
       shouldContinue: false,

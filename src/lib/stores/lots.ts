@@ -110,22 +110,26 @@ function createLots() {
   function getSimilarLot(str: string) {
     const lotId = str.match(/\B(\#[\d]+\b)(?!;)/);
     const replacedLotId = lotId && Number(lotId[0].replace('#', ''));
-    const url = extractUrl(str);
+    // const url = extractUrl(str);
 
-    if (url) {
-      // if message have exact same url as one of the lots
-      return _findSameLot(url);
-    } else if (replacedLotId && replacedLotId <= get(lots).length) {
+    let findedLot: ILot | undefined;
+
+    if (replacedLotId && replacedLotId <= get(lots).length) {
       // If message have [#id]. get(lots).length = last generated lot id
-      return _findLotById(replacedLotId);
+      findedLot = _findLotById(replacedLotId);
     } else {
       // else try to find lot by strings similarity
-      return _findLotBySimilarity(str);
+      findedLot = _findSameLot(str);
+    }
+
+    return {
+      findedLot,
+      mostSimilarLot: _findLotBySimilarity(str),
     }
   }
 
   function _findSameLot(message: string) {
-    return get(lots).find((item) => item.title.includes(message));
+    return get(lots).find((item) => item.title.toLowerCase() === message.toLowerCase());
   }
 
   function _findLotById(id: number) {
@@ -133,31 +137,15 @@ function createLots() {
   }
 
   function _findLotBySimilarity(message: string): ILot | undefined {
-    const minMergeThreshold = 40;
-    const maxMergeThreshold = 60;
-
-    let acceptableLots: (ILot & { comparePercent: number })[] = [];
+    const MERGE_THRESHOLD = 60;
 
     for (const l of get(lots)) {
+      if (l.title === message) return l;
+
       const comparePercent = compareStrings(message, l.title);
 
-      if (comparePercent > maxMergeThreshold) {
-        acceptableLots = [];
-
-        return l;
-      }
-
-      if (comparePercent > minMergeThreshold) {
-        acceptableLots.push({ ...l, comparePercent });
-      }
+      if (comparePercent > MERGE_THRESHOLD) return l;
     }
-
-    // if (acceptableLots.length > 0) {
-    //   console.log(acceptableLots)
-    //   return acceptableLots.reduce((prev, current) =>
-    //     prev.comparePercent > current.comparePercent ? prev : current
-    //   );
-    // }
   }
 
   function _detectNewLeader(items: ILot[], item: ILot) {
