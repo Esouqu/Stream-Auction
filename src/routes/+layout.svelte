@@ -22,8 +22,8 @@
 	import subscribeStores from '$lib/stores/storesBus';
 	import Rules from '$lib/components/Rules.svelte';
 	import background from '$lib/stores/background';
-	import Flame from '$lib/components/Flame.svelte';
-	import RangeSlider from '$lib/components/RangeSlider.svelte';
+	import IntensityTracker from '$lib/components/IntensityTracker.svelte';
+	import minIntensityValue from '$lib/stores/minIntensityValue';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
@@ -48,7 +48,6 @@
 	$: total = getTotal($lots.map((l) => l.value));
 	$: backgroundImage = background.image;
 	$: backgroundVideo = background.video;
-	$: intensityAmount = donations.intensityAmount;
 
 	onMount(() => {
 		const validationInterval = 1000 * 60 * 60;
@@ -293,9 +292,11 @@
 	</video>
 
 	<div style="position: fixed; z-index: 0; width: 100%">
-		{#if $intensityAmount > 0 && activeRoute?.url === NAVIGATION_ROUTES.LOTS}
-			{@const flameSize = 40 + 15 * $intensityAmount}
-			<Flame --flame-size="{flameSize}vh" />
+		{#if activeRoute?.url === NAVIGATION_ROUTES.LOTS}
+			<IntensityTracker
+				minIntensityValue={$minIntensityValue}
+				isDonationsOn={!!donationAlertsWebSocket}
+			/>
 		{/if}
 	</div>
 

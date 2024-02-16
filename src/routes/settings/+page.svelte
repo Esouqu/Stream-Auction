@@ -8,6 +8,8 @@
 	import background from '$lib/stores/background';
 	import Input from '$lib/components/Input.svelte';
 	import TextButton from '$lib/components/TextButton.svelte';
+	import NumberInput from '$lib/components/NumberInput.svelte';
+	import minIntensityValue from '$lib/stores/minIntensityValue';
 
 	let videoUrl: string;
 
@@ -17,8 +19,6 @@
 	$: baseTime = timer.baseTime;
 	$: itemAddedAction = timer.itemAddedAction;
 	$: leaderChangedAction = timer.leaderChangedAction;
-	$: backgroundImage = background.image;
-	$: backgroundVideo = background.video;
 	$: backgroundTransparency = background.transparency;
 </script>
 
@@ -53,6 +53,16 @@
 					<RangeSlider min={0.1} max={1} step={0.05} bind:value={$backgroundTransparency} />
 					<span style="width: 50px; text-align: end;">{$backgroundTransparency}</span>
 				</div>
+			</div>
+			<div class="bg-setting">
+				<p>Мин. сумма для огня</p>
+				<NumberInput
+					--input-w="90px"
+					id="intensityValue"
+					placeholder="Ссылка"
+					suffix="Руб"
+					bind:value={$minIntensityValue}
+				/>
 			</div>
 			<div style="margin-top: 20px;">
 				<TextButton --text-b-fs="14px" text="Убрать Фон" on:click={() => background.resetAll()} />
@@ -134,7 +144,13 @@
 	}
 	.bg-setting {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+
+		& p {
+			margin-right: 10px;
+		}
 	}
 	.toggles-wrapper {
 		display: flex;
@@ -179,7 +195,7 @@
 		}
 		&_bg {
 			&::before {
-				content: 'Фоновое Изображение';
+				content: 'Фон';
 			}
 		}
 	}

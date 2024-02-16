@@ -25,7 +25,7 @@ function createLots() {
 
   const itemAdded = signal(writable<ILot | undefined>());
   const leaderChanged = signal(writable<ILot | undefined>());
-  const lotValueChanged = signal(writable<{ id: number } | undefined>());
+  const lotValueChanged = signal(writable<ILot & { addedValue?: number } | undefined>());
 
   // let generatedId = tempLots.length;
   let generatedId = 0;
@@ -84,6 +84,7 @@ function createLots() {
       if (item.id !== id) return item;
 
       _detectNewLeader(items, { ...item, value: item.value + value });
+      lotValueChanged.set({ ...item, addedValue: value });
 
       if (donator && !item.donators.includes(donator)) {
         return { ...item, value: item.value + value, donators: [...item.donators, donator] }
@@ -91,8 +92,6 @@ function createLots() {
 
       return { ...item, value: item.value + value };
     }));
-
-    lotValueChanged.set({ id });
   }
 
   function setValue(id: number, value: number) {
@@ -101,7 +100,7 @@ function createLots() {
 
       if (item.value !== value) {
         _detectNewLeader(items, { ...item, value });
-        lotValueChanged.set({ id });
+        lotValueChanged.set({ ...item, addedValue: value - item.value });
       }
 
       return { ...item, value };

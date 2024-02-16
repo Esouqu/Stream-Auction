@@ -17,7 +17,6 @@ interface IProcessedDonationData {
 
 function createDonations() {
   const { subscribe, update } = writable<IDonationData[]>([]);
-  const intensityAmount = writable(0);
   const donationQueued = signal(writable<IProcessedDonationData>());
 
   const stopSpinAction = storable({
@@ -32,9 +31,6 @@ function createDonations() {
   }, 'continueSpinAction');
   const currentSpinPrice = writable(get(continueSpinAction).price);
 
-  const MIN_INTENSITY_VALUE = 100;
-  const MAX_INTENSITY = 4;
-  const INSTANT_DONATION_DELETION_TIME = 7000;
   let wheelState: WHEEL_STATE;
 
   function init() {
@@ -42,6 +38,7 @@ function createDonations() {
   }
 
   function add(donation: IDonationData) {
+    const INSTANT_DONATION_DELETION_TIME = 7000;
     const processededDonation = processDonation(donation);
 
     if (processededDonation.isInstant) {
@@ -58,39 +55,6 @@ function createDonations() {
 
       return [...donations, newDonation];
     });
-
-    const intensityDecreaseTime = 15;
-
-    if (donation.amount_in_user_currency >= MIN_INTENSITY_VALUE) {
-      intensityAmount.update((amount) => {
-        const value = donation.amount_in_user_currency;
-        let toAdd = 1;
-
-        if (value > MIN_INTENSITY_VALUE * 2) {
-          toAdd = 2;
-        }
-
-        if (value > MIN_INTENSITY_VALUE * 4) {
-          toAdd = 4;
-        }
-
-        return amount + toAdd > MAX_INTENSITY ? MAX_INTENSITY : amount + toAdd;
-      });
-
-      const intensityIntervalId = setInterval(() => {
-        intensityAmount.update((amount) => {
-          if (amount < 1) {
-            clearInterval(intensityIntervalId);
-
-            return amount;
-          }
-
-          return amount - 1 > 0 ? amount - 1 : 0;
-        })
-      }, intensityDecreaseTime * 1000);
-    } else {
-      intensityAmount.update((amount) => amount - 1 > 0 ? amount - 1 : 0);
-    }
 
     donationQueued.set({ ...processededDonation });
   }
@@ -160,7 +124,6 @@ function createDonations() {
 
   return {
     subscribe,
-    intensityAmount,
     add,
     remove,
     setValue,
