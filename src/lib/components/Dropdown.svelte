@@ -21,7 +21,7 @@
 	export let selectedOption = 0;
 	export let titleText = options[selectedOption];
 	export let isDropped = false;
-	export let isEditable = false;
+	export let isReadonly = false;
 
 	let isEditMode = false;
 	let headElement: HTMLElement;
@@ -71,6 +71,7 @@
 				--textarea-h="48px"
 				id="dropdown-title"
 				isResizable={true}
+				{isReadonly}
 				bind:isEditable={isEditMode}
 				bind:element={textareaElement}
 				bind:value={titleText}
@@ -108,7 +109,7 @@
 					</div>
 				</li>
 			{/each}
-			{#if isEditable}
+			{#if !isReadonly}
 				<div style="display: flex; align-items: center; justify-content: center; margin-top: 10px;">
 					<Button --button-size="100%" icon="plus" color="black" on:click={addOption} />
 				</div>

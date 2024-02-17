@@ -38,6 +38,9 @@
 </div>
 
 <style lang="scss">
+	#file-uploader {
+		width: 270px;
+	}
 	.file-uploader {
 		&-wrapper {
 			display: flex;

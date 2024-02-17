@@ -1,11 +1,13 @@
 <script lang="ts">
+	import Help from './Help.svelte';
 	import NumberInput from './NumberInput.svelte';
 	import Switch from './Switch.svelte';
 
 	export let id: number | string;
 	export let description: string;
-	export let value: number = 0;
-	export let suffix: string = '';
+	export let help = '';
+	export let value = 0;
+	export let suffix = '';
 	export let isToggled = false;
 	export let haveInput = true;
 	export let haveToggle = true;
@@ -18,7 +20,13 @@
 </script>
 
 <div class="setting">
-	<p>{description}</p>
+	<div class="description">
+		<p>{description}</p>
+		{#if help}
+			<Help content={help} />
+		{/if}
+	</div>
+
 	<div class="setting-inputs">
 		<div style="grid-column: 1;">
 			{#if haveInput}
@@ -57,12 +65,18 @@
 			align-items: center;
 			gap: 30px;
 		}
-		& p {
+		& .description {
+			display: flex;
+			align-items: center;
+			gap: 10px;
 			flex: 1 1 0;
-			margin: 0;
 			max-width: 650px;
-			line-height: 1;
-			font-size: 16px;
+
+			& p {
+				margin: 0;
+				line-height: 1;
+				font-size: 16px;
+			}
 		}
 	}
 </style>

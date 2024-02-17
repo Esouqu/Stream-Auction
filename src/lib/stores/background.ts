@@ -1,31 +1,31 @@
 import storable from "./storable";
 
+interface IBackground {
+  url: string;
+  type: 'Картинка' | 'Видео';
+}
+
 function createBackground() {
-  const video = storable('', 'backgroundVideo');
-  const image = storable('', 'backgroundImage');
+  const { subscribe, set, update } = storable<IBackground>({
+    url: '',
+    type: 'Картинка'
+  }, 'background');
   const transparency = storable(0.7, 'transparency');
 
-  function resetAll() {
-    image.set('');
-    video.set('');
+  function reset() {
+    update((options) => ({ ...options, url: '' }));
   }
 
-  function setImage(url: string) {
-    image.set(url);
-    video.set('');
-  }
-  function setVideo(url: string) {
-    image.set('');
-    video.set(url);
+  function setType(type: IBackground["type"]) {
+    set({ url: '', type });
   }
 
   return {
-    video,
-    image,
+    subscribe,
+    set,
     transparency,
-    resetAll,
-    setVideo,
-    setImage
+    reset,
+    setType
   }
 }
 

@@ -3,15 +3,12 @@
 
 	export let title: string = '';
 
-	$: backgroundImage = background.image;
-	$: backgroundVideo = background.video;
 	$: backgroundTransparency = background.transparency;
-	$: isTransparent = !!$backgroundImage || !!backgroundVideo;
 </script>
 
 <div
 	class="card"
-	class:transparent={isTransparent}
+	class:transparent={!!$background.url}
 	class:titless={!title}
 	style="--card-opacity: {$backgroundTransparency};"
 >

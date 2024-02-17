@@ -2,16 +2,16 @@
 	import { slide } from 'svelte/transition';
 	import donations from '$lib/stores/donations';
 	import timer from '$lib/stores/timer';
-	import FileUploader from '$lib/components/FileUploader.svelte';
 	import Setting from '$lib/components/Setting.svelte';
 	import RangeSlider from '$lib/components/RangeSlider.svelte';
 	import background from '$lib/stores/background';
 	import Input from '$lib/components/Input.svelte';
 	import TextButton from '$lib/components/TextButton.svelte';
-	import NumberInput from '$lib/components/NumberInput.svelte';
 	import minIntensityValue from '$lib/stores/minIntensityValue';
+	import Help from '$lib/components/Help.svelte';
+	import SelectButton from '$lib/components/SelectButton.svelte';
 
-	let videoUrl: string;
+	let options = ['Картинка', 'Видео'];
 
 	$: continueSpinAction = donations.continueSpinAction;
 	$: stopSpinAction = donations.stopSpinAction;
@@ -30,21 +30,23 @@
 	<div class="toggles-wrapper">
 		<div class="toggles toggles_bg">
 			<div class="bg-setting">
-				<p>Картинка</p>
-				<FileUploader />
+				<p>Тип</p>
+				<SelectButton
+					{options}
+					bind:selectedOption={$background.type}
+					on:selectionChanged={() => background.reset()}
+				/>
 			</div>
 			<div class="bg-setting">
-				<p>Видео</p>
+				<p>Ссылка</p>
+				<Help content="Динамический фон можно взять тут: https://backgrounds.gallery/animated" />
 				<Input
 					--input-w="100%"
 					--input-w-w="100%"
 					id="video-url"
 					type="text"
-					placeholder="Ссылка"
-					onEnter={() => videoUrl && background.setVideo(videoUrl)}
-					onInput={() => videoUrl && background.setVideo(videoUrl)}
-					onBlur={() => videoUrl && background.setVideo(videoUrl)}
-					bind:value={videoUrl}
+					placeholder="Ссылка на файл"
+					bind:value={$background.url}
 				/>
 			</div>
 			<div class="bg-setting">
@@ -54,23 +56,21 @@
 					<span style="width: 50px; text-align: end;">{$backgroundTransparency}</span>
 				</div>
 			</div>
-			<div class="bg-setting">
-				<p>Мин. сумма для огня</p>
-				<NumberInput
-					--input-w="90px"
-					id="intensityValue"
-					placeholder="Ссылка"
-					suffix="Руб"
-					bind:value={$minIntensityValue}
-				/>
-			</div>
+			<Setting
+				id="flame"
+				description="Жаришка нереальная"
+				help="С каждым донатом, который равен или выше заданного значения, увеличивается огонь на заднем фоне. Огонь постепенно уменьшается"
+				suffix="Руб"
+				bind:isToggled={$minIntensityValue.isEnabled}
+				bind:value={$minIntensityValue.price}
+			/>
 			<div style="margin-top: 20px;">
-				<TextButton --text-b-fs="14px" text="Убрать Фон" on:click={() => background.resetAll()} />
+				<TextButton --text-b-fs="14px" text="Убрать Фон" on:click={() => background.reset()} />
 			</div>
 		</div>
 		<div class="toggles toggles_timer">
 			<Setting
-				id={5}
+				id="timer-1"
 				description="Стартовое время"
 				suffix="Мин"
 				isDisabled={$timer.isRunning}
@@ -79,14 +79,14 @@
 				bind:value={$baseTime}
 			/>
 			<Setting
-				id={6}
+				id="timer-2"
 				description="Добавлять время за новый лот"
 				suffix="Сек"
 				bind:isToggled={$itemAddedAction.isEnabled}
 				bind:value={$itemAddedAction.seconds}
 			/>
 			<Setting
-				id={7}
+				id="timer-3"
 				description="Добавлять время за смену лидера"
 				suffix="Сек"
 				bind:isToggled={$leaderChangedAction.isEnabled}
@@ -97,13 +97,15 @@
 			<Setting
 				id="wheel-2"
 				description="Остановить, добавив вариант"
+				help="Если донат равен или превышает заданное значение, останавливает колесо на текущей позиции и добавляет/обновляет вариант из доната"
 				suffix="Руб"
 				bind:isToggled={$stopSpinAction.isEnabled}
 				bind:value={$stopSpinAction.price}
 			/>
 			<Setting
 				id="wheel-3"
-				description="Продлить кручение"
+				description="Продливать кручение"
+				help="Если донат равен или превышает заданное значение, продлевает кручение колеса"
 				suffix="Руб"
 				onInput={() => currentSpinPrice.set($continueSpinAction.price)}
 				bind:isToggled={$continueSpinAction.isEnabled}
@@ -114,13 +116,15 @@
 					<Setting
 						id="wheel-4"
 						description="Длительность продления"
+						help="Значение, на которое продлится кручение"
 						suffix="Сек"
 						haveToggle={false}
 						bind:value={$continueSpinAction.seconds}
 					/>
 					<Setting
 						id="wheel-5"
-						description="Увеличениe минимальной суммы за продление"
+						description="Увеличениe минимальной суммы за донат"
+						help="Значение, добавляемое к сумме продления, за каждый донат выше минимума"
 						suffix="Руб"
 						haveToggle={false}
 						bind:value={$continueSpinAction.step}
@@ -133,7 +137,6 @@
 
 <style lang="scss">
 	.settings-section {
-		/* position: absolute; */
 		display: flex;
 		flex: 1;
 		flex-direction: column;
@@ -147,10 +150,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-
-		& p {
-			margin-right: 10px;
-		}
+		gap: 10px;
 	}
 	.toggles-wrapper {
 		display: flex;

@@ -46,8 +46,6 @@
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: topLots = sortedLots.slice(0, 10);
 	$: total = getTotal($lots.map((l) => l.value));
-	$: backgroundImage = background.image;
-	$: backgroundVideo = background.video;
 
 	onMount(() => {
 		const validationInterval = 1000 * 60 * 60;
@@ -278,26 +276,29 @@
 	}
 </script>
 
-<div class="layout" style="background-image: {$backgroundImage};">
-	<video
-		src={$backgroundVideo}
-		style="position: absolute; top: 0; left: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover;"
-		preload="auto"
-		autoplay
-		muted
-		loop
-		bind:paused={isBackgroundVideoPaused}
-	>
-		<track kind="captions" />
-	</video>
+<div
+	class="layout"
+	style="background-image: url({$background.type === 'Картинка' ? $background.url : ''});"
+>
+	{#if $background.type === 'Видео'}
+		<video
+			src={$background.url}
+			style="position: absolute; top: 0; left: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover;"
+			preload="auto"
+			autoplay
+			muted
+			loop
+			bind:paused={isBackgroundVideoPaused}
+		>
+			<track kind="captions" />
+		</video>
+	{/if}
 
 	<div style="position: fixed; z-index: 0; width: 100%">
-		{#if activeRoute?.url === NAVIGATION_ROUTES.LOTS}
-			<IntensityTracker
-				minIntensityValue={$minIntensityValue}
-				isDonationsOn={!!donationAlertsWebSocket}
-			/>
-		{/if}
+		<IntensityTracker
+			minIntensityValue={$minIntensityValue.price}
+			isDonationsOn={!!donationAlertsWebSocket}
+		/>
 	</div>
 
 	<div class="layout-section layout-section_left">

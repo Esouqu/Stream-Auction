@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, onMount } from 'svelte';
+	import { afterUpdate } from 'svelte';
 
 	export let id: string;
 	export let value: string;
@@ -7,6 +7,7 @@
 	export let element: HTMLTextAreaElement | null = null;
 	export let isResizable = false;
 	export let isEditable = false;
+	export let isReadonly = false;
 
 	let textareaHeight = 'auto';
 
@@ -39,7 +40,7 @@
 		bind:value
 		on:input={() => updateTextareaHeight()}
 		on:blur={() => (isEditable = false)}
-		on:click={() => (isEditable = true)}
+		on:click={() => isReadonly && (isEditable = true)}
 	/>
 </div>
 

@@ -1,7 +1,10 @@
 import storable from "./storable";
 
 function createMinIntensityValue() {
-  const { subscribe, set } = storable(1000, 'minIntensityValue');
+  const { subscribe, set } = storable({
+    price: 1000,
+    isEnabled: true,
+  }, 'intensitySetting');
 
   return {
     subscribe,

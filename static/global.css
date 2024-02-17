@@ -104,3 +104,24 @@ span::selection {
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--primary-70);
 }
+
+.tippy-box[data-theme~='general'] {
+  color: var(--on-inverse-surface);
+  background-color: var(--inverse-surface);
+
+  &[data-placement^='top']>.tippy-arrow::before {
+    border-top-color: var(--inverse-surface) !important;
+  }
+
+  &[data-placement^='bottom']>.tippy-arrow::before {
+    border-bottom-color: var(--inverse-surface) !important;
+  }
+
+  &[data-placement^='left']>.tippy-arrow::before {
+    border-left-color: var(--inverse-surface) !important;
+  }
+
+  &[data-placement^='right']>.tippy-arrow::before {
+    border-right-color: var(--inverse-surface) !important;
+  }
+}

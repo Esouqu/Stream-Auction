@@ -67,13 +67,7 @@
 	}
 </script>
 
-<div
-	class="input-wrapper"
-	style="--input-p-l: {type === 'text' ? 5 : 0}px;"
-	class:disabled={isDisabled}
-	class:filled={isFilled}
-	data-suffix={suffix}
->
+<div class="input-wrapper" class:disabled={isDisabled} class:filled={isFilled} data-suffix={suffix}>
 	<input
 		type="text"
 		id="input-{id}-{pathName}"
@@ -94,8 +88,6 @@
 	.input {
 		position: relative;
 		padding: var(--input-p, 10.5px);
-		padding-left: var(--input-p-l, 0);
-		padding-right: var(--input-p-r, 0);
 		border: 1px solid var(--outline);
 		border-radius: 5px;
 		outline: 0;

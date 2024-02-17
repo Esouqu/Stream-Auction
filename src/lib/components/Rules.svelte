@@ -10,7 +10,6 @@
 <div class="rules">
 	<Dropdown
 		options={$presets.map((p) => p.title)}
-		isEditable={true}
 		bind:selectedOption={$selectedPreset}
 		bind:titleText={$presets[$selectedPreset].title}
 		on:optiondeleted={(e) => presets.remove(e.detail.index)}

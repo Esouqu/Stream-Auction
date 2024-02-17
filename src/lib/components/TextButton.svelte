@@ -54,6 +54,7 @@
 				height: 100%;
 			}
 		}
+
 		&_purple {
 			color: var(--on-surface);
 			background-color: var(--primary-50);
