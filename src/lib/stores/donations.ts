@@ -69,7 +69,8 @@ function createDonations() {
     const currentPrice = get(currentSpinPrice);
     const canStopSpin = isStopEnabled && donation.amount_in_user_currency >= stopSpinPrice;
     const canContinueSpin = isContinueEnabled && donation.amount_in_user_currency >= currentPrice;
-    const { findedLot, mostSimilarLot } = lots.getSimilarLot(donation.message);
+    const message = donation.message ?? '';
+    const { findedLot, mostSimilarLot } = lots.getSimilarLot(message);
 
     let data: IProcessedDonationData = {
       donation,
@@ -94,13 +95,13 @@ function createDonations() {
       return {
         ...data,
         isInstant: true,
-        message: data.lot ? data.lot.title : donation.message
+        message: data.lot ? data.lot.title : message
       }
     };
     if (!data.lot) return {
       ...data,
       isInstant: false,
-      message: donation.message
+      message
     };
     return {
       ...data,

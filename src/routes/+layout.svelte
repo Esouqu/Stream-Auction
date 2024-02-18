@@ -295,10 +295,12 @@
 	{/if}
 
 	<div style="position: fixed; z-index: 0; width: 100%">
-		<IntensityTracker
-			minIntensityValue={$minIntensityValue.price}
-			isDonationsOn={!!donationAlertsWebSocket}
-		/>
+		{#if $minIntensityValue.isEnabled}
+			<IntensityTracker
+				minIntensityValue={$minIntensityValue.price}
+				isDonationsOn={!!donationAlertsWebSocket}
+			/>
+		{/if}
 	</div>
 
 	<div class="layout-section layout-section_left">

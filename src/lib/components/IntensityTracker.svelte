@@ -84,6 +84,6 @@
 		background-repeat: repeat-x;
 		background-position-y: 170%;
 		background-position-x: center;
-		transition: background-size 1s ease-in-out;
+		transition: background-size 3s ease-in-out;
 	}
 </style>

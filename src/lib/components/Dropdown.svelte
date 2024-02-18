@@ -71,7 +71,6 @@
 				--textarea-h="48px"
 				id="dropdown-title"
 				isResizable={true}
-				{isReadonly}
 				bind:isEditable={isEditMode}
 				bind:element={textareaElement}
 				bind:value={titleText}

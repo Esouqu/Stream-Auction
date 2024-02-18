@@ -39,7 +39,7 @@
 		gap: 5px;
 		padding: 3px 5px;
 		border-radius: 10px;
-		background-color: var(--surface-container-high);
+		background-color: var(--neutral);
 
 		&__button {
 			display: flex;
@@ -51,7 +51,7 @@
 			border: 0;
 			border-radius: 10px;
 			line-height: 1;
-			opacity: 0.5;
+			opacity: 0.7;
 			color: var(--on-surface);
 			background-color: transparent;
 			transition: 0.2s;
@@ -68,7 +68,7 @@
 				cursor: pointer;
 
 				&:hover {
-					opacity: 0.7;
+					opacity: 1;
 				}
 			}
 		}

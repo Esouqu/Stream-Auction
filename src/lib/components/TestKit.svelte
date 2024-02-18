@@ -31,7 +31,7 @@
 				amount: amount,
 				amount_in_user_currency: amount,
 				currency,
-				mostSimilarLot: null,
+				mostSimilarLot: undefined,
 				created_at: Date.now().toString(),
 				isInstant: false
 			})}
