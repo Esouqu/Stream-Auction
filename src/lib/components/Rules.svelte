@@ -15,11 +15,7 @@
 		on:optiondeleted={(e) => presets.remove(e.detail.index)}
 		on:optionadded={() => presets.create()}
 	/>
-	<Textarea
-		id="rules"
-		placeholder="Написать правила..."
-		bind:value={$presets[$selectedPreset].text}
-	/>
+	<Textarea id="rules" placeholder="Текст правил..." bind:value={$presets[$selectedPreset].text} />
 </div>
 
 <style lang="scss">

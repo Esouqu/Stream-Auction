@@ -6,8 +6,10 @@ import 'tippy.js/themes/material.css';
 const tooltip: Action<HTMLElement, Partial<Props>> = (node: HTMLElement, options: Partial<Props>) => {
   const initialOptions: Partial<Props> = {
     theme: 'general',
-    placement: 'right',
     interactive: true,
+    appendTo: () => document.body,
+    // hideOnClick: false,
+    // trigger: 'click'
   }
   const tool = tippy(node, {
     ...options,

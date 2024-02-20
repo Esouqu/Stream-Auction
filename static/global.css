@@ -106,6 +106,7 @@ span::selection {
 }
 
 .tippy-box[data-theme~='general'] {
+  white-space: break-spaces;
   color: var(--on-inverse-surface);
   background-color: var(--inverse-surface);
 

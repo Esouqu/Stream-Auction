@@ -1,12 +1,14 @@
 <script lang="ts">
 	import tooltip from '$lib/actions/tooltip';
 	import helpIcon from '$lib/assets/help_icon.svg';
+	import type { Placement } from 'tippy.js';
 
 	export let content: string;
+	export let placement: Placement = 'right';
 </script>
 
 <div>
-	<span class="help" use:tooltip={{ content }}>
+	<span class="help" use:tooltip={{ content, placement }}>
 		<img src={helpIcon} alt="Help" />
 	</span>
 </div>
