@@ -309,7 +309,12 @@
 	<div class="layout-section layout-section_left">
 		<div class="layout-wrapper">
 			{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
-				<Card --card-flex="0 1 auto" --card-gap="10px" --card-title-size="28px" title="Возможности">
+				<Card
+					--card-flex="0 1 auto"
+					--card-gap="10px"
+					--card-title-size="28px"
+					title="Возможности Зрителя"
+				>
 					<Snackbar>
 						<span>Остановить колесо, добавив ваш вариант</span>
 						{#if $stopSpinAction.isEnabled}
@@ -330,12 +335,8 @@
 					</Snackbar>
 				</Card>
 			{/if}
-			<Card
-				--card-flex="1 1 0"
-				--card-title-size="28px"
-				title={activeRoute?.url === NAVIGATION_ROUTES.WHEEL ? 'Топ 10' : ''}
-			>
-				{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
+			{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
+				<Card --card-flex="1 1 0" --card-title-size="28px" title="Топ 10">
 					<div style="width: 100%;">
 						{#each topLots as { id, title, color, contrastColor, value } (id)}
 							{@const percent = (value / total) * 100}
@@ -344,11 +345,13 @@
 							</div>
 						{/each}
 					</div>
-				{:else}
+				</Card>
+			{:else}
+				<Card --card-flex="1 1 0" --card-title-size="28px">
 					<Rules />
-				{/if}
-			</Card>
-			<Card --card-justify="center" --card-align="center">
+				</Card>
+			{/if}
+			<Card --card-flex="0 1 auto" --card-justify="center" --card-align="center">
 				<div style="display: flex; width: 100%; justify-content: center; gap: 20px;">
 					<Contact title="Esouqu" icon={githubIconWhite} url="https://github.com/Esouqu" />
 					<Contact title="nikogda" icon={discordIconWhite} />
@@ -358,13 +361,13 @@
 	</div>
 	<div class="layout-section layout-section_center">
 		<Card --card-flex="1" --card-justify="end" --card-p="30px 20px">
-			{#key previousRoute}
-				<div class="layout-section-wrapper">
-					<!-- in:fly={{ x: getFlyDirection()?.forward, duration: 300 }}
+			<!-- {#key previousRoute} -->
+			<div class="layout-section-wrapper">
+				<!-- in:fly={{ x: getFlyDirection()?.forward, duration: 300 }}
 					out:fly={{ x: getFlyDirection()?.backward, duration: 300 }} -->
-					<slot />
-				</div>
-			{/key}
+				<slot />
+			</div>
+			<!-- {/key} -->
 			<div class="navigation-wrapper">
 				{#if activeRoute?.url === NAVIGATION_ROUTES.LOTS}
 					<div
@@ -506,7 +509,7 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		gap: 20px;
+		gap: 10px;
 		width: 100%;
 	}
 
