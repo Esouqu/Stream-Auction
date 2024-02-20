@@ -24,6 +24,9 @@
 	import background from '$lib/stores/background';
 	import IntensityTracker from '$lib/components/IntensityTracker.svelte';
 	import minIntensityValue from '$lib/stores/minIntensityValue';
+	import discordIconWhite from '$lib/assets/discord-logo/icon_clyde_white_RGB.svg';
+	import githubIconWhite from '$lib/assets/github-mark/github-mark-white.svg';
+	import Contact from '$lib/components/Contact.svelte';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
@@ -344,6 +347,12 @@
 				{:else}
 					<Rules />
 				{/if}
+			</Card>
+			<Card --card-justify="center" --card-align="center">
+				<div style="display: flex; width: 100%; justify-content: center; gap: 20px;">
+					<Contact title="Esouqu" icon={githubIconWhite} url="https://github.com/Esouqu" />
+					<Contact title="nikogda" icon={discordIconWhite} />
+				</div>
 			</Card>
 		</div>
 	</div>
