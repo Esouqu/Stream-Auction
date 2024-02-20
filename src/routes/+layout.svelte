@@ -308,7 +308,7 @@
 
 	<div class="layout-section layout-section_left">
 		<div class="layout-wrapper">
-			{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL}
+			{#if activeRoute?.url === NAVIGATION_ROUTES.WHEEL && !!donationAlertsWebSocket}
 				<Card
 					--card-flex="0 1 auto"
 					--card-gap="10px"
