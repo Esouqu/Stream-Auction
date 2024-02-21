@@ -5,10 +5,11 @@
 
 	export let content: string;
 	export let placement: Placement = 'right';
+	export let interactive = true;
 </script>
 
 <div>
-	<span class="help" use:tooltip={{ content, placement }}>
+	<span class="help" use:tooltip={{ content, placement, interactive }}>
 		<img src={helpIcon} alt="Help" />
 	</span>
 </div>

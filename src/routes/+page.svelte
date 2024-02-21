@@ -13,8 +13,9 @@
 <section class="auction-section">
 	<div class="add-lot-wrapper">
 		<Addlot />
-		<div style="position: absolute; right: 20px; width: 100%; text-align: end;">
+		<div style="position: absolute; top: 35px; right: 20px;">
 			<Help
+				interactive={false}
 				placement="left-end"
 				content={'Переходя на другие страницы, кручение колеса продолжится. Таким образом вы можете добавлять/изменять/удалять лоты переходя на страницу с лотами или менять настройки на странице настроек не прерывая кручения колеса.\n\nПресеты правил и настройки на странице настроек сохраняются до очищения кэша браузера.\n\nВНИМАНИЕ: Лоты не сохраняются!'}
 			/>
