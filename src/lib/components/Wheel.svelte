@@ -67,7 +67,7 @@
 		onResize();
 		drawChart(pie);
 
-		const unsubSpinStopped = wheel.spinStopped.subscribe(() => {
+		return wheel.spinStopped.subscribe(() => {
 			const lastPie = createPie($lots);
 
 			isSettingsShown = true;
@@ -76,8 +76,6 @@
 			getWinner($wheel.normalizedAngle, lastPie);
 			celebrate();
 		});
-
-		return unsubSpinStopped;
 	});
 
 	function loadAudio() {

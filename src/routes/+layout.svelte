@@ -26,6 +26,7 @@
 	import minIntensityValue from '$lib/stores/minIntensityValue';
 	import discordIconWhite from '$lib/assets/discord-logo/icon_clyde_white_RGB.svg';
 	import githubIconWhite from '$lib/assets/github-mark/github-mark-white.svg';
+	import boostyIcon from '$lib/assets/boosty_logo/White.svg';
 	import Contact from '$lib/components/Contact.svelte';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
@@ -353,6 +354,7 @@
 			{/if}
 			<Card --card-flex="0 1 auto" --card-justify="center" --card-align="center">
 				<div style="display: flex; width: 100%; justify-content: center; gap: 20px;">
+					<Contact icon={boostyIcon} title="Поддержать" url="https://boosty.to/esouqu/donate" />
 					<Contact title="Esouqu" icon={githubIconWhite} url="https://github.com/Esouqu" />
 					<Contact title="nikogda" icon={discordIconWhite} />
 				</div>
