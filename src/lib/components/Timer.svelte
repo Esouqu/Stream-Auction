@@ -88,7 +88,7 @@
 			color: inherit;
 		}
 		100% {
-			color: crimson;
+			color: var(--error);
 		}
 	}
 </style>
