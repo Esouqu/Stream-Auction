@@ -81,9 +81,9 @@ function createWheel() {
   }
 
   function restartSpin(ms: number) {
-    speed = maxSpeed;
-    spinStartTime = 0;
-    spinDuration = ms;
+    // speed = maxSpeed;
+    // spinStartTime = 0;
+    spinDuration += ms;
 
     state.set(WHEEL_STATE.SPINNING);
 
