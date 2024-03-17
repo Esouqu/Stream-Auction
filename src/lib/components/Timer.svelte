@@ -15,7 +15,9 @@
 </script>
 
 <div class="timer">
-	<p class="timer__time">{currentTime.min}:{currentTime.sec}:{currentTime.ms}</p>
+	<p class="timer__time" class:delayed={$wheelState === WHEEL_STATE.DELAYED}>
+		{currentTime.min}:{currentTime.sec}:{currentTime.ms}
+	</p>
 	<div class="timer-buttons-wrapper">
 		{#if $wheelState === WHEEL_STATE.SPINNING}
 			<h3>Происходит кручение колеса...</h3>
@@ -74,6 +76,19 @@
 			font-weight: 600;
 			font-variant-numeric: tabular-nums;
 			user-select: none;
+
+			&.delayed {
+				animation: blink 0.5s infinite alternate ease-in;
+			}
+		}
+	}
+
+	@keyframes blink {
+		0% {
+			color: inherit;
+		}
+		100% {
+			color: crimson;
 		}
 	}
 </style>
