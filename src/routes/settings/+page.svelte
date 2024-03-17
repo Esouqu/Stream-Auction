@@ -1,25 +1,28 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
-	import donations from '$lib/stores/donations';
 	import timer from '$lib/stores/timer';
 	import Setting from '$lib/components/Setting.svelte';
 	import RangeSlider from '$lib/components/RangeSlider.svelte';
-	import background from '$lib/stores/background';
 	import Input from '$lib/components/Input.svelte';
 	import TextButton from '$lib/components/TextButton.svelte';
-	import minIntensityValue from '$lib/stores/minIntensityValue';
 	import Help from '$lib/components/Help.svelte';
 	import SelectButton from '$lib/components/SelectButton.svelte';
+	import settings from '$lib/stores/settings';
+	import { TIMER_STATE } from '$lib/constants';
 
 	let options = ['Картинка', 'Видео'];
 
-	$: continueSpinAction = donations.continueSpinAction;
-	$: stopSpinAction = donations.stopSpinAction;
-	$: currentSpinPrice = donations.currentSpinPrice;
-	$: baseTime = timer.baseTime;
-	$: itemAddedAction = timer.itemAddedAction;
-	$: leaderChangedAction = timer.leaderChangedAction;
-	$: backgroundTransparency = background.transparency;
+	$: continueSpinAction = settings.extendSpinAction;
+	$: stopSpinAction = settings.stopSpinAction;
+	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
+	$: timerBaseTime = settings.timerBaseTime;
+	$: itemAddedAction = settings.itemAddedAction;
+	$: leaderChangedAction = settings.leaderChangedAction;
+	$: intensity = settings.intensity;
+	$: timerState = timer.state;
+	$: background = settings.background;
+	$: backgroundTransparency = settings.transparency;
+	$: wheelWinnerDelay = settings.wheelWinnerDelay;
 </script>
 
 <svelte:head>
@@ -34,7 +37,7 @@
 				<SelectButton
 					{options}
 					bind:selectedOption={$background.type}
-					on:selectionChanged={() => background.reset()}
+					on:selectionChanged={() => settings.resetBackground()}
 				/>
 			</div>
 			<div class="bg-setting">
@@ -61,11 +64,15 @@
 				description="Жаришка нереальная"
 				help="С каждым донатом, который равен или выше заданного значения, увеличивается огонь на заднем фоне. Огонь постепенно уменьшается"
 				suffix="Руб"
-				bind:isToggled={$minIntensityValue.isEnabled}
-				bind:value={$minIntensityValue.price}
+				bind:isToggled={$intensity.isEnabled}
+				bind:value={$intensity.price}
 			/>
 			<div style="margin-top: 20px;">
-				<TextButton --text-b-fs="14px" text="Убрать Фон" on:click={() => background.reset()} />
+				<TextButton
+					--text-b-fs="14px"
+					text="Убрать Фон"
+					on:click={() => settings.resetBackground()}
+				/>
 			</div>
 		</div>
 		<div class="toggles toggles_timer">
@@ -73,10 +80,9 @@
 				id="timer-1"
 				description="Стартовое время"
 				suffix="Мин"
-				isDisabled={$timer.isRunning}
+				isDisabled={$timerState === TIMER_STATE.RUNNING}
 				haveToggle={false}
-				onInput={() => timer.setInitialTime($baseTime)}
-				bind:value={$baseTime}
+				bind:value={$timerBaseTime}
 			/>
 			<Setting
 				id="timer-2"
@@ -95,6 +101,14 @@
 		</div>
 		<div class="toggles toggles_wheel">
 			<Setting
+				id="wheel-6"
+				description="Задержка"
+				help="Определение победителя будет отложенно на указанное значение"
+				suffix="Сек"
+				bind:isToggled={$wheelWinnerDelay.isEnabled}
+				bind:value={$wheelWinnerDelay.seconds}
+			/>
+			<Setting
 				id="wheel-2"
 				description="Остановить, добавив вариант"
 				help="Если донат равен или превышает заданное значение, останавливает колесо на текущей позиции и добавляет/обновляет вариант из доната"
@@ -105,9 +119,9 @@
 			<Setting
 				id="wheel-3"
 				description="Продливать кручение"
-				help="Если донат равен или превышает заданное значение, продлевает кручение колеса"
+				help="Если донат равен или превышает заданное значение, продлевает кручение колеса и добавляет/обновляет вариант из доната"
 				suffix="Руб"
-				onInput={() => currentSpinPrice.set($continueSpinAction.price)}
+				onInput={() => currentExtendSpinPrice.set($continueSpinAction.price)}
 				bind:isToggled={$continueSpinAction.isEnabled}
 				bind:value={$continueSpinAction.price}
 			/>

@@ -20,6 +20,7 @@
 	import NumberInput from './NumberInput.svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import storable from '$lib/stores/storable';
+	import actionManager from '$lib/stores/actionManager';
 	// import wheelSectionSound from '$lib/assets/sounds/wheel_section_sound.wav';
 
 	const radius = 360;
@@ -29,19 +30,18 @@
 	const degreeCapForTextDisplay = Number(((400 / 100) * 3).toFixed(2));
 	const maxTitleLength = Number(((radius / 100) * 5.75).toFixed(2));
 
-	let celebrationSound: HTMLAudioElement;
-	// let spinSound = new Audio(wheelSectionSound);
-
 	let spinDuration = 10;
 	let minSpinDuration = storable(1, 'minSpinDuration');
 	let maxSpinDuration = storable(10, 'maxSpinDuration');
 	let isNavigating = false;
 	let isDragging = false;
 	let isSettingsShown = true;
-	let draggingAngle = 0;
 	let draggingStartAngle = 0;
+	let draggingAngle = 0;
 	let winner: IPieItem | null = null;
 
+	let wheelState: WHEEL_STATE = WHEEL_STATE.IDLE;
+	let celebrationSound: HTMLAudioElement;
 	let canvas: HTMLCanvasElement;
 	let context: CanvasRenderingContext2D | null;
 	let wheelElement: HTMLElement;
@@ -49,16 +49,27 @@
 	let wheelHeight: number;
 	let wheelX: number;
 	let wheelY: number;
+	let pie: IPieItem[] = [];
 
-	$: canvasRotation = isDragging && !isNavigating ? draggingAngle : $wheel.angle;
-	$: wheelState = wheel.state;
-	$: pie = createPie($lots);
-	$: $wheelState, isDragging, drawChart(pie);
+	$: angle = wheel.angle;
+	$: normalizedAngle = wheel.normalizedAngle;
+	$: canvasRotation = isDragging && !isNavigating ? draggingAngle : $angle;
 	$: {
-		if (!isNavigating) getWinner($wheel.normalizedAngle);
+		if (!isNavigating) {
+			getWinner($normalizedAngle);
+		}
+	}
+	$: {
+		if (isDragging) {
+			drawChart(pie);
+		}
 	}
 
-	beforeNavigate(() => (isNavigating = true));
+	beforeNavigate(() => {
+		isNavigating = true;
+
+		if (wheelState === WHEEL_STATE.STOPPED) wheel.state.set(WHEEL_STATE.IDLE);
+	});
 
 	onMount(() => {
 		context = canvas.getContext('2d');
@@ -67,15 +78,34 @@
 		onResize();
 		drawChart(pie);
 
-		return wheel.spinStopped.subscribe(() => {
-			const lastPie = createPie($lots);
+		const unsubLots = lots.subscribe((store) => {
+			const updatedPie = createPie(store);
 
-			isSettingsShown = true;
+			pie = updatedPie;
+			drawChart(updatedPie);
 
-			drawChart(lastPie);
-			getWinner($wheel.normalizedAngle, lastPie);
-			celebrate();
+			if (wheelState !== WHEEL_STATE.IDLE && wheelState !== WHEEL_STATE.STOPPED) {
+				getWinner($normalizedAngle);
+			}
 		});
+
+		const unsubWheelState = wheel.state.subscribe((store) => {
+			wheelState = store;
+
+			if (store === WHEEL_STATE.STOPPED) {
+				isSettingsShown = true;
+				getWinner($normalizedAngle);
+				celebrate();
+			}
+			if (store !== WHEEL_STATE.IDLE && store !== WHEEL_STATE.DELAYED) {
+				drawChart(pie);
+			}
+		});
+
+		return () => {
+			unsubLots();
+			unsubWheelState();
+		};
 	});
 
 	function loadAudio() {
@@ -158,7 +188,7 @@
 		);
 		context.closePath();
 
-		if ($wheelState !== WHEEL_STATE.WINNING || isDragging) {
+		if (wheelState !== WHEEL_STATE.STOPPED || isDragging) {
 			context.fillStyle = color;
 			context.strokeStyle = 'white';
 		} else if (isWinner) {
@@ -189,8 +219,6 @@
 		angle: number,
 		targetPie: IPieItem[] = [...pie].sort((a, b) => a.startAngle - b.startAngle)
 	) {
-		if ($wheelState === WHEEL_STATE.WAITING) return;
-
 		let left = 0;
 		let right = targetPie.length - 1;
 
@@ -213,13 +241,14 @@
 		isSettingsShown = false;
 
 		drawChart(pie);
-		wheel.startSpin(spinDuration * 1000);
+		actionManager.startWheelSpin(spinDuration * 1000);
 	}
 
 	function deleteWinner() {
 		if (!winner) return;
 
 		lots.remove(winner.id);
+		wheel.state.set(WHEEL_STATE.IDLE);
 		winner = null;
 	}
 
@@ -234,7 +263,7 @@
 		if (!isDragging) return;
 
 		isDragging = false;
-		wheel.setAngle(draggingAngle);
+		wheel.angle.set(draggingAngle);
 	}
 
 	function onMove(x: number, y: number) {
@@ -242,18 +271,18 @@
 
 		const deltaAngle = calculateAngle(x, y) - draggingStartAngle;
 
-		draggingAngle = deltaAngle + $wheel.angle;
+		draggingAngle = deltaAngle + $angle;
 	}
 
 	function onGrab(x: number, y: number) {
-		if ($wheelState === WHEEL_STATE.SPINNING) return;
+		if (wheelState === WHEEL_STATE.SPINNING) return;
 
 		onResize();
 
 		winner = null;
 		isDragging = true;
 		draggingStartAngle = calculateAngle(x, y);
-		wheelState.set(WHEEL_STATE.WAITING);
+		wheel.state.set(WHEEL_STATE.IDLE);
 	}
 
 	function calculateAngle(currentX: number, currentY: number) {
@@ -299,7 +328,7 @@
 				{/if}
 			</div>
 		{/if}
-		{#if isSettingsShown && $wheelState !== WHEEL_STATE.SPINNING}
+		{#if isSettingsShown && wheelState !== WHEEL_STATE.SPINNING && wheelState !== WHEEL_STATE.DELAYED}
 			<div class="wheel-settings-wrapper" transition:fade={{ duration: 200 }}>
 				<div class="winner-options" class:spaced={winner !== null}>
 					<div style="display: flex; flex-direction: row;">
@@ -349,7 +378,7 @@
 				</div>
 			</div>
 		{/if}
-		{#if $wheelState !== WHEEL_STATE.SPINNING && !isDragging}
+		{#if wheelState !== WHEEL_STATE.SPINNING && wheelState !== WHEEL_STATE.DELAYED && !isDragging}
 			<div class="hide-button-wrapper">
 				<TextButton
 					text={isSettingsShown ? 'Скрыть' : 'Показать'}
@@ -363,7 +392,7 @@
 		<div
 			style="--wheel-rotation: {canvasRotation}deg; --wheel-outline: {winner?.color}"
 			class="wheel-canvas-wrapper"
-			class:disabled={$wheelState === WHEEL_STATE.SPINNING}
+			class:disabled={wheelState === WHEEL_STATE.SPINNING || wheelState === WHEEL_STATE.DELAYED}
 			aria-hidden
 			bind:this={wheelElement}
 			on:mousedown={(e) => onGrab(e.clientX, e.clientY)}
@@ -451,7 +480,7 @@
 			cursor: grab;
 
 			&.disabled {
-				cursor: default;
+				pointer-events: none;
 
 				&:active {
 					cursor: default;

@@ -1,11 +1,7 @@
 import type { IPreset } from '$lib/interfaces';
 import storable from './storable';
 
-const initialPresets: IPreset[] = [
-  {
-    title: 'Правила', text: ``
-  }
-]
+const initialPresets: IPreset[] = [{ title: 'Правила', text: `` }];
 
 function createPresets() {
   const { subscribe, set, update } = storable<IPreset[]>(initialPresets, 'presets');

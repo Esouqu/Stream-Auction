@@ -19,15 +19,14 @@
 	import TransitionContainer from '$lib/components/TransitionContainer.svelte';
 	import TestKit from '$lib/components/TestKit.svelte';
 	import LotPreview from '$lib/components/LotPreview.svelte';
-	import subscribeStores from '$lib/stores/storesBus';
 	import Rules from '$lib/components/Rules.svelte';
-	import background from '$lib/stores/background';
 	import IntensityTracker from '$lib/components/IntensityTracker.svelte';
-	import minIntensityValue from '$lib/stores/minIntensityValue';
 	import discordIconWhite from '$lib/assets/discord-logo/icon_clyde_white_RGB.svg';
 	import githubIconWhite from '$lib/assets/github-mark/github-mark-white.svg';
 	import boostyIcon from '$lib/assets/boosty_logo/White.svg';
 	import Contact from '$lib/components/Contact.svelte';
+	import settings from '$lib/stores/settings';
+	import actionManager from '$lib/stores/actionManager';
 
 	const customRewardTitle = 'Stream Auction - Бесплатный Заказ';
 
@@ -44,9 +43,11 @@
 	let isTotalShown = false;
 	let isBackgroundVideoPaused = false;
 
-	$: stopSpinAction = donations.stopSpinAction;
-	$: continueSpinAction = donations.continueSpinAction;
-	$: currentSpinPrice = donations.currentSpinPrice;
+	$: stopSpinAction = settings.stopSpinAction;
+	$: extendSpinAction = settings.extendSpinAction;
+	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
+	$: intensity = settings.intensity;
+	$: background = settings.background;
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: topLots = sortedLots.slice(0, 10);
 	$: total = getTotal($lots.map((l) => l.value));
@@ -55,7 +56,7 @@
 		const validationInterval = 1000 * 60 * 60;
 		let validationIntervalId: NodeJS.Timeout;
 
-		subscribeStores();
+		actionManager.initialize();
 
 		if (twitchSession) {
 			validationIntervalId = setInterval(async () => {
@@ -260,17 +261,11 @@
 				const username = donation.username ?? 'Аноним';
 				const roundedAmount = Math.round(donation.amount_in_user_currency);
 
-				donations.add({
-					id: donation.id,
-					type: 'Donation Alerts',
+				actionManager.processDonation({
+					...donation,
 					username,
-					amount: donation.amount,
-					amount_in_user_currency: roundedAmount,
-					message: donation.message,
-					currency: donation.currency,
-					created_at: donation.created_at,
-					mostSimilarLot: undefined,
-					isInstant: false
+					type: 'Donation Alerts',
+					amount_in_user_currency: roundedAmount
 				});
 			}
 		});
@@ -299,9 +294,9 @@
 	{/if}
 
 	<div style="position: fixed; z-index: 0; width: 100%">
-		{#if $minIntensityValue.isEnabled}
+		{#if $intensity.isEnabled}
 			<IntensityTracker
-				minIntensityValue={$minIntensityValue.price}
+				minIntensityValue={$intensity.price}
 				isDonationsOn={!!donationAlertsWebSocket}
 			/>
 		{/if}
@@ -317,7 +312,7 @@
 					title="Возможности Зрителя"
 				>
 					<Snackbar>
-						<span>Остановить колесо, добавив ваш вариант</span>
+						<span>Остановить колесо, добавив свой вариант</span>
 						{#if $stopSpinAction.isEnabled}
 							<span>{$stopSpinAction.price} Руб</span>
 						{:else}
@@ -325,10 +320,10 @@
 						{/if}
 					</Snackbar>
 					<Snackbar>
-						<span>Продлить кручение колеса</span>
-						{#if $continueSpinAction.isEnabled}
-							<TransitionContainer trigger={$currentSpinPrice}>
-								<span>{$currentSpinPrice} Руб</span>
+						<span>Продлить кручение колеса, добавив свой вариант</span>
+						{#if $extendSpinAction.isEnabled}
+							<TransitionContainer trigger={$currentExtendSpinPrice}>
+								<span>{$currentExtendSpinPrice} Руб</span>
 							</TransitionContainer>
 						{:else}
 							<span>Х</span>

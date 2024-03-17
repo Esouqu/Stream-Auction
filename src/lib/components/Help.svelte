@@ -17,7 +17,7 @@
 <style lang="scss">
 	.help {
 		display: inline-block;
-		height: 30px;
+		height: 25px;
 
 		& img {
 			height: 100%;

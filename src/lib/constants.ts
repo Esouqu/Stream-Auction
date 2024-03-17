@@ -4,9 +4,23 @@ import listIcon from '$lib/assets/list_icon.svg';
 import settingsIcon from '$lib/assets/settings_icon.svg';
 
 export enum WHEEL_STATE {
-  WAITING,
-  SPINNING,
-  WINNING,
+  IDLE = 'idle',
+  SPINNING = 'spinning',
+  STOPPED = 'stopped',
+  DELAYED = 'delayed',
+}
+
+export enum ACTION_MANAGER_STATE {
+  IDLE = 'idle',
+  AUCTIONING = 'auctioning',
+  SPINNING_WHEEL = 'spinning wheel',
+  DELAYING_WHEEL_WINNER = 'delaying wheel winner',
+}
+
+export enum TIMER_STATE {
+  IDLE = 'idle',
+  PAUSED = 'paused',
+  RUNNING = 'running',
 }
 
 export enum NAVIGATION_ROUTES {

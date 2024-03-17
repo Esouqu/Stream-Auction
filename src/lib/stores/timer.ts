@@ -1,161 +1,101 @@
-import type { ICountdownTimerState } from '$lib/interfaces';
-import { derived, get, writable } from 'svelte/store';
-import lots from './lots';
-import wheel from './wheel';
-import { WHEEL_STATE } from '$lib/constants';
-import storable from './storable';
+import { get, writable } from 'svelte/store';
+import settings from './settings';
+import { TIMER_STATE } from '$lib/constants';
 
 function createCountdownTimer() {
-  const baseTime = storable(10, 'baseTime');
-  const baseTimeInMs = derived(baseTime, ($baseTime) => $baseTime * 1000 * 60);
-  const timer = writable<ICountdownTimerState>({
-    timeRemaining: get(baseTimeInMs),
-    isRunning: false,
-  });
+  const state = writable(TIMER_STATE.IDLE);
+  const time = writable(0);
 
-  const itemAddedAction = storable({
-    isEnabled: true,
-    seconds: 60,
-  }, 'itemAddedAction');
-  const leaderChangedAction = storable({
-    isEnabled: true,
-    seconds: 120,
-  }, 'leaderChangedAction');
-
+  let baseTime = 0;
   let animationId = 0;
   let animationStartTime = 0;
   let animationPausedTime = 0;
-  let currentTime = get(baseTimeInMs);
+  let currentTime = baseTime;
+  let timerState: TIMER_STATE;
 
-  let wheelState: WHEEL_STATE;
+  state.subscribe((s) => timerState = s);
+  settings.timerBaseTime.subscribe((s) => {
+    const minutesInMs = s * 1000 * 60;
 
-  function init() {
-    wheel.state.subscribe((s) => wheelState = s);
-    wheel.spinStarted.subscribe(({ ms }) => _startOnSpinStarted(ms));
-    wheel.spinStopped.subscribe(() => reset());
-    wheel.spinExtended.subscribe(({ ms }) => add(ms));
-    lots.itemAdded.subscribe(() => _addTimeOnItemAdded());
-    lots.leaderChanged.subscribe(() => _addTimeOnLeaderChanged());
-  }
+    if (timerState === TIMER_STATE.RUNNING) reset();
+    baseTime = minutesInMs;
+    currentTime = baseTime;
+    time.set(minutesInMs);
+  });
 
   function tick(frameTIme: number) {
     const elapsedTime = frameTIme - animationStartTime;
+    const remaining = currentTime - elapsedTime;
 
-    timer.update((state) => {
-      const remaining = currentTime - elapsedTime;
+    if (remaining <= 0) {
+      currentTime = 0;
+      animationPausedTime = 0;
+      cancelAnimationFrame(animationId);
 
-      if (remaining <= 0) {
-        currentTime = 0;
-        animationPausedTime = 0;
-        cancelAnimationFrame(animationId);
-
-        return { timeRemaining: 0, isRunning: false };
-      }
-
+      time.set(0);
+      state.set(TIMER_STATE.IDLE);
+    } else {
+      time.set(Math.round(remaining));
       animationId = requestAnimationFrame(tick);
-
-      return { ...state, timeRemaining: Math.round(remaining) };
-    })
+    }
   }
 
-  function start() {
-    timer.update((state) => {
-      if (state.isRunning || state.timeRemaining <= 0) return state;
-      animationStartTime = performance.now() - animationPausedTime;
+  function start(ms?: number) {
+    // if (timerState === TIMER_STATE.RUNNING) return;
 
-      requestAnimationFrame(tick);
+    if (ms) setTime(ms);
 
-      return { ...state, isRunning: true }
-    });
+    animationStartTime = performance.now() - animationPausedTime;
+    state.set(TIMER_STATE.RUNNING);
+    requestAnimationFrame(tick);
   }
 
   function pause() {
-    timer.update((state) => {
-      animationPausedTime = performance.now() - animationStartTime;
+    if (timerState === TIMER_STATE.PAUSED) return;
 
-      // DON"T FORGET TO CHECK (TIMER.SET ???)
-      if (state.isRunning) {
-        cancelAnimationFrame(animationId);
-        timer.set({ timeRemaining: state.timeRemaining, isRunning: false });
-      }
-
-      return { ...state, isRunning: false };
-    })
+    animationPausedTime = performance.now() - animationStartTime;
+    cancelAnimationFrame(animationId);
+    state.set(TIMER_STATE.PAUSED);
   }
 
   function add(ms: number) {
     currentTime += ms;
-    timer.update((state) => ({ ...state, timeRemaining: state.timeRemaining + ms }));
+    time.update((state) => state + ms);
   }
 
   function subtract(ms: number) {
-    timer.update((state) => {
-      if (state.timeRemaining > 0) {
-        currentTime -= ms;
+    time.update((state) => {
+      if (state <= 0) return state;
 
-        return { ...state, timeRemaining: Math.max(0, state.timeRemaining - ms) };
-      } else {
-        return state;
-      }
+      currentTime -= ms;
+
+      return Math.max(0, state - ms);
     });
-
   }
 
   function reset() {
-    currentTime = get(baseTimeInMs);
-    animationPausedTime = 0;
     cancelAnimationFrame(animationId);
-    timer.set({ timeRemaining: get(baseTimeInMs), isRunning: false });
-  }
-
-  function setInitialTime(minutes: number) {
-    if (get(timer).isRunning) reset();
-
-    baseTime.set(minutes);
-    currentTime = get(baseTimeInMs);
-    timer.update((state) => ({ ...state, timeRemaining: get(baseTimeInMs) }));
+    currentTime = baseTime;
+    animationPausedTime = 0;
+    time.set(baseTime);
+    state.set(TIMER_STATE.IDLE);
   }
 
   function setTime(ms: number) {
     currentTime = ms;
-    timer.update((state) => ({ ...state, timeRemaining: ms }));
-  }
-
-  function _startOnSpinStarted(ms: number) {
-    reset();
-    setTime(ms);
-    start();
-  }
-
-  function _addTimeOnItemAdded() {
-    const { isEnabled, seconds } = get(itemAddedAction);
-
-    if (!get(timer).isRunning || wheelState === WHEEL_STATE.SPINNING || !isEnabled) return;
-
-    add(seconds * 1000);
-  }
-
-  function _addTimeOnLeaderChanged() {
-    const { isEnabled, seconds } = get(leaderChangedAction);
-
-    if (!get(timer).isRunning || wheelState === WHEEL_STATE.SPINNING || !isEnabled) return;
-
-    add(seconds * 1000);
+    time.set(ms);
   }
 
   return {
-    subscribe: timer.subscribe,
+    baseTime,
+    time,
+    state,
     start,
     pause,
     add,
     subtract,
     reset,
-    setInitialTime,
     setTime,
-    itemAddedAction,
-    leaderChangedAction,
-    baseTime,
-    init
   };
 };
 

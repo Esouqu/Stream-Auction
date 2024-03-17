@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { fly } from 'svelte/transition';
 	import flameGif from '$lib/assets/flame.gif';
 	import donations from '$lib/stores/donations';
 	import lots from '$lib/stores/lots';
@@ -16,20 +15,14 @@
 	let intensityIntervalId: NodeJS.Timeout;
 
 	onMount(() => {
-		const unsubDonations = donations.donationQueued.subscribe(({ donation }) => {
-			if (isDonationsOn) {
-				processValue(donation.amount_in_user_currency);
-			}
+		const unsubDonations = donations.itemAdded.subscribe((donation) => {
+			if (isDonationsOn && donation) processValue(donation.amount_in_user_currency);
 		});
 		const unsubLots = lots.itemAdded.subscribe((lot) => {
-			if (!isDonationsOn && lot) {
-				processValue(lot.value);
-			}
+			if (!isDonationsOn && lot) processValue(lot.value);
 		});
 		const unsubLotsValue = lots.lotValueChanged.subscribe((lot) => {
-			if (!isDonationsOn && lot?.addedValue) {
-				processValue(lot.addedValue);
-			}
+			if (!isDonationsOn && lot?.addedValue) processValue(lot.addedValue);
 		});
 
 		return () => {
@@ -69,7 +62,6 @@
 	style="--flame-gif: url({flameGif}); --flame-size: {40 + 15 * intensityAmount}vh;"
 	class="flame"
 	class:visible={isVisible}
-	transition:fly={{ y: 300, duration: 1000 }}
 />
 
 <style lang="scss">

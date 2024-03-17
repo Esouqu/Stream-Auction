@@ -1,22 +1,18 @@
-import { get, writable } from 'svelte/store';
-import donations from './donations';
-import signal from './signal';
+import { derived, writable } from 'svelte/store';
 import { WHEEL_STATE } from '$lib/constants';
+import settings from './settings';
 
 function createWheel() {
-  const { subscribe, update } = writable({
-    angle: 0,
-    normalizedAngle: 0,
-  });
-  const state = writable(WHEEL_STATE.WAITING);
+  const state = writable(WHEEL_STATE.IDLE);
+  const angle = writable(0);
+  const normalizedAngle = derived(angle, ($angle) => {
+    const angleModulo = Math.abs($angle % 360);
+    const isClockwiseRotation = $angle >= 0;
 
-  // value of signal writable store should be inside the object 
-  // so assignment to it would trigger reactivity even if value is the same as previous
-  const spinStarted = signal(writable({ ms: 0 }));
-  const spinStopped = signal(writable({ ms: 0 }));
-  const spinExtended = signal(writable({ ms: 0 }));
+    return isClockwiseRotation ? 360 - angleModulo : angleModulo;
+  })
 
-  const maxSpeed = 10;
+  const maxSpeed = 5;
   const accelerationTime = 0.1;
   const decelerationTime = 0.3;
   const slowDownTime = 0.6;
@@ -26,38 +22,13 @@ function createWheel() {
   let speed = 0;
   let animationId: number;
   let spinStartTime: number;
+  let wheelState: WHEEL_STATE;
+  let wheelWinnerDelay: { isEnabled: boolean, seconds: number };
 
-  function init() {
-    donations.donationQueued.subscribe(({ shouldStop, shouldContinue, spinSeconds }) => {
-      if (get(state) !== WHEEL_STATE.SPINNING) return;
-
-      if (shouldStop) _stop()
-      else if (shouldContinue) _continueSpin(spinSeconds * 1000);
-    });
-  }
-
-  function startSpin(ms: number) {
-    if (get(state) === WHEEL_STATE.SPINNING || spinDuration < 1) return;
-
-    const randomAngle = Math.floor(Math.random() * 360);
-
-    speed = maxSpeed;
-    spinDuration = ms;
-
-    update(() => ({
-      angle: randomAngle,
-      normalizedAngle: 0,
-    }));
-
-    state.set(WHEEL_STATE.SPINNING);
-    spinStarted.set({ ms });
-
-    requestAnimationFrame(_giveMoment);
-  }
-
-  function setAngle(deg: number) {
-    update((state) => ({ ...state, angle: deg }));
-  }
+  state.subscribe((s) => wheelState = s);
+  settings.wheelWinnerDelay.subscribe((store) => {
+    wheelWinnerDelay = store;
+  });
 
   function _giveMoment(currentTime: number) {
     if (!spinStartTime) spinStartTime = currentTime;
@@ -65,9 +36,17 @@ function createWheel() {
     const elapsedTime = currentTime - spinStartTime;
     const progress = Math.min(elapsedTime / spinDuration, 1);
 
-    if (progress >= 1 || get(state) === WHEEL_STATE.WINNING) {
-      _stop();
+    if (progress >= 1) {
+      if (wheelWinnerDelay.isEnabled) {
+        state.set(WHEEL_STATE.DELAYED);
+      } else {
+        state.set(WHEEL_STATE.STOPPED);
+      }
 
+      cancelAnimationFrame(animationId);
+      return;
+    } else if (wheelState === WHEEL_STATE.STOPPED) {
+      cancelAnimationFrame(animationId);
       return;
     }
 
@@ -82,39 +61,54 @@ function createWheel() {
       speed = 1 * (1 - slowdownProgress);
     }
 
-    update((state) => {
-      const angleModulo = Math.abs((state.angle + speed) % 360);
-      const isClockwiseRotation = (state.angle + speed) >= 0;
-      const normalizedAngle = isClockwiseRotation ? 360 - angleModulo : angleModulo;
-
-      return { ...state, angle: state.angle + speed, normalizedAngle }
-    });
-
+    angle.update((state) => state + speed);
     animationId = requestAnimationFrame(_giveMoment);
   }
 
-  function _continueSpin(ms: number) {
-    spinDuration += ms;
-    spinExtended.set({ ms })
+  function startSpin(ms: number) {
+    if (wheelState === WHEEL_STATE.SPINNING || spinDuration <= 0) return;
+
+    const randomAngle = Math.floor(Math.random() * 360);
+
+    speed = maxSpeed;
+    spinStartTime = 0;
+    spinDuration = ms;
+
+    angle.set(randomAngle);
+    state.set(WHEEL_STATE.SPINNING);
+
+    requestAnimationFrame(_giveMoment);
   }
 
-  function _stop() {
-    cancelAnimationFrame(animationId);
+  function restartSpin(ms: number) {
+    speed = maxSpeed;
     spinStartTime = 0;
-    state.set(WHEEL_STATE.WINNING);
-    spinStopped.set({ ms: 0 });
+    spinDuration = ms;
+
+    state.set(WHEEL_STATE.SPINNING);
+
+    requestAnimationFrame(_giveMoment);
+  }
+
+  function extendSpin(ms: number) {
+    spinDuration += ms;
+  }
+
+  function stopSpin() {
+    cancelAnimationFrame(animationId);
+
+    state.set(WHEEL_STATE.STOPPED);
   }
 
   return {
-    subscribe,
     state,
+    angle,
+    normalizedAngle,
     spinDuration,
     startSpin,
-    setAngle,
-    spinStarted,
-    spinStopped,
-    spinExtended,
-    init
+    extendSpin,
+    stopSpin,
+    restartSpin,
   }
 }
 

@@ -1,14 +1,17 @@
 <script lang="ts">
-	import { WHEEL_STATE } from '$lib/constants';
+	import { TIMER_STATE, WHEEL_STATE } from '$lib/constants';
 	import { formatTime } from '$lib/utils';
 	import timer from '$lib/stores/timer';
 	import wheel from '$lib/stores/wheel';
 	import Button from './Button.svelte';
+	import actionManager from '$lib/stores/actionManager';
 
 	export let timeToAdd: number = 60000;
 
-	$: currentTime = formatTime($timer.timeRemaining);
+	$: time = timer.time;
 	$: wheelState = wheel.state;
+	$: timerState = timer.state;
+	$: currentTime = formatTime($time);
 </script>
 
 <div class="timer">
@@ -16,20 +19,22 @@
 	<div class="timer-buttons-wrapper">
 		{#if $wheelState === WHEEL_STATE.SPINNING}
 			<h3>Происходит кручение колеса...</h3>
+		{:else if $wheelState === WHEEL_STATE.DELAYED}
+			<h3>Задержка...</h3>
 		{:else}
-			{#if !$timer.isRunning}
+			{#if $timerState !== TIMER_STATE.RUNNING}
 				<Button
 					--button-size="60px"
 					--button-p="10px"
 					icon="start"
-					on:click={() => timer.start()}
+					on:click={() => actionManager.startAuction()}
 				/>
-			{:else}
+			{:else if $timerState === TIMER_STATE.RUNNING}
 				<Button
 					--button-size="60px"
 					--button-p="10px"
 					icon="pause"
-					on:click={() => timer.pause()}
+					on:click={() => actionManager.pauseAuction()}
 				/>
 			{/if}
 			<Button --button-size="60px" --button-p="10px" icon="reset" on:click={() => timer.reset()} />

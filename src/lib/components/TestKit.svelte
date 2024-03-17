@@ -1,4 +1,5 @@
 <script lang="ts">
+	import actionManager from '$lib/stores/actionManager';
 	import donations from '$lib/stores/donations';
 	import Input from './Input.svelte';
 	import NumberInput from './NumberInput.svelte';
@@ -23,7 +24,7 @@
 		text="Донат"
 		on:click={() =>
 			amount &&
-			donations.add({
+			actionManager.processDonation({
 				id: Math.floor(Math.random() * 100000),
 				username: username || 'Аноним',
 				type,
@@ -31,9 +32,7 @@
 				amount: amount,
 				amount_in_user_currency: amount,
 				currency,
-				mostSimilarLot: undefined,
-				created_at: Date.now().toString(),
-				isInstant: false
+				created_at: Date.now().toString()
 			})}
 	/>
 </div>

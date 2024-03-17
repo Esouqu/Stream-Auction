@@ -1,17 +1,12 @@
 <script lang="ts">
-	import background from '$lib/stores/background';
+	import settings from '$lib/stores/settings';
 
 	export let title: string = '';
 
-	$: backgroundTransparency = background.transparency;
+	$: backgroundTransparency = settings.transparency;
 </script>
 
-<div
-	class="card"
-	class:transparent={!!$background.url}
-	class:titless={!title}
-	style="--card-opacity: {$backgroundTransparency};"
->
+<div class="card" class:titless={!title} style="--card-opacity: {$backgroundTransparency};">
 	{#if title}
 		<h3 class="card__title">
 			{title}
@@ -59,10 +54,6 @@
 			overflow: var(--card-flow, unset);
 		}
 
-		&.transparent::before {
-			opacity: var(--card-opacity);
-		}
-
 		&::before {
 			content: '';
 			position: absolute;
@@ -70,6 +61,7 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
+			opacity: var(--card-opacity);
 			background-color: var(--surface);
 		}
 	}

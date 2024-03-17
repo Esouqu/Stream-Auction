@@ -73,14 +73,12 @@ export interface IDonationDataFull {
 export interface IDonationData {
   id: number | string;
   type: 'Twitch' | 'Donation Alerts';
-  isInstant: boolean;
   username: string;
   amount: number;
   amount_in_user_currency: number;
   currency: string;
   message: string;
   created_at: string;
-  mostSimilarLot?: ILot;
 }
 
 export interface ITwitchUserData {
@@ -136,4 +134,11 @@ export interface ITwitchRedeemedReward {
     user_input: string;
     status: 'FULFILLED' | 'UNFULFILLED'
   }
+}
+
+export interface IProcessedDonationData extends IDonationData {
+  // isInstant indicates that donation will be showed as notification
+  isInstant: boolean;
+  lot?: ILot;
+  mostSimilarLot?: ILot;
 }
