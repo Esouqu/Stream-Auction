@@ -10,25 +10,26 @@ function createWheel() {
     const isClockwiseRotation = $angle >= 0;
 
     return isClockwiseRotation ? 360 - angleModulo : angleModulo;
-  })
+  });
 
-  const maxSpeed = 5;
+  const initialMaxSpeed = 5;
+  const minSpeed = 1;
+  const decayFactor = 0.95;
   const accelerationTime = 0.1;
   const decelerationTime = 0.3;
   const slowDownTime = 0.6;
   const generalTime = accelerationTime + slowDownTime;
-
-  let spinDuration = 10;
+  
+  let maxSpeed = initialMaxSpeed;
   let speed = 0;
+  let spinDuration = 10;
   let animationId: number;
   let spinStartTime: number;
-  let wheelState: WHEEL_STATE;
+  let _state: WHEEL_STATE;
   let wheelWinnerDelay: { isEnabled: boolean, seconds: number };
 
-  state.subscribe((s) => wheelState = s);
-  settings.wheelWinnerDelay.subscribe((store) => {
-    wheelWinnerDelay = store;
-  });
+  state.subscribe((store) => _state = store);
+  settings.wheelWinnerDelay.subscribe((store) => wheelWinnerDelay = store);
 
   function _giveMoment(currentTime: number) {
     if (!spinStartTime) spinStartTime = currentTime;
@@ -45,7 +46,7 @@ function createWheel() {
 
       cancelAnimationFrame(animationId);
       return;
-    } else if (wheelState === WHEEL_STATE.STOPPED) {
+    } else if (_state === WHEEL_STATE.STOPPED) {
       cancelAnimationFrame(animationId);
       return;
     }
@@ -66,37 +67,35 @@ function createWheel() {
   }
 
   function startSpin(ms: number) {
-    if (wheelState === WHEEL_STATE.SPINNING || spinDuration <= 0) return;
+    if (_state === WHEEL_STATE.SPINNING || spinDuration <= 0) return;
 
     const randomAngle = Math.floor(Math.random() * 360);
 
-    speed = maxSpeed;
+    maxSpeed = 5;
     spinStartTime = 0;
     spinDuration = ms;
 
     angle.set(randomAngle);
     state.set(WHEEL_STATE.SPINNING);
-
     requestAnimationFrame(_giveMoment);
   }
 
   function restartSpin(ms: number) {
-    // speed = maxSpeed;
-    // spinStartTime = 0;
-    spinDuration += ms;
+    spinStartTime = 0;
+    spinDuration = ms;
+    maxSpeed = Math.max(maxSpeed * decayFactor, minSpeed);
 
     state.set(WHEEL_STATE.SPINNING);
-
     requestAnimationFrame(_giveMoment);
   }
 
   function extendSpin(ms: number) {
     spinDuration += ms;
+    maxSpeed = Math.max(maxSpeed * decayFactor, minSpeed);
   }
 
   function stopSpin() {
     cancelAnimationFrame(animationId);
-
     state.set(WHEEL_STATE.STOPPED);
   }
 

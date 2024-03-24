@@ -29,7 +29,7 @@
 		overflow: hidden;
 
 		&.titless .card-inner {
-			padding: 20px;
+			padding: var(--card-p, 20px);
 		}
 
 		&__title {
