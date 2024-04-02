@@ -30,7 +30,7 @@ function createActionManager() {
   function initialize() {
     state.subscribe((store) => _state = store);
     lots.subscribe((store) => {
-      const newLeader = store.sort((a, b) => b.value - a.value)[0];
+      const newLeader = [...store].sort((a, b) => b.value - a.value)[0];
 
       if (_state === ACTION_MANAGER_STATE.AUCTIONING) {
         if (!_previousLotsLeader && newLeader) _previousLotsLeader = newLeader;
