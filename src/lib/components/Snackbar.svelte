@@ -1,7 +1,10 @@
 <script lang="ts">
+	import settings from '$lib/stores/settings';
+
+	$: transparency = settings.transparency;
 </script>
 
-<div class="snackbar">
+<div class="snackbar" style="--snackbar-opacity: {$transparency};">
 	<div class="snackbar-inner">
 		<slot />
 	</div>
@@ -14,25 +17,28 @@
 		flex-direction: column;
 		border-radius: 5px;
 		width: 100%;
-		box-shadow: var(--elevation-3);
-		font-size: 18px;
-		font-weight: 600;
+		box-shadow: var(--elevation-1);
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
 		overflow: hidden;
-		background-color: var(--primary-container);
 
-		&-inner {
-			display: grid;
-			grid-template-columns: 1fr auto;
-			align-items: center;
-			gap: 20px;
-			padding: 10px;
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			opacity: var(--snackbar-opacity, 1);
+			background-color: var(--surface-bright);
 		}
 
-		/* &:not(:last-child)::after {
-			content: '';
-			width: 100%;
-			height: 1px;
-			background-color: var(--outline-variant);
-		} */
+		&-inner {
+			z-index: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+			padding: var(--snackbar-p, 20px);
+		}
 	}
 </style>

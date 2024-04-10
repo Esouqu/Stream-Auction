@@ -3,6 +3,8 @@
 	import flameGif from '$lib/assets/flame.gif';
 	import donations from '$lib/stores/donations';
 	import lots from '$lib/stores/lots';
+	import { page } from '$app/stores';
+	import { NAVIGATION_ROUTES } from '$lib/constants';
 
 	const INTENSITY_DECREASE_TIME = 15;
 	const MAX_INTENSITY = 4;
@@ -58,11 +60,13 @@
 	}
 </script>
 
-<div
-	style="--flame-gif: url({flameGif}); --flame-size: {40 + 15 * intensityAmount}vh;"
-	class="flame"
-	class:visible={isVisible}
-/>
+{#if $page.route.id === NAVIGATION_ROUTES.LOTS}
+	<div
+		style="--flame-gif: url({flameGif}); --flame-size: {40 + 15 * intensityAmount}vh;"
+		class="flame"
+		class:visible={isVisible}
+	/>
+{/if}
 
 <style lang="scss">
 	.flame {

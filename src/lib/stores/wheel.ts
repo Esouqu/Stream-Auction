@@ -1,6 +1,8 @@
 import { derived, writable } from 'svelte/store';
 import { WHEEL_STATE } from '$lib/constants';
 import settings from './settings';
+import { tweened } from 'svelte/motion';
+import { cubicOut } from 'svelte/easing';
 
 function createWheel() {
   const state = writable(WHEEL_STATE.IDLE);
@@ -11,6 +13,10 @@ function createWheel() {
 
     return isClockwiseRotation ? 360 - angleModulo : angleModulo;
   });
+  const currentMaxSpeed = tweened(5, {
+    duration: 400,
+    easing: cubicOut,
+  });
 
   const initialMaxSpeed = 5;
   const minSpeed = 1;
@@ -19,7 +25,7 @@ function createWheel() {
   const decelerationTime = 0.3;
   const slowDownTime = 0.6;
   const generalTime = accelerationTime + slowDownTime;
-  
+
   let maxSpeed = initialMaxSpeed;
   let speed = 0;
   let spinDuration = 10;
@@ -71,10 +77,11 @@ function createWheel() {
 
     const randomAngle = Math.floor(Math.random() * 360);
 
-    maxSpeed = 5;
+    maxSpeed = initialMaxSpeed;
     spinStartTime = 0;
     spinDuration = ms;
 
+    currentMaxSpeed.set(initialMaxSpeed);
     angle.set(randomAngle);
     state.set(WHEEL_STATE.SPINNING);
     requestAnimationFrame(_giveMoment);
@@ -86,12 +93,15 @@ function createWheel() {
     maxSpeed = Math.max(maxSpeed * decayFactor, minSpeed);
 
     state.set(WHEEL_STATE.SPINNING);
+    currentMaxSpeed.set(Math.max(maxSpeed * decayFactor, minSpeed));
     requestAnimationFrame(_giveMoment);
   }
 
   function extendSpin(ms: number) {
     spinDuration += ms;
     maxSpeed = Math.max(maxSpeed * decayFactor, minSpeed);
+
+    currentMaxSpeed.set(Math.max(maxSpeed * decayFactor, minSpeed));
   }
 
   function stopSpin() {
@@ -104,6 +114,7 @@ function createWheel() {
     angle,
     normalizedAngle,
     spinDuration,
+    currentMaxSpeed,
     startSpin,
     extendSpin,
     stopSpin,

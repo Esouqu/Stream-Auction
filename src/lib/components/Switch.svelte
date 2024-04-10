@@ -23,11 +23,12 @@
 <style lang="scss">
 	.switch {
 		position: relative;
-		width: 48px;
-		height: 25px;
+		min-width: 42px;
+		height: 24px;
 		padding: 0;
 		border: 0;
-		border-radius: 30px;
+		border-radius: 100px;
+		outline: 2px solid #b4b4b4;
 		background-color: var(--neutral);
 		opacity: 1;
 		transition: 0.2s;
@@ -40,21 +41,22 @@
 		&::after {
 			content: '';
 			position: absolute;
-			left: 15%;
+			left: 3px;
 			top: 50%;
 			translate: 0 -50%;
 			border-radius: 50%;
-			width: 12px;
-			height: 12px;
-			box-shadow: 0 1px 2px black;
+			width: 18px;
+			height: 18px;
+			box-shadow: 0 0px 2px black;
 			background-color: white;
 			transition: 0.2s;
 		}
 		&.enabled {
+			outline-color: var(--primary-70);
 			background-color: var(--primary-50);
 
 			&::after {
-				left: 60%;
+				translate: calc(100%) -50%;
 			}
 		}
 	}

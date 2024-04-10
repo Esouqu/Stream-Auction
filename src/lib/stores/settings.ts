@@ -3,17 +3,17 @@ import storable from './storable';
 
 interface IBackground {
   url: string;
-  type: 'Картинка' | 'Видео';
+  type: 'image' | 'video';
 }
 
 function createSettings() {
   const background = storable<IBackground>({
     url: '',
-    type: 'Картинка'
+    type: 'image'
   }, 'background');
-  const transparency = storable(0.7, 'transparency');
+  const transparency = storable(1, 'transparency');
   const intensity = storable({
-    isEnabled: true,
+    isEnabled: false,
     price: 1000,
   }, 'intensity');
   const wheelWinnerDelay = storable({
@@ -30,6 +30,7 @@ function createSettings() {
     price: 30,
     step: 10,
   }, 'extendSpinAction');
+  const addLotWhileSpinAction = storable(true, 'addLotWhileSpinAction');
   const itemAddedAction = storable({
     isEnabled: true,
     seconds: 60,
@@ -40,6 +41,8 @@ function createSettings() {
   }, 'leaderChangedAction');
   const timerBaseTime = storable(10, 'timerBaseTime');
   const currentExtendSpinPrice = writable(get(extendSpinAction).price);
+  let minSpinDuration = storable(10, 'minSpinDuration');
+  let maxSpinDuration = storable(100, 'maxSpinDuration');
 
   function increaseExtendSpinPrice() {
     currentExtendSpinPrice.update((state) => state + get(extendSpinAction).step);
@@ -62,8 +65,11 @@ function createSettings() {
     extendSpinAction,
     itemAddedAction,
     leaderChangedAction,
+    addLotWhileSpinAction,
     timerBaseTime,
     currentExtendSpinPrice,
+    minSpinDuration,
+    maxSpinDuration,
     increaseExtendSpinPrice,
     resetBackground,
     setBackgroundType,

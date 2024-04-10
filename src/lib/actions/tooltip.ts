@@ -13,7 +13,7 @@ const tooltip: Action<HTMLElement, Partial<Props>> = (node: HTMLElement, options
   const tool = tippy(node, {
     ...options,
     ...initialOptions
-  })
+  });
 
   function update() {
     tool.setProps({

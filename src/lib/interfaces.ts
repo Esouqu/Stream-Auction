@@ -38,6 +38,10 @@ export interface IAuthTokenData {
   refresh_token: string;
 }
 
+export interface IDonationAlertsRefreshToken extends Omit<IAuthTokenData, 'refresh_token'> {
+  refresh_token?: string;
+}
+
 export interface IDonationAlertsUserData {
   id: number;
   code: string;

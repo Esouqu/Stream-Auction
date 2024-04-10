@@ -70,20 +70,20 @@
 			<div class="donation-buttons-wrapper">
 				<Button
 					icon="listAddItem"
-					color={type === 'Twitch' ? 'white' : 'black'}
+					iconColor={type === 'Twitch' ? 'white' : 'black'}
 					on:click={handleAdd}
 				/>
 				{#if mostSimilarLot}
 					<Button
 						icon="plus"
-						color={type === 'Twitch' ? 'white' : 'black'}
-						text={mostSimilarLot.title}
+						iconColor={type === 'Twitch' ? 'white' : 'black'}
+						title={mostSimilarLot.title}
 						on:click={handleAddSimilar}
 					/>
 				{/if}
 				<Button
 					icon="delete"
-					color={type === 'Twitch' ? 'white' : 'black'}
+					iconColor={type === 'Twitch' ? 'white' : 'black'}
 					on:click={() => donations.remove(id)}
 				/>
 			</div>
@@ -104,7 +104,7 @@
 		&-wrapper {
 			position: relative;
 			border-radius: 5px;
-			width: 360px;
+			width: 100%;
 			box-shadow: var(--elevation-3);
 			line-height: 18px;
 			transition: 0.2s;

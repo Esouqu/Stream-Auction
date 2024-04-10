@@ -23,16 +23,23 @@ export enum TIMER_STATE {
   RUNNING = 'running',
 }
 
+export enum SOCKET_STATE {
+  CONNECTING = 0,
+  OPEN = 1,
+  CLOSING = 2,
+  CLOSED = 3,
+}
+
 export enum NAVIGATION_ROUTES {
   LOTS = '/',
   WHEEL = '/wheel',
-  SETTINGS = '/settings',
+  // SETTINGS = '/settings',
 }
 
 export const routes: IRoute[] = [
   { id: 0, title: 'Лоты', icon: listIcon, url: NAVIGATION_ROUTES.LOTS },
   { id: 1, title: 'Колесо', icon: pieIcon, url: NAVIGATION_ROUTES.WHEEL },
-  { id: 2, title: 'Настройки', icon: settingsIcon, url: NAVIGATION_ROUTES.SETTINGS }
+  // { id: 2, title: 'Настройки', icon: settingsIcon, url: NAVIGATION_ROUTES.SETTINGS }
   // { id: 2, title: 'Бомбер', icon: getIcon('bomb'), url: '/bomber' },
   // { id: 2, title: 'События', icon: eventIcon, url: '/events' },
 ];

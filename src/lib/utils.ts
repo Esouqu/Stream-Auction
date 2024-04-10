@@ -179,6 +179,21 @@ export function getContrastColor(hexColor: string) {
   }
 }
 
+export function isVideoOrImage(link: string) {
+  const videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+  const fileExtension = link.split('.').pop()!.toLowerCase();
+
+  if (videoExtensions.includes(fileExtension)) {
+    return "video";
+  } else if (imageExtensions.includes(fileExtension)) {
+    return "image";
+  } else {
+    return;
+  }
+}
+
 export function fireConfetti() {
   const count = 200;
   const defaults = {

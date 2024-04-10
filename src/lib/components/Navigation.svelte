@@ -1,71 +1,47 @@
 <script lang="ts">
-	import type { IRoute } from '$lib/interfaces';
+	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { fade } from 'svelte/transition';
-	import { sineInOut } from 'svelte/easing';
 	import { routes } from '$lib/constants';
-	import { createEventDispatcher } from 'svelte';
+	import { onMount } from 'svelte';
 
-	interface INavigationEvents {
-		routeswitch: {
-			from: IRoute;
-			to: IRoute;
-		};
-	}
+	let selectorPosition = 0;
 
-	const dispatch = createEventDispatcher<INavigationEvents>();
-	export let activeRoute: IRoute | undefined = routes.find((r) => r.url === $page.route.id);
+	// onMount(() => setSelectorPosition());
 
-	function handleRouting(route: IRoute, event: MouseEvent) {
-		if (route.id === activeRoute?.id || event.ctrlKey || event.altKey || event.shiftKey) return;
-
-		const previousRoute = activeRoute;
-		activeRoute = route;
-
-		if (previousRoute) {
-			dispatch('routeswitch', { from: previousRoute, to: activeRoute });
-		}
+	function setSelectorPosition() {
+		selectorPosition = $page.route.id === '/' ? 0 : 50;
 	}
 </script>
 
 <nav class="navigation">
-	{#key activeRoute}
-		<h2 in:fade={{ duration: 300, easing: sineInOut }}>{activeRoute?.title}</h2>
-	{/key}
-	{#if activeRoute}
-		<ul class="navigation-list" style="--select-left: {activeRoute?.id * 50}px">
-			{#each routes as route}
-				<li>
-					<a
-						href={route.url}
-						class="navigation__route"
-						class:active={route.url === activeRoute?.url}
-						draggable="false"
-						on:click={(e) => handleRouting(route, e)}
-					>
-						<div class="navigation-icon-wrapper">
-							<img src={route.icon} alt="Navigation route icon" draggable="false" />
-						</div>
-					</a>
-				</li>
-			{/each}
-		</ul>
-	{/if}
+	<ul class="navigation-list" style="--select-left: {$page.route.id === '/' ? 0 : 50}px">
+		{#each routes as route}
+			<li>
+				<a
+					href={route.url}
+					class="navigation__route"
+					class:active={route.url === $page.route.id}
+					title={route.title}
+					draggable="false"
+				>
+					<div class="navigation-icon-wrapper">
+						<img src={route.icon} alt="Navigation route icon" draggable="false" />
+					</div>
+					<!-- <h2>{route.title}</h2> -->
+				</a>
+			</li>
+		{/each}
+	</ul>
 </nav>
 
 <style lang="scss">
 	.navigation {
 		position: relative;
-		margin-top: 40px;
 		border-radius: 10px;
 		box-shadow: inset 0 2px 4px black;
 		background-color: var(--surface-container);
 
 		& h2 {
-			position: absolute;
-			top: -30px;
-			left: 50%;
-			translate: -50%;
 			margin: 0;
 			font-size: 18px;
 			text-transform: uppercase;
@@ -99,7 +75,6 @@
 			justify-content: center;
 			align-items: center;
 			gap: 10px;
-			width: 30px;
 			height: 30px;
 			padding: 10px;
 			border: none;

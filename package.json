@@ -19,6 +19,7 @@
 		"animejs": "^3.2.2",
 		"axios": "^1.6.5",
 		"canvas-confetti": "^1.9.2",
+		"dexie": "^4.0.1",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.10.1",
 		"sass": "^1.69.7",

@@ -3,9 +3,10 @@ import type { ILot } from "$lib/interfaces";
 import { getContrastColor, getRandomColor } from "$lib/utils";
 import { writable } from "svelte/store";
 import signal from "./signal";
+import db from "$lib/db";
 // import wordList from '../../../../words/words.json';
 
-// const tempLots = Array.from(new Array(10), (_, id) => {
+// const tempLots = Array.from(new Array(100), (_, id) => {
 //   const color = getRandomColor(colors);
 //   const contrastColor = getContrastColor(color);
 
@@ -28,7 +29,15 @@ function createLots() {
   let generatedId = 0;
   let color = '';
 
-  function add(title: string, value: number, donator?: string) {
+  async function loadDatabaseItems() {
+    const dbItems = await db.lots.toArray();
+    const lotWithHighestId = await db.lots.orderBy('id').reverse().first();
+
+    lots.set(dbItems);
+    generatedId = lotWithHighestId?.id || 0;
+  }
+
+  async function add(title: string, value: number, donator?: string) {
     generatedId += 1;
     color = getRandomColor(colors);
 
@@ -48,30 +57,36 @@ function createLots() {
     });
 
     itemAdded.set(item);
+    await db.lots.add(item);
   }
 
-  function remove(id: number) {
+  async function remove(id: number) {
     lots.update((items) => items.filter(item => item.id !== id));
+    await db.lots.delete(id);
   }
 
-  function removeAll() {
+  async function removeAll() {
     generatedId = 0;
     lots.set([]);
+    await db.lots.clear();
   }
 
-  function setTitle(id: number, title: string) {
+  async function setTitle(id: number, title: string) {
     lots.update((items) => items.map((item) => {
       if (item.id !== id) return item;
 
       return { ...item, title };
     }));
+
+    await db.lots.update(id, { title });
   }
 
-  function addValue(id: number, value: number, donator?: string) {
+  async function addValue(id: number, value: number, donator?: string) {
     lots.update((items) => items.map((item) => {
       if (item.id !== id) return item;
 
       lotValueChanged.set({ ...item, addedValue: value });
+      db.lots.update(id, { value: item.value + value });
 
       if (donator && !item.donators.includes(donator)) {
         return { ...item, value: item.value + value, donators: [...item.donators, donator] }
@@ -79,9 +94,11 @@ function createLots() {
 
       return { ...item, value: item.value + value };
     }));
+
+
   }
 
-  function setValue(id: number, value: number) {
+  async function setValue(id: number, value: number) {
     lots.update((items) => items.map((item) => {
       if (item.id !== id) return item;
 
@@ -91,6 +108,8 @@ function createLots() {
 
       return { ...item, value };
     }));
+
+    await db.lots.update(id, { value });
   }
 
   return {
@@ -101,6 +120,7 @@ function createLots() {
     setTitle,
     addValue,
     setValue,
+    loadDatabaseItems,
     lotValueChanged,
     itemAdded,
   }

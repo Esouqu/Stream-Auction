@@ -24,6 +24,7 @@ function createActionManager() {
   let _stopSpinAction: { isEnabled: boolean; price: number };
   let _itemAddedAction: ISetting;
   let _leaderChangedAction: ISetting;
+  let _addLotWhileSpinAction: boolean;
   let _currentExtendSpinPrice: number;
   let _wheelWinnerDelayTimeout: NodeJS.Timeout;
 
@@ -67,6 +68,7 @@ function createActionManager() {
     settings.stopSpinAction.subscribe((store) => _stopSpinAction = store);
     settings.itemAddedAction.subscribe((store) => _itemAddedAction = store);
     settings.leaderChangedAction.subscribe((store) => _leaderChangedAction = store);
+    settings.addLotWhileSpinAction.subscribe((store) => _addLotWhileSpinAction = store);
   }
 
   function startAuction() {
@@ -159,7 +161,14 @@ function createActionManager() {
         const isShouldStopSpin = _stopSpinAction.isEnabled && donationAmount >= _stopSpinAction.price;
         const isShouldExtendSpin = _extendSpinAction.isEnabled && donationAmount >= _currentExtendSpinPrice;
 
-        handleDonation(isShouldStopSpin);
+        if (!_addLotWhileSpinAction) {
+          donations.add({
+            ...donation,
+            isInstant: false,
+          });
+        } else {
+          handleDonation(isShouldStopSpin);
+        }
 
         if (isShouldStopSpin) {
           wheel.stopSpin();

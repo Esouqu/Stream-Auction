@@ -22,7 +22,7 @@
 <style lang="scss">
 	.range-slider {
 		appearance: none;
-		width: 200px;
+		width: var(--slider-width, 200px);
 		height: 25px;
 		border: 0;
 		border-radius: 50px;
@@ -42,6 +42,7 @@
 		&-wrapper {
 			display: flex;
 			border-radius: 50px;
+			width: var(--slider-width, 200px);
 			overflow: hidden;
 		}
 

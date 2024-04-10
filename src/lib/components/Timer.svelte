@@ -25,33 +25,13 @@
 			<h3>Задержка...</h3>
 		{:else}
 			{#if $timerState !== TIMER_STATE.RUNNING}
-				<Button
-					--button-size="60px"
-					--button-p="10px"
-					icon="start"
-					on:click={() => actionManager.startAuction()}
-				/>
+				<Button icon="start" size={40} on:click={() => actionManager.startAuction()} />
 			{:else if $timerState === TIMER_STATE.RUNNING}
-				<Button
-					--button-size="60px"
-					--button-p="10px"
-					icon="pause"
-					on:click={() => actionManager.pauseAuction()}
-				/>
+				<Button icon="pause" size={40} on:click={() => actionManager.pauseAuction()} />
 			{/if}
-			<Button --button-size="60px" --button-p="10px" icon="reset" on:click={() => timer.reset()} />
-			<Button
-				--button-size="60px"
-				--button-p="10px"
-				icon="upArrow"
-				on:click={() => timer.add(timeToAdd)}
-			/>
-			<Button
-				--button-size="60px"
-				--button-p="10px"
-				icon="downArrow"
-				on:click={() => timer.subtract(timeToAdd)}
-			/>
+			<Button icon="reset" size={40} on:click={() => timer.reset()} />
+			<Button icon="upArrow" size={40} on:click={() => timer.add(timeToAdd)} />
+			<Button icon="downArrow" size={40} on:click={() => timer.subtract(timeToAdd)} />
 		{/if}
 	</div>
 </div>
@@ -67,7 +47,9 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			gap: 10px;
 			width: 100%;
+			height: 50px;
 		}
 
 		&__time {
@@ -75,6 +57,7 @@
 			font-size: 80px;
 			font-weight: 600;
 			font-variant-numeric: tabular-nums;
+			letter-spacing: 6px;
 			user-select: none;
 
 			&.delayed {

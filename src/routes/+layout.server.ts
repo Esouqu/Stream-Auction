@@ -1,35 +1,21 @@
+import type { IDonationAlertsRefreshToken } from "$lib/interfaces";
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
-  let daSession = cookies.get('daSession');
-  let twitchSession = cookies.get('twitchSession');
+export const load: LayoutServerLoad = async ({ cookies, fetch, setHeaders }) => {
+  let donationalertsSession = cookies.get('daSession');
 
-  await fetch('/api/twitch/validate').then((res) => res.status === 200);
+  if (!donationalertsSession) {
+    const refreshTokenResponse = await fetch('/api/donationalerts/refresh', { method: 'POST' })
+      .then((res) => res);
 
-  if (!daSession) {
-    const response = await fetch('/api/da/refresh', { method: 'POST' });
-
-    if (response.status === 200) {
-      daSession = await response.json().then((data) => data.access_token);
-    }
-    if (response.status === 401) {
-      cookies.delete('daRefreshToken');
+    if (refreshTokenResponse.status === 200) {
+      donationalertsSession = await refreshTokenResponse.json().then((data: IDonationAlertsRefreshToken) => data.access_token);
     }
   }
 
-  if (!twitchSession) {
-    const response = await fetch('api/twitch/refresh', { method: 'POST' });
-
-    if (response.status === 200) {
-      twitchSession = await response.json().then((data) => data.access_token);
-    }
-    if (response.status === 401) {
-      cookies.delete('twitchRefreshToken');
-    }
-  }
+  // setHeaders({ 'cache-control': 'no-store' });
 
   return {
-    daSession,
-    twitchSession
+    isAuthorizedToDonationAlerts: !!donationalertsSession,
   }
 };

@@ -11,6 +11,7 @@
 	export let isFilled = false;
 	export let isDisabled = false;
 	export let isPreventInput = false;
+	export let isBorderless = false;
 	export let element: HTMLInputElement | null = null;
 	export let onEnter: (() => void) | null = null;
 	export let onInput: (() => void) | null = null;
@@ -67,7 +68,13 @@
 	}
 </script>
 
-<div class="input-wrapper" class:disabled={isDisabled} class:filled={isFilled} data-suffix={suffix}>
+<div
+	class="input-wrapper"
+	class:disabled={isDisabled}
+	class:filled={isFilled}
+	class:borderless={isBorderless}
+	data-suffix={suffix}
+>
 	<input
 		type="text"
 		id="input-{id}-{pathName}"
@@ -88,9 +95,10 @@
 	.input {
 		position: relative;
 		padding: var(--input-p, 10.5px);
-		border: 1px solid var(--outline);
+		// border: 1px solid var(--outline);
+		border: 0;
 		border-radius: 5px;
-		outline: 0;
+		outline: 1px solid var(--outline);
 		width: var(--input-w, 100%);
 		line-height: 1;
 		font-size: var(--input-font-size, 16px);
@@ -98,9 +106,11 @@
 		text-align: var(--input-text-al, start);
 		text-decoration: none;
 		text-overflow: ellipsis;
+		letter-spacing: 0.25px;
 		color: var(--on-surface);
+		box-shadow: 0 0 0 0 var(--primary-70);
 		background-color: transparent;
-		transition: outline 0.2s, border-color 0.2s;
+		transition: 0.3s;
 		overflow: hidden;
 
 		&-wrapper {
@@ -127,6 +137,26 @@
 				}
 			}
 
+			&.borderless {
+				& .input {
+					border: 0;
+					border-radius: 0;
+					outline: 0;
+
+					&:focus {
+						z-index: 999;
+						outline: none;
+						border-color: transparent;
+						box-shadow: 0 3px 0px 0 var(--primary-70);
+					}
+
+					&:hover:not(:focus):not(:disabled) {
+						background-color: var(--hover-white);
+						cursor: default;
+					}
+				}
+			}
+
 			&::after {
 				content: attr(data-suffix);
 				position: absolute;
@@ -147,7 +177,7 @@
 		}
 
 		&:hover:not(:focus):not(:disabled) {
-			border-color: white;
+			outline-color: white;
 		}
 
 		&::selection {

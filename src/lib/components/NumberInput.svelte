@@ -10,6 +10,7 @@
 	export let isDisabled = false;
 	export let isFilled = false;
 	export let isPreventInput = false;
+	export let isBorderless = false;
 	export let onEnter: (() => void) | null = null;
 	export let onInput: (() => void) | null = null;
 	export let onBlur: (() => void) | null = null;
@@ -54,6 +55,7 @@
 	class:disabled={isDisabled}
 	class:filled={isFilled}
 	class:labeled={label}
+	class:borderless={isBorderless}
 	data-suffix={suffix}
 >
 	{#if label}
@@ -81,17 +83,20 @@
 	.input {
 		position: relative;
 		padding: 10.5px;
-		border: 1px solid var(--outline);
+		// border: 1px solid var(--outline);
+		border: 0;
 		border-radius: 5px;
-		outline: 0;
-		width: var(--input-w, 100%);
+		outline: 1px solid var(--outline);
+		width: var(--input-w, 90px);
 		line-height: 1;
 		text-align: var(--input-text-al, start);
 		text-overflow: ellipsis;
 		text-decoration: none;
+		letter-spacing: 0.25px;
+		box-shadow: 0 0px 0px 0 var(--primary-70);
 		color: var(--on-surface);
 		background-color: transparent;
-		transition: outline 0.2s, border-color 0.2s;
+		transition: box-shadow 0.3s, background-color 0.2s, outline-color 0.2s, border-color 0.2s;
 		overflow: hidden;
 
 		&-fieldset {
@@ -151,6 +156,7 @@
 			&.labeled {
 				& .input {
 					border: 1px solid transparent;
+					outline: 0;
 
 					&:hover {
 						border-color: transparent !important;
@@ -170,12 +176,28 @@
 					border: 3px solid var(--primary);
 				}
 
-				& .input-fieldset {
+				&.filled .input-fieldset {
 					background-color: var(--surface-container-highest);
 				}
+			}
 
+			&.borderless {
 				& .input {
+					border: 0;
+					border-radius: 0;
 					outline: 0;
+
+					&:focus {
+						z-index: 999;
+						outline: none;
+						border-color: transparent;
+						box-shadow: 0 3px 0px 0 var(--primary-70);
+					}
+
+					&:hover:not(:focus):not(:disabled) {
+						background-color: var(--hover-white);
+						cursor: default;
+					}
 				}
 			}
 
@@ -186,8 +208,8 @@
 				right: 10px;
 				z-index: 999;
 				translate: 0 -50%;
-				font-size: 14px;
-				text-transform: capitalize;
+				font-size: 16px;
+				font-weight: 400;
 				opacity: 0.7;
 			}
 		}
@@ -199,11 +221,7 @@
 		}
 
 		&:hover:not(:focus):not(:disabled) {
-			border-color: white;
-		}
-
-		&::selection {
-			background-color: var(--primary-60);
+			outline-color: white;
 		}
 
 		&::-webkit-inner-spin-button {

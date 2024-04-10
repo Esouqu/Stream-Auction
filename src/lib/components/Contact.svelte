@@ -5,7 +5,7 @@
 </script>
 
 <a href={url} target="_blank" class="contact" class:clickable={!!url}>
-	<div class="contact-icon-wrapper">
+	<div class="icon-wrapper" style="padding: 10px;">
 		<img src={icon} alt="Contact" />
 	</div>
 	<div class="contact-title">
@@ -18,7 +18,6 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-		gap: 7px;
 		transition: 0.2s;
 		pointer-events: none;
 		text-decoration: none;
@@ -33,6 +32,7 @@
 				bottom: 0;
 				z-index: -1;
 				translate: -50% 0;
+				border-radius: 2px;
 				width: 100%;
 				padding: 0 3px;
 				height: 2px;
@@ -51,15 +51,6 @@
 			font-weight: 500;
 			letter-spacing: 0.7px;
 			color: var(--on-surface);
-		}
-		&-icon-wrapper {
-			display: flex;
-			width: 25px;
-
-			& img {
-				width: 100%;
-				object-fit: contain;
-			}
 		}
 	}
 </style>

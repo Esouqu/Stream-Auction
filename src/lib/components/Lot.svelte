@@ -101,7 +101,7 @@
 	on:dragleave|preventDefault={(e) => handleDragLeave(e)}
 	on:drop|preventDefault={(e) => handleDrop(e)}
 >
-	<span class="lot__id" style="color: {contrastColor}; background-color: {color};">#{id}</span>
+	<div class="lot__id" style="--lot-id-color: {color};">#{id}</div>
 	<div class="lot-inputs-wrapper">
 		<Input
 			--input-w-w="100%"
@@ -111,6 +111,7 @@
 			onEnter={() => lots.setTitle(id, title)}
 			onInput={() => lots.setTitle(id, title)}
 			onBlur={() => lots.setTitle(id, title)}
+			isBorderless={true}
 			bind:value={title}
 		/>
 		<NumberInput
@@ -121,6 +122,7 @@
 			onEnter={() => lots.setValue(id, value)}
 			onBlur={() => lots.setValue(id, value)}
 			isPreventInput={true}
+			isBorderless={true}
 			bind:value
 		/>
 	</div>
@@ -132,13 +134,14 @@
 				id="lot-add-value-{id}"
 				placeholder="Сумма"
 				onEnter={hideInputAndAddValue}
+				isBorderless={true}
 				bind:element={additionalInputElement}
 				bind:value={valueToAdd}
 			/>
 		</div>
 	{/if}
-	<div style="display: flex; align-items: center; margin-left: 10px;">
-		<span class="lot__percent">{Number(percent.toFixed(1))}%</span>
+	<div class="lot__percent">{Number(percent.toFixed(1))}%</div>
+	<div style="z-index: 0; display: flex; align-items: center; margin-right: 10px;">
 		<Button icon="plus" on:click={isAddInputVisible ? hideInputAndAddValue : showInput} />
 		<Button icon="listRemoveItem" on:click={() => lots.remove(id)} />
 	</div>
@@ -147,19 +150,32 @@
 <style lang="scss">
 	.lot {
 		display: flex;
-		align-items: center;
-		border-radius: 10px;
+		width: 100%;
 		background-color: transparent;
 
 		&__id {
+			position: relative;
 			display: flex;
+			z-index: 1;
 			align-items: center;
 			justify-content: center;
 			margin-right: 10px;
-			border-radius: 5px;
 			min-width: 60px;
-			height: 30px;
-			font-weight: bold;
+			font-weight: 500;
+			letter-spacing: 0.25px;
+			color: white;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: -1;
+				width: 100%;
+				height: 100%;
+				background-color: var(--lot-id-color, transparent);
+				opacity: 0.4;
+			}
 		}
 
 		&-inputs-wrapper {
@@ -168,10 +184,13 @@
 		}
 
 		&__percent {
-			min-width: 60px;
-			text-align: center;
+			z-index: 0;
+			display: flex;
+			align-self: center;
+			justify-content: center;
+			padding: 0 10.5px;
+			min-width: 90px;
 			font-variant-numeric: tabular-nums;
-			opacity: 0.5;
 		}
 
 		&.hovered {

@@ -30,7 +30,7 @@
 		{id}
 		{placeholder}
 		rows="1"
-		class="textarea"
+		class="textarea medium-title"
 		class:resizable={isResizable}
 		style="--textarea-resize: {textareaHeight}"
 		spellcheck="false"
@@ -54,9 +54,6 @@
 		border: 1px solid var(--outline);
 		outline: 0px solid transparent;
 		font-size: var(--textarea-font-size, 20px);
-		font-weight: 600;
-		line-height: 26px;
-		letter-spacing: 0.2px;
 		text-align: var(--textarea-align, start);
 		text-overflow: ellipsis;
 		text-decoration: none;

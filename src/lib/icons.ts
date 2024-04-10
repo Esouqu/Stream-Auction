@@ -8,17 +8,30 @@ import pauseIcon from '$lib/assets/pause_icon.svg';
 import deleteIcon from '$lib/assets/close_icon.svg';
 import deleteIconBlack from '$lib/assets/close_icon_black.svg';
 import listRemoveIcon from '$lib/assets/list_remove_icon.svg';
+import listRemoveIconBlack from '$lib/assets/list_remove_icon_black.svg';
 import infoIcon from '$lib/assets/donators_list_icon.svg';
 import plusIcon from '$lib/assets/add_icon.svg';
 import plusIconBlack from '$lib/assets/add_icon_black.svg';
-import trashcanIcon from '$lib/assets/trashcan_icon.svg';
-import visibilityIcon from '$lib/assets/visibility_off_icon.svg';
+import trashcanSweepIcon from '$lib/assets/trashcan_sweep_icon.svg';
+import trashcanIconSweepBlack from '$lib/assets/trashcan_sweep_icon_black.svg';
 import bombIcon from '$lib/assets/bomb_icon.svg';
 import bombIconBlack from '$lib/assets/bomb_icon_black.svg';
 import helpIcon from '$lib/assets/help_icon.svg';
-import emeraldIcon from '$lib/assets/emerald_icon.svg';
 import moreIcon from '$lib/assets/more_icon.svg';
 import editIcon from '$lib/assets/edit_icon.svg';
+import searchIcon from '$lib/assets/search_icon.svg';
+import searchIconBlack from '$lib/assets/search_icon_black.svg';
+import diceIcon from '$lib/assets/dice_icon.svg';
+import diceIconBlack from '$lib/assets/dice_icon_black.svg';
+import cycleIcon from '$lib/assets/cycle_icon.svg';
+import cycleIconBlack from '$lib/assets/cycle_icon_black.svg';
+import visibilityIcon from '$lib/assets/visibility_icon.svg';
+import visibilityIconBlack from '$lib/assets/visibility_icon_black.svg';
+import visibilityOffIcon from '$lib/assets/visibility_off_icon.svg';
+import visibilityOffIconBlack from '$lib/assets/visibility_off_icon_black.svg';
+import warningIcon from '$lib/assets/warning_icon.svg';
+import rubleIcon from '$lib/assets/currency_ruble_icon.svg';
+
 
 export type iconTypes =
   | 'listAddItem'
@@ -31,12 +44,18 @@ export type iconTypes =
   | 'delete'
   | 'info'
   | 'plus'
-  | 'trashcan'
+  | 'trashcanSweep'
+  | 'visibilityOff'
   | 'visibility'
+  | 'cycle'
+  | 'dice'
+  | 'search'
   | 'bomb'
   | 'help'
   | 'emerald'
   | 'more'
+  | 'warning'
+  | 'ruble'
   | 'edit';
 
 export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'white') {
@@ -44,7 +63,7 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
     case 'listAddItem':
       return color === 'white' ? listAddIcon : listAddIconBlack;
     case 'listRemoveItem':
-      return listRemoveIcon;
+      return color === 'white' ? listRemoveIcon : listRemoveIconBlack;
     case 'start':
       return startIcon;
     case 'reset':
@@ -59,14 +78,20 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
       return color === 'white' ? deleteIcon : deleteIconBlack;
     case 'info':
       return infoIcon;
-    case 'trashcan':
-      return trashcanIcon;
+    case 'trashcanSweep':
+      return color === 'white' ? trashcanSweepIcon : trashcanIconSweepBlack;
     case 'visibility':
-      return visibilityIcon;
+      return color === 'white' ? visibilityIcon : visibilityIconBlack;
     case 'help':
       return helpIcon;
-    case 'emerald':
-      return emeraldIcon;
+    case 'visibilityOff':
+      return color === 'white' ? visibilityOffIcon : visibilityOffIconBlack;
+    case 'cycle':
+      return color === 'white' ? cycleIcon : cycleIconBlack;
+    case 'dice':
+      return color === 'white' ? diceIcon : diceIconBlack;
+    case 'search':
+      return color === 'white' ? searchIcon : searchIconBlack;
     case 'edit':
       return editIcon;
     case 'bomb':
@@ -75,6 +100,10 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
       return color === 'white' ? plusIcon : plusIconBlack;
     case 'more':
       return moreIcon;
+    case 'warning':
+      return warningIcon;
+    case 'ruble':
+      return rubleIcon;
     default:
       return '';
   }

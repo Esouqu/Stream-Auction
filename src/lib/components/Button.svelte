@@ -3,42 +3,42 @@
 	import getIcon from '$lib/icons';
 
 	export let icon: iconTypes;
-	export let text: string = '';
-	export let color: 'white' | 'black' = 'white';
-	export let isDisabled: boolean = false;
-	export let shadowColor: string | null = null;
+	export let iconColor: 'white' | 'black' = 'white';
+	export let title: string = '';
+	export let color: string = 'var(--inverse-surface)';
+	export let size: number = 30;
+	export let isDisabled = false;
+	export let isFilled = false;
+	export let isInteractive = true;
 </script>
 
-<button
-	type="button"
-	class="icon-button"
-	class:icon-button_text={text}
-	class:icon-button_black={color === 'black'}
-	class:icon-button_white={color === 'white'}
-	style="--btn-shadow-c: {shadowColor}"
-	disabled={isDisabled}
-	on:click|stopPropagation
->
-	<img
-		class:shadowed={!!shadowColor}
-		src={getIcon(icon, color)}
-		alt="Icon button"
-		draggable="false"
-	/>
-	{#if text}
-		<div>
-			<span>{text}</span>
-		</div>
-	{/if}
-</button>
+<div style="display: contents; --button-color: {color};">
+	<button
+		style="--btn-hover-color: {iconColor === 'white' ? 'var(--hover-white)' : 'var(--hover-black)'}"
+		type="button"
+		class="button"
+		class:filled={isFilled}
+		class:interactive={isInteractive}
+		{title}
+		disabled={isDisabled}
+		on:click|stopPropagation
+		on:mouseenter
+		on:mouseleave
+		on:focus
+	>
+		{#if icon}
+			<div class="icon-wrapper" style="width: {size}px; height: {size}px;">
+				<img src={getIcon(icon, iconColor)} alt="Icon button" draggable="false" />
+			</div>
+		{/if}
+	</button>
+</div>
 
 <style lang="scss">
-	.icon-button {
+	.button {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		min-width: var(--button-size, 40px);
-		height: var(--button-size, 40px);
 		padding: var(--button-p, 5px);
 		border: none;
 		border-radius: 10px;
@@ -48,57 +48,26 @@
 		user-select: none;
 		cursor: pointer;
 
-		&_text {
-			width: auto;
+		&:not(.interactive) {
+			cursor: default;
 
-			& div {
-				display: flex;
-				padding-right: 5px;
-
-				& span {
-					display: inline-block;
-					max-width: 200px;
-					height: 100%;
-					font-weight: 700;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					overflow: hidden;
-				}
-			}
-			& img {
-				width: fit-content !important;
-				height: 100%;
+			&:active {
+				opacity: 1 !important;
 			}
 		}
-		&_black {
-			color: black;
-
-			&:hover {
-				background-color: rgba(0, 0, 0, 0.1) !important;
-			}
-		}
-		&_white {
-			color: white;
-
-			&:hover {
-				background-color: rgba(255, 255, 255, 0.1) !important;
-			}
+		&.filled {
+			background-color: var(--button-color);
 		}
 
-		&:hover {
-			background-color: rgba(255, 255, 255, 0.1);
+		&:hover:not(.filled) {
+			background-color: var(--btn-hover-color);
 		}
-		&:active {
+		&:active:not(.filled) {
 			opacity: 0.7;
 		}
 		&:disabled {
 			opacity: 0.3;
 			pointer-events: none;
-		}
-
-		& img {
-			/* width: 100%; */
-			object-fit: contain;
 		}
 	}
 </style>

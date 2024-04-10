@@ -101,7 +101,7 @@
 					<div style="position: absolute; top: 50%; right: 6px; translate: 0 -50%; display: flex;">
 						<Button
 							icon="delete"
-							color={idx === selectedOption ? 'white' : 'black'}
+							iconColor={idx === selectedOption ? 'white' : 'black'}
 							isDisabled={options.length < 2}
 							on:click={() => deleteOption(idx)}
 						/>
@@ -110,7 +110,7 @@
 			{/each}
 			{#if !isReadonly}
 				<div style="display: flex; align-items: center; justify-content: center; margin-top: 10px;">
-					<Button --button-size="100%" icon="plus" color="black" on:click={addOption} />
+					<Button --button-size="100%" icon="plus" iconColor="black" on:click={addOption} />
 				</div>
 			{/if}
 		</ul>

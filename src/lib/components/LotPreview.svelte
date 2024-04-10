@@ -7,36 +7,64 @@
 </script>
 
 <div class="lot-preview" data-lot-id="#{id}">
-	<span class="lot-preview__id" style="color: {contrastColor}; background-color: {color};">
+	<div class="lot-preview__id" style="--lot-id-color: {color};">
 		#{id}
-	</span>
-	<span class="lot-preview__title">{title}</span>
-	<span class="lot-preview__percent">{Number(percent.toFixed(1))}%</span>
+	</div>
+	<div class="lot-preview__title">{title}</div>
+	<div class="lot-preview__percent">{Number(percent.toFixed(1))}%</div>
 </div>
 
 <style lang="scss">
 	.lot-preview {
 		display: flex;
 		align-items: center;
-		padding: 5px 0;
-
-		&__id {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 5px;
-			min-width: 60px;
-			height: 30px;
-			font-weight: bold;
-		}
+		width: 100%;
 
 		&__title {
+			z-index: 0;
 			padding: 10px;
 			border-radius: 100px;
 			width: 100%;
-			white-space: nowrap;
 			text-overflow: ellipsis;
+			white-space: nowrap;
+			letter-spacing: 0.25px;
 			overflow: hidden;
+		}
+
+		&__id {
+			position: relative;
+			display: flex;
+			z-index: 1;
+			align-items: center;
+			justify-content: center;
+			margin-right: 10px;
+			min-width: 60px;
+			height: 100%;
+			font-weight: 500;
+			color: white;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: -1;
+				width: 100%;
+				height: 100%;
+				background-color: var(--lot-id-color, transparent);
+				opacity: 0.4;
+			}
+		}
+
+		&__percent {
+			z-index: 0;
+			display: flex;
+			align-self: center;
+			justify-content: center;
+			padding: 0 10.5px;
+			min-width: 90px;
+			font-variant-numeric: tabular-nums;
+			letter-spacing: 0.25px;
 		}
 	}
 </style>
