@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, setHeaders }) => 
     }
   }
 
-  // setHeaders({ 'cache-control': 'no-store' });
+  setHeaders({ 'cache-control': 'no-store' });
 
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
