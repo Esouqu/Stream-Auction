@@ -14,6 +14,11 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
         .then((data: IDonationAlertsRefreshToken) => data);
 
       donationalertsSession = newSessionToken.access_token;
+
+      // problem with cookies still persist
+      // if donationalertsSession is expires and content of the page is not changed
+      // cookies is not refreshed on page reload
+      // have no idea how to fix it
     } else {
       // Handle the case where refreshing the session fails
       // You can redirect to a login page or handle it based on your requirements

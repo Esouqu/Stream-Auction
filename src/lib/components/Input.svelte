@@ -110,7 +110,7 @@
 		color: var(--on-surface);
 		box-shadow: 0 0 0 0 var(--primary-70);
 		background-color: transparent;
-		transition: 0.3s;
+		transition: outline-color 0.3s;
 		overflow: hidden;
 
 		&-wrapper {
@@ -142,6 +142,7 @@
 					border: 0;
 					border-radius: 0;
 					outline: 0;
+					transition: 0.3s;
 
 					&:focus {
 						z-index: 999;

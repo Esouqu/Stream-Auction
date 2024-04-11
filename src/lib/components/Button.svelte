@@ -4,7 +4,6 @@
 
 	export let icon: iconTypes;
 	export let iconColor: 'white' | 'black' = 'white';
-	export let title = '';
 	export let text = '';
 	export let color: string = 'var(--inverse-surface)';
 	export let size: number = 30;
@@ -23,7 +22,6 @@
 		class="button"
 		class:filled={isFilled}
 		class:interactive={isInteractive}
-		title={title || text}
 		disabled={isDisabled}
 		on:click|stopPropagation
 		on:mouseenter
@@ -55,7 +53,7 @@
 		border-radius: 10px;
 		background-color: transparent;
 		opacity: 1;
-		transition: 0.2s;
+		transition: 0.1s;
 		user-select: none;
 		cursor: pointer;
 
@@ -75,6 +73,17 @@
 		}
 		&:active:not(.filled) {
 			opacity: 0.7;
+		}
+		&.interactive {
+			&:active {
+				opacity: 0.8;
+				// box-shadow: inset 0 2px 2px black;
+
+				// & img {
+				// 	scale: 0.9;
+				// 	transition: 0.1s;
+				// }
+			}
 		}
 		&:disabled {
 			opacity: 0.3;

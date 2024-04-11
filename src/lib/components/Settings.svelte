@@ -146,6 +146,7 @@
 					/>
 					<TextButton
 						--text-b-fs="14px"
+						color="red"
 						text="Удалить"
 						isDisabled={!$background.url}
 						on:click={() => {

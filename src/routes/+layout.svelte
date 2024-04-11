@@ -125,7 +125,7 @@
 			</div>
 			{#if isAuthorizedToDonationAlerts}
 				<div class="indicator-wrapper">
-					<div class="icon-wrapper" style="padding: 10px; width: 40px; height: 40px;">
+					<div class="icon-wrapper" style="padding: 10px; width: 35px; height: 35px;">
 						<img src={daIcon} alt="DonationAlerts icon" />
 					</div>
 					<Indicator isActive={$centrifugoState === SOCKET_STATE.OPEN} />

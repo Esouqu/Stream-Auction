@@ -129,7 +129,7 @@
 		&-selected-wrapper {
 			display: flex;
 			flex-direction: column;
-			padding: 5px 52px;
+			padding: 0px 52px;
 			gap: 10px;
 		}
 

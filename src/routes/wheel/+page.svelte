@@ -50,7 +50,6 @@
 			<Button
 				icon="dice"
 				iconColor="black"
-				title="Сгенерировать случайное число"
 				isFilled={true}
 				isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
 				on:click={() => {
@@ -64,7 +63,6 @@
 					icon="stopCycle"
 					iconColor="white"
 					color="var(--error)"
-					title="Остановить"
 					isFilled={true}
 					on:click={() => {
 						actionManager.stopWheelSpin();
@@ -77,7 +75,6 @@
 				<Button
 					icon="cycle"
 					iconColor="black"
-					title="Крутить"
 					isFilled={true}
 					on:click={() => {
 						actionManager.startWheelSpin(spinDuration * 1000);
@@ -92,7 +89,6 @@
 				icon="listRemoveItem"
 				iconColor="white"
 				color="var(--error)"
-				title="Удалить лот"
 				isFilled={true}
 				isDisabled={!winner ||
 					$wheelState === WHEEL_STATE.SPINNING ||

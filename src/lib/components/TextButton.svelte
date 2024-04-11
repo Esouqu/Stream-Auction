@@ -37,7 +37,6 @@
 		padding: 10px;
 		border: 0;
 		border-radius: 10px;
-		box-shadow: 0 2px 2px black;
 		line-height: 1;
 		font-size: 16px;
 		font-weight: 700;
@@ -76,21 +75,16 @@
 		}
 
 		&:disabled {
-			translate: 0% 3%;
-			box-shadow: 0 1px 0px black;
 			opacity: 0.8;
 			background-color: var(--neutral);
 			pointer-events: none;
 		}
 
 		&:hover {
-			translate: 0% -3%;
-			box-shadow: 0 2px 5px black;
 			cursor: pointer;
 		}
 		&:active {
-			translate: 0% 3%;
-			box-shadow: 0 1px 0px black;
+			opacity: 0.7;
 		}
 	}
 </style>

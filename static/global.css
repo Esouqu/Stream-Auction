@@ -107,26 +107,11 @@ a {
 
 .tippy-box[data-theme~='general'] {
   white-space: break-spaces;
-  font-weight: 500;
-  letter-spacing: 0.25px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   color: var(--on-inverse-surface);
   background-color: var(--inverse-surface);
-
-  &[data-placement^='top']>.tippy-arrow::before {
-    border-top-color: none;
-  }
-
-  &[data-placement^='bottom']>.tippy-arrow::before {
-    border-bottom-color: none;
-  }
-
-  &[data-placement^='left']>.tippy-arrow::before {
-    border-left-color: none;
-  }
-
-  &[data-placement^='right']>.tippy-arrow::before {
-    border-right-color: none;
-  }
 }
 
 .transition-container {

@@ -131,7 +131,6 @@
 				iconColor={isAddingLot ? 'white' : 'black'}
 				color={isAddingLot ? 'var(--primary-50)' : 'white'}
 				isFilled={true}
-				title="Добавить лот"
 				on:click={addItem}
 			/>
 		</div>

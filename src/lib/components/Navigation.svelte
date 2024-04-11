@@ -40,7 +40,7 @@
 		background-color: var(--surface-container);
 
 		&__item {
-			// position: relative;
+			position: relative;
 			transition: opacity 0.2s;
 
 			&:not(.active) {
@@ -75,6 +75,7 @@
 				background-color: var(--inverse-surface);
 				opacity: 0;
 				transition: opacity 0.2s;
+				pointer-events: none;
 			}
 		}
 		&-list {
