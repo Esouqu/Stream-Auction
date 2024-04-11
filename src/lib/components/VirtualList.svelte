@@ -94,9 +94,9 @@
 		&:nth-child(even)::before {
 			background-color: var(--surface-container-high);
 		}
-		&:last-child::before {
-			border-bottom: 3px solid var(--primary-50);
-		}
+		// &:last-child::before {
+		// 	border-bottom: 3px solid var(--primary-50);
+		// }
 
 		&:hover {
 			background-color: var(--primary-70-30);

@@ -26,19 +26,19 @@ export const POST: RequestHandler = async ({ cookies }) => {
     const tokenData = await response.json().then((data: IDonationAlertsRefreshToken) => data);
 
 
-    cookies.set('daSession', tokenData.access_token, {
-      path: '/',
-      secure: !dev,
-      expires: new Date(Date.now() + tokenData.expires_in)
-    });
+    // cookies.set('daSession', tokenData.access_token, {
+    //   path: '/',
+    //   secure: !dev,
+    //   expires: new Date(Date.now() + tokenData.expires_in)
+    // });
 
-    if (tokenData.refresh_token) {
-      cookies.set('daRefreshToken', tokenData.refresh_token, {
-        path: '/',
-        secure: !dev,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-      });
-    }
+    // if (tokenData.refresh_token) {
+    //   cookies.set('daRefreshToken', tokenData.refresh_token, {
+    //     path: '/',
+    //     secure: !dev,
+    //     expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    //   });
+    // }
 
     return new Response(JSON.stringify(tokenData), { status: 200 });
   } catch (err: unknown) {

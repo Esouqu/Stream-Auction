@@ -6,6 +6,8 @@ import 'tippy.js/themes/material.css';
 const tooltip: Action<HTMLElement, Partial<Props>> = (node: HTMLElement, options: Partial<Props>) => {
   const initialOptions: Partial<Props> = {
     theme: 'general',
+    arrow: false,
+    offset: [0, 24],
     appendTo: () => document.body,
     // hideOnClick: false,
     // trigger: 'click'

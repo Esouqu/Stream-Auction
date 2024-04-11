@@ -76,7 +76,7 @@
 
 		<VirtualList lots={sortedLots} let:item>
 			{@const percent = (item.value / total) * 100}
-			{@const { position, donators, ...rest } = item}
+			{@const { position, donators, contrastColor, ...rest } = item}
 
 			<Lot {...rest} {percent} />
 		</VirtualList>
@@ -88,7 +88,7 @@
 		{/if}
 	</div>
 
-	<ActionPanel>
+	<div style="position: absolute; right: 20px; top: 25px; z-index: 999; display: flex; gap: 5px;">
 		{#if isAddingLot}
 			<div style="display: flex;" transition:slide={{ axis: 'x', duration: 200 }}>
 				<Input
@@ -96,6 +96,7 @@
 					type="text"
 					id="add-lot-text"
 					placeholder="Название лота"
+					isFilled={true}
 					onEnter={addItem}
 					bind:element={titleInputElement}
 					bind:value={text}
@@ -106,6 +107,7 @@
 					id="add-lot-value"
 					placeholder="Сумма"
 					onEnter={addItem}
+					isFilled={true}
 					bind:value
 				/>
 			</div>
@@ -117,45 +119,53 @@
 					type="text"
 					id="search-text"
 					placeholder="Название лота"
+					isFilled={true}
 					bind:element={searchLotInputElement}
 					bind:value={searchText}
 				/>
 			</div>
 		{/if}
-		<Button
-			icon="listAddItem"
-			iconColor={isAddingLot ? 'white' : 'black'}
-			color={isAddingLot ? 'var(--primary-50)' : 'white'}
-			isFilled={true}
-			title="Добавить лот"
-			on:click={addItem}
-		/>
+		<div use:tooltip={{ content: 'Добавить лот' }}>
+			<Button
+				icon="listAddItem"
+				iconColor={isAddingLot ? 'white' : 'black'}
+				color={isAddingLot ? 'var(--primary-50)' : 'white'}
+				isFilled={true}
+				title="Добавить лот"
+				on:click={addItem}
+			/>
+		</div>
 
-		<Button
-			icon="search"
-			iconColor={isSearching ? 'white' : 'black'}
-			color={isSearching ? 'var(--primary-50)' : 'white'}
-			title="Поиск"
-			isFilled={true}
-			isDisabled={$lots.length < 1}
-			on:click={search}
-		/>
-		<Button
-			icon="trashcanSweep"
-			iconColor="white"
-			color="var(--error)"
-			title={`Очистить лоты (${$lots.length})`}
-			isFilled={true}
-			isDisabled={$lots.length < 1}
-			on:click={() => lots.removeAll()}
-		/>
+		<div use:tooltip={{ content: 'Поиск' }}>
+			<Button
+				icon="search"
+				iconColor={isSearching ? 'white' : 'black'}
+				color={isSearching ? 'var(--primary-50)' : 'white'}
+				isFilled={true}
+				isDisabled={$lots.length < 1}
+				on:click={search}
+			/>
+		</div>
+
+		{#key $lots}
+			<div use:tooltip={{ content: `Удалить все лоты (${$lots.length})` }}>
+				<Button
+					icon="trashcanSweep"
+					iconColor="white"
+					color="var(--error)"
+					isFilled={true}
+					isDisabled={$lots.length < 1}
+					on:click={() => lots.removeAll()}
+				/>
+			</div>
+		{/key}
 
 		{#key total}
 			<div use:tooltip={{ content: `Общая сумма (${total})` }}>
 				<Button icon="ruble" iconColor="white" isInteractive={false} />
 			</div>
 		{/key}
-	</ActionPanel>
+	</div>
 </section>
 
 <style lang="scss">
@@ -168,7 +178,9 @@
 	}
 	.auction-section {
 		display: flex;
+		flex: 1;
 		flex-direction: column;
+		border-bottom: 3px solid var(--primary-50);
 		width: 100%;
 	}
 	.no-lots {

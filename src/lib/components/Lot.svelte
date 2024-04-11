@@ -13,7 +13,6 @@
 	export let value: number;
 	export let percent: number;
 	export let color: string;
-	export let contrastColor: string;
 
 	let valueToAdd: number;
 	let isHovered = false;

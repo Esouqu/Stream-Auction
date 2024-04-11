@@ -9,8 +9,8 @@
 		position: relative;
 		z-index: 1;
 		border-radius: 100%;
-		width: 10px;
-		height: 10px;
+		width: 14px;
+		height: 14px;
 
 		&.active {
 			&::before {

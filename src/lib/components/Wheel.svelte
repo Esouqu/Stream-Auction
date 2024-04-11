@@ -17,12 +17,14 @@
 	import winnerSound from '$lib/assets/sounds/winner_sound.wav';
 	import { beforeNavigate } from '$app/navigation';
 
+	const baseRadius = 360;
 	const offset = 20;
+	const baseWheelCenterSize = 150;
 	const degreeCapForTextDisplay = Number(((400 / 100) * 3).toFixed(2));
 
 	export let winner: IPieItem | null = null;
 
-	let radius = 360;
+	let radius = baseRadius;
 	let isDragging = false;
 	let isSettingsShown = true;
 	let draggingStartAngle = 0;
@@ -41,6 +43,9 @@
 	let pie: IPieItem[] = [];
 
 	$: width = radius * 2;
+	$: textSize = (radius / 100) * 5;
+	$: pointerSize = radius / baseRadius;
+	$: wheelCenterSize = baseWheelCenterSize * (textSize / 20);
 	$: offsetCenter = radius + offset / 2;
 	$: angle = wheel.angle;
 	$: normalizedAngle = wheel.normalizedAngle;
@@ -136,16 +141,17 @@
 	function drawPieSliceText(title: string, color: string, startAngle: number, endAngle: number) {
 		if (!context || endAngle - startAngle < degreeCapForTextDisplay) return;
 
-		const maxTitleLength = Number(((radius / 100) * 5.75).toFixed(2));
+		const maxTitleLength = 20;
 		const shortTitle = getShortenedText(title, maxTitleLength);
 		const textAngle = (startAngle + endAngle) / 2; // Find the middle angle of the slice
-		const offsetFromCenter = 0.8; // 0 = right at the center | 1 = right on the edge
+		const offsetFromCenter = 0.85; // 0 = right at the center | 1 = right on the edge
 		const textX =
 			offsetCenter + offsetCenter * offsetFromCenter * Math.cos(textAngle * degreesToRadians);
 		const textY =
 			offsetCenter + offsetCenter * offsetFromCenter * Math.sin(textAngle * degreesToRadians);
 
-		context.font = '700 20px sans-serif';
+		context.font = `700 ${textSize}px sans-serif`;
+		// context.font = '700 20px sans-serif';
 		context.textBaseline = 'middle';
 		context.textAlign = 'start';
 		context.fillStyle = color;
@@ -227,7 +233,7 @@
 
 	function onResize() {
 		const resizeHeight = resizeElement.clientHeight;
-		radius = resizeHeight / 2 - offset * 2;
+		radius = Math.floor(resizeHeight / 2 - offset * 2);
 
 		setTimeout(() => drawChart(pie), 1);
 
@@ -313,6 +319,7 @@
 			<svg id="pointer" viewBox="0 10 20 60">
 				<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="buttonface" />
 			</svg>
+			<div class="wheel-center" style="width: {wheelCenterSize}px; height: {wheelCenterSize}px;" />
 			<div
 				style="--wheel-rotation: {canvasRotation}deg; --wheel-outline: {winner?.color}"
 				class="wheel-canvas-wrapper"
@@ -361,6 +368,7 @@
 	}
 	#pointer {
 		position: absolute;
+		top: -10px;
 		left: 50%;
 		z-index: 2;
 		transform: translateX(-50%);
@@ -371,6 +379,19 @@
 	.wheel {
 		position: relative;
 		display: flex;
+
+		&-center {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			translate: -50% -50%;
+			z-index: 1;
+			border-radius: 50%;
+			box-shadow: inset 0 2px 4px black;
+			width: 150px;
+			height: 150px;
+			background-color: white;
+		}
 
 		&-canvas-wrapper {
 			display: flex;

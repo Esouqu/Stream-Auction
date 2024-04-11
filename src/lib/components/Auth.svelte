@@ -13,7 +13,7 @@
 	}
 </script>
 
-<div class="auth">
+<div class={`${isLoggedIn ? 'auth_loggedIn' : 'auth'}`}>
 	<div class="auth-title-wrapper">
 		<div class="icon-wrapper">
 			<img src={icon} alt="{title} Brand Icon" />
@@ -28,11 +28,21 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 10px;
+		padding: 20px;
+		border-radius: 5px;
+		background-color: var(--surface-container-highest);
 
 		&-title-wrapper {
 			display: flex;
 			align-items: center;
 			gap: 15px;
+		}
+
+		&_loggedIn {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
 		}
 	}
 </style>

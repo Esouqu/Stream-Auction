@@ -1,33 +1,31 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { routes } from '$lib/constants';
-	import { onMount } from 'svelte';
 
-	let selectorPosition = 0;
+	let selectorPosition: number;
 
-	// onMount(() => setSelectorPosition());
+	$: {
+		if ($page.route.id) {
+			const route = routes.find((r) => r.url === $page.route.id);
 
-	function setSelectorPosition() {
-		selectorPosition = $page.route.id === '/' ? 0 : 50;
+			selectorPosition = route?.id || 0;
+		}
 	}
 </script>
 
 <nav class="navigation">
-	<ul class="navigation-list" style="--select-left: {$page.route.id === '/' ? 0 : 50}px">
+	<ul class="navigation-list" style="--select-position: {selectorPosition * 50}px">
 		{#each routes as route}
-			<li>
-				<a
-					href={route.url}
-					class="navigation__route"
-					class:active={route.url === $page.route.id}
-					title={route.title}
-					draggable="false"
-				>
-					<div class="navigation-icon-wrapper">
+			<li
+				class="navigation__item"
+				class:active={route.url === $page.route.id}
+				data-title={route.title}
+				title={route.title}
+			>
+				<a href={route.url} class="navigation__route" draggable="false">
+					<div class="icon-wrapper" style="width: 30px; height: 30px;">
 						<img src={route.icon} alt="Navigation route icon" draggable="false" />
 					</div>
-					<!-- <h2>{route.title}</h2> -->
 				</a>
 			</li>
 		{/each}
@@ -41,12 +39,44 @@
 		box-shadow: inset 0 2px 4px black;
 		background-color: var(--surface-container);
 
-		& h2 {
-			margin: 0;
-			font-size: 18px;
-			text-transform: uppercase;
-		}
+		&__item {
+			// position: relative;
+			transition: opacity 0.2s;
 
+			&:not(.active) {
+				& .navigation__route {
+					opacity: 0.2;
+					cursor: pointer;
+
+					&:hover {
+						opacity: 0.7;
+					}
+				}
+			}
+
+			&:not(.active):hover::after {
+				opacity: 1;
+			}
+
+			&::after {
+				content: attr(data-title);
+				position: absolute;
+				bottom: -46px;
+				left: 50%;
+				translate: -50% 0px;
+				z-index: 999;
+				margin: 0;
+				padding: 5px 10px;
+				border-radius: 5px;
+				font-weight: 700;
+				letter-spacing: 0.5px;
+				text-transform: uppercase;
+				color: var(--on-inverse-surface);
+				background-color: var(--inverse-surface);
+				opacity: 0;
+				transition: opacity 0.2s;
+			}
+		}
 		&-list {
 			display: flex;
 			justify-content: center;
@@ -59,7 +89,7 @@
 				content: '';
 				position: absolute;
 				top: 0;
-				left: var(--select-left, 0);
+				left: var(--select-position, 0);
 				width: 50px;
 				height: 50px;
 				border-radius: 10px;
@@ -79,30 +109,10 @@
 			padding: 10px;
 			border: none;
 			text-decoration: none;
-			overflow: hidden;
 			color: white;
-			user-select: none;
 			transition: opacity 0.3s;
+			user-select: none;
 			cursor: default;
-
-			&:hover:not(.active) {
-				opacity: 0.7;
-			}
-
-			&:not(.active) {
-				cursor: pointer;
-				opacity: 0.2;
-			}
-		}
-
-		&-icon-wrapper {
-			display: flex;
-
-			& img {
-				width: 100%;
-				object-fit: contain;
-				transition: 0.2s;
-			}
 		}
 	}
 </style>

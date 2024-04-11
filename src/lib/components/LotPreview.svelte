@@ -2,7 +2,6 @@
 	export let id: number;
 	export let title: string;
 	export let color: string;
-	export let contrastColor: string;
 	export let percent: number;
 </script>
 
@@ -10,7 +9,9 @@
 	<div class="lot-preview__id" style="--lot-id-color: {color};">
 		#{id}
 	</div>
-	<div class="lot-preview__title">{title}</div>
+	<div style="display: grid; width: 100%;">
+		<div class="lot-preview__title">{title}</div>
+	</div>
 	<div class="lot-preview__percent">{Number(percent.toFixed(1))}%</div>
 </div>
 
@@ -23,7 +24,6 @@
 		&__title {
 			z-index: 0;
 			padding: 10px;
-			border-radius: 100px;
 			width: 100%;
 			text-overflow: ellipsis;
 			white-space: nowrap;

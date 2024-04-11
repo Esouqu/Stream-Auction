@@ -36,7 +36,9 @@
 
 <section class="wheel-section">
 	<Wheel bind:winner />
-	<ActionPanel>
+	<div
+		style="position: absolute; right: 20px; top: 25px; z-index: 999; display: flex; gap: 5px; align-items: center;"
+	>
 		<NumberInput
 			id="spin-time"
 			suffix="сек"
@@ -44,52 +46,74 @@
 			isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
 			bind:value={spinDuration}
 		/>
-		<Button
-			icon="cycle"
-			iconColor="black"
-			title="Ролл"
-			isFilled={true}
-			isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
-			on:click={() => {
-				actionManager.startWheelSpin(spinDuration * 1000);
-				currentExtendSpinPrice.set($extendSpinAction.price);
-			}}
-		/>
-		<Button
-			icon="dice"
-			iconColor="black"
-			title="Сгенерировать случайное число"
-			isFilled={true}
-			isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
-			on:click={() => {
-				spinDuration = getRandomInRange($minSpinDuration, $maxSpinDuration);
-			}}
-		/>
-		<Button
-			icon="listRemoveItem"
-			iconColor="white"
-			color="var(--error)"
-			title="Удалить текущий лот"
-			isFilled={true}
-			isDisabled={!winner ||
-				$wheelState === WHEEL_STATE.SPINNING ||
-				$wheelState === WHEEL_STATE.DELAYED}
-			on:click={deleteWinner}
-		/>
+		<div use:tooltip={{ content: 'Сгенерировать случайное число' }}>
+			<Button
+				icon="dice"
+				iconColor="black"
+				title="Сгенерировать случайное число"
+				isFilled={true}
+				isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
+				on:click={() => {
+					spinDuration = getRandomInRange($minSpinDuration, $maxSpinDuration);
+				}}
+			/>
+		</div>
+		{#if $wheelState === WHEEL_STATE.DELAYED || $wheelState === WHEEL_STATE.SPINNING}
+			<div use:tooltip={{ content: 'Остановить' }}>
+				<Button
+					icon="stopCycle"
+					iconColor="white"
+					color="var(--error)"
+					title="Остановить"
+					isFilled={true}
+					on:click={() => {
+						actionManager.stopWheelSpin();
+						currentExtendSpinPrice.set($extendSpinAction.price);
+					}}
+				/>
+			</div>
+		{:else}
+			<div use:tooltip={{ content: 'Крутить' }}>
+				<Button
+					icon="cycle"
+					iconColor="black"
+					title="Крутить"
+					isFilled={true}
+					on:click={() => {
+						actionManager.startWheelSpin(spinDuration * 1000);
+						currentExtendSpinPrice.set($extendSpinAction.price);
+					}}
+				/>
+			</div>
+		{/if}
+
+		<div use:tooltip={{ content: 'Удалить лот' }}>
+			<Button
+				icon="listRemoveItem"
+				iconColor="white"
+				color="var(--error)"
+				title="Удалить лот"
+				isFilled={true}
+				isDisabled={!winner ||
+					$wheelState === WHEEL_STATE.SPINNING ||
+					$wheelState === WHEEL_STATE.DELAYED}
+				on:click={deleteWinner}
+			/>
+		</div>
 		<div
 			use:tooltip={{
-				content: 'Рекомедуется включить аппаратное ускорение для более плавной анимации колеса',
-				placement: 'top'
+				content: 'Рекомедуется включить аппаратное ускорение для более плавной анимации колеса'
 			}}
 		>
 			<Button icon="warning" iconColor="white" isInteractive={false} />
 		</div>
-	</ActionPanel>
+	</div>
 </section>
 
 <style lang="scss">
 	.wheel-section {
 		display: flex;
+		flex: 1;
 		flex-direction: column;
 		justify-content: center;
 		width: 100%;

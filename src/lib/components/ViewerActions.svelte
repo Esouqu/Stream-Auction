@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { SOCKET_STATE } from '$lib/constants';
+	import centrifugo from '$lib/stores/centrifugo';
 	import settings from '$lib/stores/settings';
 	import SettingWrapper from './SettingWrapper.svelte';
 	import Snackbar from './Snackbar.svelte';
 	import TitledSection from './TitledSection.svelte';
 	import TransitionContainer from './TransitionContainer.svelte';
 
-	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
-
+	$: centrifugoState = centrifugo.state;
 	$: addLotWhileSpinAction = settings.addLotWhileSpinAction;
 	$: stopSpinAction = settings.stopSpinAction;
 	$: extendSpinAction = settings.extendSpinAction;
@@ -17,11 +17,11 @@
 	$: haveToggles = toggles.some((t) => t);
 </script>
 
-{#if haveToggles && isAuthorizedToDonationAlerts}
+{#if haveToggles && $centrifugoState === SOCKET_STATE.OPEN}
 	<TitledSection --titled-section-justify="center" title="Возможности зрителя">
 		{#if $addLotWhileSpinAction}
 			<Snackbar --snackbar-p="10px 20px">
-				<SettingWrapper title="Добавить / обновить лот во время кручения" />
+				<SettingWrapper title="Добавить вариант во время кручения" />
 			</Snackbar>
 		{/if}
 		{#if $stopSpinAction.isEnabled}
@@ -38,7 +38,7 @@
 				<SettingWrapper title="Продлить кручение колеса">
 					<TransitionContainer trigger={$currentExtendSpinPrice}>
 						<span class="default-title" style="min-width: max-content;">
-							{$currentExtendSpinPrice} руб
+							от {$currentExtendSpinPrice} руб
 						</span>
 					</TransitionContainer>
 				</SettingWrapper>

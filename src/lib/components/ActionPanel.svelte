@@ -16,10 +16,9 @@
 	.action-panel {
 		position: relative;
 		display: flex;
-		justify-content: space-between;
+		justify-content: center;
 		align-items: center;
 		gap: 5px;
-		border-radius: 10px 10px 0 0;
 		padding: 20px;
 		height: fit-content;
 
@@ -28,6 +27,7 @@
 			position: absolute;
 			top: 0;
 			left: 0;
+			border-radius: 0 0 10px 10px;
 			width: 100%;
 			height: 100%;
 			background-color: var(--surface-container);

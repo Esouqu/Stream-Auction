@@ -4,22 +4,26 @@
 
 	export let icon: iconTypes;
 	export let iconColor: 'white' | 'black' = 'white';
-	export let title: string = '';
+	export let title = '';
+	export let text = '';
 	export let color: string = 'var(--inverse-surface)';
 	export let size: number = 30;
 	export let isDisabled = false;
 	export let isFilled = false;
 	export let isInteractive = true;
+
+	$: hoverColor = iconColor === 'white' ? 'var(--hover-white)' : 'var(--hover-black)';
+	$: textColor = iconColor === 'white' ? 'var(--on-surface)' : 'var(--on-inverse-surface)';
 </script>
 
 <div style="display: contents; --button-color: {color};">
 	<button
-		style="--btn-hover-color: {iconColor === 'white' ? 'var(--hover-white)' : 'var(--hover-black)'}"
+		style="--btn-hover-color: {hoverColor};"
 		type="button"
 		class="button"
 		class:filled={isFilled}
 		class:interactive={isInteractive}
-		{title}
+		title={title || text}
 		disabled={isDisabled}
 		on:click|stopPropagation
 		on:mouseenter
@@ -29,6 +33,13 @@
 		{#if icon}
 			<div class="icon-wrapper" style="width: {size}px; height: {size}px;">
 				<img src={getIcon(icon, iconColor)} alt="Icon button" draggable="false" />
+			</div>
+		{/if}
+		{#if text}
+			<div
+				style="margin-left: 5px; font-size: 15px; font-weight: 700; line-height: 1; text-transform: uppercase; color: {textColor};"
+			>
+				{text}
 			</div>
 		{/if}
 	</button>

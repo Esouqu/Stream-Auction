@@ -31,6 +31,8 @@ import visibilityOffIcon from '$lib/assets/visibility_off_icon.svg';
 import visibilityOffIconBlack from '$lib/assets/visibility_off_icon_black.svg';
 import warningIcon from '$lib/assets/warning_icon.svg';
 import rubleIcon from '$lib/assets/currency_ruble_icon.svg';
+import stopCycleIcon from '$lib/assets/stop_cycle_icon.svg'
+import stopCycleIconBlack from '$lib/assets/stop_cycle_icon_black.svg'
 
 
 export type iconTypes =
@@ -48,6 +50,7 @@ export type iconTypes =
   | 'visibilityOff'
   | 'visibility'
   | 'cycle'
+  | 'stopCycle'
   | 'dice'
   | 'search'
   | 'bomb'
@@ -88,6 +91,8 @@ export default function getIcon(icon: iconTypes, color: 'white' | 'black' = 'whi
       return color === 'white' ? visibilityOffIcon : visibilityOffIconBlack;
     case 'cycle':
       return color === 'white' ? cycleIcon : cycleIconBlack;
+    case 'stopCycle':
+      return color === 'white' ? stopCycleIcon : stopCycleIconBlack;
     case 'dice':
       return color === 'white' ? diceIcon : diceIconBlack;
     case 'search':

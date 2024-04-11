@@ -2,6 +2,7 @@ import type { IRoute } from "./interfaces";
 import pieIcon from '$lib/assets/pie_chart_icon.svg';
 import listIcon from '$lib/assets/list_icon.svg';
 import settingsIcon from '$lib/assets/settings_icon.svg';
+import integrationsIcon from '$lib/assets/integrations_icon.svg';
 
 export enum WHEEL_STATE {
   IDLE = 'idle',
@@ -33,15 +34,15 @@ export enum SOCKET_STATE {
 export enum NAVIGATION_ROUTES {
   LOTS = '/',
   WHEEL = '/wheel',
-  // SETTINGS = '/settings',
+  SETTINGS = '/settings',
+  INTEGRATIONS = '/integrations',
 }
 
 export const routes: IRoute[] = [
   { id: 0, title: 'Лоты', icon: listIcon, url: NAVIGATION_ROUTES.LOTS },
   { id: 1, title: 'Колесо', icon: pieIcon, url: NAVIGATION_ROUTES.WHEEL },
-  // { id: 2, title: 'Настройки', icon: settingsIcon, url: NAVIGATION_ROUTES.SETTINGS }
-  // { id: 2, title: 'Бомбер', icon: getIcon('bomb'), url: '/bomber' },
-  // { id: 2, title: 'События', icon: eventIcon, url: '/events' },
+  { id: 2, title: 'Интеграции', icon: integrationsIcon, url: NAVIGATION_ROUTES.INTEGRATIONS },
+  { id: 3, title: 'Настройки', icon: settingsIcon, url: NAVIGATION_ROUTES.SETTINGS },
 ];
 
 export const radiansToDegrees = 180 / Math.PI;

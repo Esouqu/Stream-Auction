@@ -173,7 +173,7 @@
 		}
 		&__description {
 			font-weight: 500;
-			letter-spacing: 0.2px;
+			letter-spacing: 0.25px;
 			overflow-wrap: break-word;
 			overflow: hidden;
 		}
@@ -192,7 +192,8 @@
 			& p {
 				margin: 0;
 				font-size: 18px;
-				font-weight: 800;
+				font-weight: 700;
+				letter-spacing: 0.5px;
 			}
 		}
 	}

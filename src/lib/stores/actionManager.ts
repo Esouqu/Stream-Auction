@@ -88,6 +88,12 @@ function createActionManager() {
     wheel.startSpin(ms);
   }
 
+  function stopWheelSpin() {
+    timer.reset();
+    state.set(ACTION_MANAGER_STATE.IDLE);
+    wheel.stopSpin();
+  }
+
   function getSimilarLot(str: string) {
     const lotId = str.match(/\B(\#[\d]+\b)(?!;)/);
     const replacedLotId = lotId && Number(lotId[0].replace('#', ''));
@@ -158,7 +164,7 @@ function createActionManager() {
 
       case ACTION_MANAGER_STATE.DELAYING_WHEEL_WINNER:
       case ACTION_MANAGER_STATE.SPINNING_WHEEL: {
-        const isShouldStopSpin = _stopSpinAction.isEnabled && donationAmount >= _stopSpinAction.price;
+        const isShouldStopSpin = _stopSpinAction.isEnabled && donationAmount === _stopSpinAction.price;
         const isShouldExtendSpin = _extendSpinAction.isEnabled && donationAmount >= _currentExtendSpinPrice;
 
         if (!_addLotWhileSpinAction) {
@@ -195,6 +201,7 @@ function createActionManager() {
     state,
     initialize,
     startWheelSpin,
+    stopWheelSpin,
     processDonation,
     startAuction,
     pauseAuction,

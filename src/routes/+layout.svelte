@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { flip } from 'svelte/animate';
-	import { fly } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { NAVIGATION_ROUTES, SOCKET_STATE } from '$lib/constants';
 	import { getTotal } from '$lib/utils';
@@ -18,8 +17,6 @@
 	import Contact from '$lib/components/Contact.svelte';
 	import settings from '$lib/stores/settings';
 	import actionManager from '$lib/stores/actionManager';
-	import Tabs from '$lib/components/Tabs.svelte';
-	import Settings from '$lib/components/Settings.svelte';
 	import TitledSection from '$lib/components/TitledSection.svelte';
 	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_White.svg';
 	import ViewerActions from '$lib/components/ViewerActions.svelte';
@@ -27,9 +24,10 @@
 	import centrifugo from '$lib/stores/centrifugo';
 	import VirtualList from '$lib/components/VirtualList.svelte';
 	import TestKit from '$lib/components/TestKit.svelte';
+	import ActionPanel from '$lib/components/ActionPanel.svelte';
 
+	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
-	let currentTab: number;
 
 	$: centrifugoState = centrifugo.state;
 	$: transparency = settings.transparency;
@@ -37,7 +35,6 @@
 	$: background = settings.background;
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: total = getTotal($lots.map((l) => l.value));
-	$: tabs = [`Очередь (${$donations.length})`, 'Настройки'];
 
 	onMount(() => {
 		actionManager.initialize();
@@ -83,7 +80,7 @@
 					--titled-section-height="100%"
 					--titled-section-justify="center"
 					--titled-section-gap="0px"
-					title="Лоты"
+					title="Варианты"
 				>
 					<div class="list-headers">
 						<h4 style="min-width: 60px; margin-right: 10px; text-align: center;">ID</h4>
@@ -91,16 +88,16 @@
 						<h4 style="min-width: 90px; padding: 0 10.5px; text-align: center;">Процент</h4>
 					</div>
 					<VirtualList lots={sortedLots} minItems={11} let:item>
-						{@const { id, title, color, contrastColor } = item}
+						{@const { id, title, color } = item}
 						{@const percent = (item.value / total) * 100}
 
-						<LotPreview {id} {title} {color} {contrastColor} {percent} />
+						<LotPreview {id} {title} {color} {percent} />
 					</VirtualList>
 				</TitledSection>
 			{:else}
 				<Rules />
 			{/if}
-			<div style="display: flex; width: 100%; justify-content: center; gap: 20px;">
+			<div style="display: flex; width: 100%; justify-content: center; gap: 10px;">
 				<Contact icon={boostyIcon} title="Поддержать" url="https://boosty.to/esouqu/donate" />
 				<Contact title="Esouqu" icon={githubIconWhite} url="https://github.com/Esouqu" />
 				<Contact title="nikogda" icon={discordIconWhite} />
@@ -109,6 +106,7 @@
 	</div>
 	<div class="layout-section layout-section_center">
 		<div class="layout-section-wrapper">
+			<ActionPanel />
 			<slot />
 		</div>
 	</div>
@@ -116,35 +114,23 @@
 		<div class="layout-wrapper">
 			<Timer />
 			<!-- <TestKit /> -->
-			<Tabs options={tabs} bind:currentTab />
-			<div class="transition-container">
-				{#if currentTab === 0}
-					<div
-						style="display: flex; flex-direction: column; overflow: hidden;"
-						transition:fly={{ x: -200, duration: 300 }}
-					>
-						<div style="height: 100%; scrollbar-gutter: stable; overflow: hidden auto;">
-							<div class="donations-wrapper">
-								{#each $donations as { created_at, ...donation } (donation.id)}
-									<div style="width: 100%;" animate:flip={{ duration: 300 }}>
-										<Donation {...donation} />
-									</div>
-								{/each}
-							</div>
+			<div style="height: 100%; scrollbar-gutter: stable; overflow: hidden auto;">
+				<div class="donations-wrapper">
+					{#each $donations as { created_at, ...donation } (donation.id)}
+						<div style="width: 100%;" animate:flip={{ duration: 300 }}>
+							<Donation {...donation} />
 						</div>
-						<div class="indicator-wrapper">
-							<div class="icon-wrapper" style="padding: 10px;">
-								<img src={daIcon} alt="DonationAlerts icon" />
-							</div>
-							<Indicator isActive={$centrifugoState === SOCKET_STATE.OPEN} />
-						</div>
-					</div>
-				{:else if currentTab === 1}
-					<div style="overflow: hidden auto;" transition:fly={{ x: 200, duration: 300 }}>
-						<Settings />
-					</div>
-				{/if}
+					{/each}
+				</div>
 			</div>
+			{#if isAuthorizedToDonationAlerts}
+				<div class="indicator-wrapper">
+					<div class="icon-wrapper" style="padding: 10px; width: 40px; height: 40px;">
+						<img src={daIcon} alt="DonationAlerts icon" />
+					</div>
+					<Indicator isActive={$centrifugoState === SOCKET_STATE.OPEN} />
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -190,12 +176,12 @@
 
 		&-section-wrapper {
 			display: flex;
+			flex-direction: column;
 			flex: 1 1 0;
 			justify-content: center;
-			border-radius: 10px 10px 0 0;
+			// border-radius: 10px 10px 0 0;
 			width: 100%;
 			height: calc(100% - 83px);
-			overflow: hidden;
 		}
 
 		&-section {
@@ -213,7 +199,6 @@
 			&_center {
 				flex: 1 1 45%;
 				padding: 0;
-				margin-top: 20px;
 			}
 			&_right {
 				flex: 1 1 25%;
