@@ -3,9 +3,7 @@
 declare global {
   namespace App {
     // interface Error {}
-    interface Locals {
-      isAuthorizedToDonationAlerts: boolean;
-    }
+    // interface Locals {}
     interface PageData {
       isAuthorizedToDonationAlerts: boolean;
     }
