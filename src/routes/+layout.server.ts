@@ -26,8 +26,6 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, setHeaders }) => 
     }
   }
 
-  setHeaders({ 'Cache-Control': 'no-cache' });
-
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
   }
