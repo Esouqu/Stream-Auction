@@ -23,10 +23,8 @@ export const POST: RequestHandler = async ({ cookies, setHeaders }) => {
       })
     }).then((res) => res);
 
-    console.log(response);
     const tokenData = await response.json().then((data: IDonationAlertsRefreshToken) => data);
 
-    console.log(tokenData);
     cookies.set('daSession', tokenData.access_token, {
       path: '/',
       secure: !dev,

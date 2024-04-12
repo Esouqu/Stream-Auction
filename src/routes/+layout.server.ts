@@ -1,16 +1,12 @@
 import type { IDonationAlertsRefreshToken } from "$lib/interfaces";
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
+export const load: LayoutServerLoad = async ({ cookies, fetch, setHeaders }) => {
   let donationalertsSession = cookies.get('daSession');
   let donationalertsRefreshToken = cookies.get('daRefreshToken');
 
   if (!donationalertsSession && donationalertsRefreshToken) {
-    const refreshTokenResponse = await fetch('/api/donationalerts/refresh', {
-      method: 'POST', headers: {
-        'Cache-Control': 'no-cache'
-      }
-    })
+    const refreshTokenResponse = await fetch('/api/donationalerts/refresh', { method: 'POST' })
       .then((res) => res);
 
     if (refreshTokenResponse.ok) {
@@ -29,6 +25,8 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
       // return new Response('Failed to refresh session', { status: 401 });
     }
   }
+
+  setHeaders({ 'Cache-Control': 'no-cache' });
 
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
