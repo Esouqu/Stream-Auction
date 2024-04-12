@@ -3,7 +3,6 @@
 	import lots from '$lib/stores/lots';
 	import VirtualList from '$lib/components/VirtualList.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import ActionPanel from '$lib/components/ActionPanel.svelte';
 	import { getTotal } from '$lib/utils';
 	import Input from '$lib/components/Input.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';

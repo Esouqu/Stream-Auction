@@ -1,5 +1,7 @@
 import type { LayoutServerLoad } from "../$types";
 
-export const load: LayoutServerLoad = async ({ parent }) => {
-  await parent();
+export const load: LayoutServerLoad = async ({ locals }) => {
+  return {
+    isAuthorizedToDonationAlerts: locals.isAuthorizedToDonationAlerts,
+  }
 };
