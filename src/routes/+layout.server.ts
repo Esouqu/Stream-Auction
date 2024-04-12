@@ -6,7 +6,11 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
   let donationalertsRefreshToken = cookies.get('daRefreshToken');
 
   if (!donationalertsSession && donationalertsRefreshToken) {
-    const refreshTokenResponse = await fetch('/api/donationalerts/refresh', { method: 'POST' })
+    const refreshTokenResponse = await fetch('/api/donationalerts/refresh', {
+      method: 'POST', headers: {
+        'Cache-Control': 'no-cache'
+      }
+    })
       .then((res) => res);
 
     if (refreshTokenResponse.ok) {

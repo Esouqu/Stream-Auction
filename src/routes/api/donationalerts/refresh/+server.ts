@@ -23,8 +23,10 @@ export const POST: RequestHandler = async ({ cookies, setHeaders }) => {
       })
     }).then((res) => res);
 
+    console.log(response);
     const tokenData = await response.json().then((data: IDonationAlertsRefreshToken) => data);
 
+    console.log(tokenData);
     cookies.set('daSession', tokenData.access_token, {
       path: '/',
       secure: !dev,
@@ -38,8 +40,6 @@ export const POST: RequestHandler = async ({ cookies, setHeaders }) => {
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
       });
     }
-
-    setHeaders({ 'cache-control': 'no-store' });
 
     return new Response(JSON.stringify(tokenData), { status: 200 });
   } catch (err: unknown) {
