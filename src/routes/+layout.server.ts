@@ -9,6 +9,8 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, setHeaders }) => 
     const refreshTokenResponse = await fetch('/api/donationalerts/refresh', { method: 'POST' })
       .then((res) => res);
 
+    console.log(refreshTokenResponse.headers)
+
     if (refreshTokenResponse.ok) {
       const newSessionToken = await refreshTokenResponse.json()
         .then((data: IDonationAlertsRefreshToken) => data);
