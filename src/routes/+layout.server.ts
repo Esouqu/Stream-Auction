@@ -1,15 +1,13 @@
 import type { IDonationAlertsRefreshToken } from "$lib/interfaces";
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({ cookies, fetch, setHeaders }) => {
+export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
   let donationalertsSession = cookies.get('daSession');
   let donationalertsRefreshToken = cookies.get('daRefreshToken');
 
   if (!donationalertsSession && donationalertsRefreshToken) {
     const refreshTokenResponse = await fetch('/api/donationalerts/refresh', { method: 'POST' })
       .then((res) => res);
-
-    console.log(refreshTokenResponse.headers)
 
     if (refreshTokenResponse.ok) {
       const newSessionToken = await refreshTokenResponse.json()
