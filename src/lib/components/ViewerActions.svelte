@@ -26,7 +26,7 @@
 		{/if}
 		{#if $stopSpinAction.isEnabled}
 			<Snackbar --snackbar-p="10px 20px">
-				<SettingWrapper title="Остановить колесо">
+				<SettingWrapper title="Стоп колесо">
 					<span class="default-title" style="min-width: max-content;">
 						{$stopSpinAction.price} руб
 					</span>

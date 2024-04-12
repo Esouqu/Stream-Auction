@@ -4,7 +4,7 @@ import { PUBLIC_DA_CLIENT_ID } from "$env/static/public";
 import type { IDonationAlertsRefreshToken } from "$lib/interfaces";
 import type { RequestHandler } from "@sveltejs/kit";
 
-export const POST: RequestHandler = async ({ cookies }) => {
+export const POST: RequestHandler = async ({ cookies, setHeaders }) => {
   const refreshToken = cookies.get('daRefreshToken');
   const scope = 'oauth-user-show oauth-donation-subscribe';
 
@@ -38,6 +38,8 @@ export const POST: RequestHandler = async ({ cookies }) => {
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
       });
     }
+
+    setHeaders({ 'cache-control': 'no-store' });
 
     return new Response(JSON.stringify(tokenData), { status: 200 });
   } catch (err: unknown) {
