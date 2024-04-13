@@ -51,7 +51,6 @@
 		padding: var(--button-p, 5px);
 		border: none;
 		border-radius: 10px;
-		box-shadow: var(--elevation-1);
 		opacity: 1;
 		background-color: transparent;
 		transition: 0.1s;
@@ -66,6 +65,7 @@
 			}
 		}
 		&.filled {
+			box-shadow: var(--elevation-1);
 			background-color: var(--button-color);
 		}
 

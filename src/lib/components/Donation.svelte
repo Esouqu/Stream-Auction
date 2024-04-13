@@ -19,19 +19,28 @@
 	export let mostSimilarLot: ILot | undefined = undefined;
 	export let isInstant = false;
 
+	let moveDirection: 1 | -1 = 1;
+
 	$: transparency = settings.transparency;
 
-	function handleAddSimilar(e: Event) {
+	function removeDonation() {
+		moveDirection = 1;
+		donations.remove(id);
+	}
+
+	function addSimilarVariant(e: Event) {
 		if (!mostSimilarLot) return;
 		e.stopPropagation();
 
+		moveDirection = -1;
 		lots.addValue(mostSimilarLot.id, amount_in_user_currency, username);
 		donations.remove(id);
 	}
 
-	function handleAdd(e: Event) {
+	function addVariant(e: Event) {
 		e.stopPropagation();
 
+		moveDirection = -1;
 		lots.add(message, amount_in_user_currency, username);
 		donations.remove(id);
 	}
@@ -42,6 +51,7 @@
 			value: amount_in_user_currency,
 			username
 		};
+		moveDirection = -1;
 
 		e.dataTransfer?.setData('application/json', JSON.stringify(obj));
 		isDragged = true;
@@ -52,13 +62,14 @@
 	class="donation-wrapper"
 	class:dragged={isDragged}
 	class:donation-alerts={type === 'Donation Alerts'}
+	class:interactive={!isInstant}
 	style="--donation-opacity: {$transparency};"
 	draggable={!isInstant}
 	aria-hidden
 	on:dragstart={handleDragStart}
 	on:dragend={() => (isDragged = false)}
 	in:fly={{ y: 100 }}
-	out:fly={{ x: 500 }}
+	out:fly={{ x: 300 * moveDirection }}
 >
 	<div class="donation-icon icon-wrapper">
 		<img src={donationalertsIcon} alt="Donationalerts Icon" draggable="false" />
@@ -77,15 +88,15 @@
 			</div>
 
 			<div class="donation-buttons-wrapper">
-				<Button icon="listAddItem" on:click={handleAdd} />
+				<Button icon="listAddItem" on:click={addVariant} />
 				{#if mostSimilarLot}
 					<Button
 						icon="plus"
 						text={getShortenedText(mostSimilarLot.title, 21)}
-						on:click={handleAddSimilar}
+						on:click={addSimilarVariant}
 					/>
 				{/if}
-				<Button icon="delete" on:click={() => donations.remove(id)} />
+				<Button icon="delete" on:click={removeDonation} />
 			</div>
 		{/if}
 	</div>
@@ -130,7 +141,6 @@
 			transition: 0.2s;
 			user-select: none;
 			overflow: hidden;
-			cursor: grab;
 
 			&.dragged {
 				filter: grayscale(1);
@@ -138,8 +148,12 @@
 				transition: none;
 			}
 
-			&:active :not(.donation_small) {
-				cursor: grabbing;
+			&.interactive {
+				cursor: grab;
+
+				&:active {
+					cursor: grabbing;
+				}
 			}
 		}
 
