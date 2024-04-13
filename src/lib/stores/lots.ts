@@ -11,7 +11,7 @@ import db from "$lib/db";
 //   const contrastColor = getContrastColor(color);
 
 //   return {
-//     id,
+//     id: id + 1,
 //     title: wordList.words[Math.floor(Math.random() * wordList.words.length)].word,
 //     value: Math.floor(Math.random() * 100),
 //     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],

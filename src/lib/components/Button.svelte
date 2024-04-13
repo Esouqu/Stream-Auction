@@ -51,8 +51,9 @@
 		padding: var(--button-p, 5px);
 		border: none;
 		border-radius: 10px;
-		background-color: transparent;
+		box-shadow: var(--elevation-1);
 		opacity: 1;
+		background-color: transparent;
 		transition: 0.1s;
 		user-select: none;
 		cursor: pointer;

@@ -13,10 +13,10 @@ function createWheel() {
 
     return isClockwiseRotation ? 360 - angleModulo : angleModulo;
   });
-  const currentMaxSpeed = tweened(5, {
-    duration: 400,
-    easing: cubicOut,
-  });
+  // const currentMaxSpeed = tweened(5, {
+  //   duration: 400,
+  //   easing: cubicOut,
+  // });
 
   const initialMaxSpeed = 5;
   const minSpeed = 1;
@@ -81,7 +81,7 @@ function createWheel() {
     spinStartTime = 0;
     spinDuration = ms;
 
-    currentMaxSpeed.set(initialMaxSpeed);
+    // currentMaxSpeed.set(initialMaxSpeed);
     angle.set(randomAngle);
     state.set(WHEEL_STATE.SPINNING);
     requestAnimationFrame(_giveMoment);
@@ -93,7 +93,7 @@ function createWheel() {
     maxSpeed = Math.max(maxSpeed * decayFactor, minSpeed);
 
     state.set(WHEEL_STATE.SPINNING);
-    currentMaxSpeed.set(Math.max(maxSpeed * decayFactor, minSpeed));
+    // currentMaxSpeed.set(Math.max(maxSpeed * decayFactor, minSpeed));
     requestAnimationFrame(_giveMoment);
   }
 
@@ -101,7 +101,7 @@ function createWheel() {
     spinDuration += ms;
     maxSpeed = Math.max(maxSpeed * decayFactor, minSpeed);
 
-    currentMaxSpeed.set(Math.max(maxSpeed * decayFactor, minSpeed));
+    // currentMaxSpeed.set(Math.max(maxSpeed * decayFactor, minSpeed));
   }
 
   function stopSpin() {
@@ -114,7 +114,7 @@ function createWheel() {
     angle,
     normalizedAngle,
     spinDuration,
-    currentMaxSpeed,
+    // currentMaxSpeed,
     startSpin,
     extendSpin,
     stopSpin,

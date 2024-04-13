@@ -1,10 +1,12 @@
 <script lang="ts">
 	import settings from '$lib/stores/settings';
 
+	export let isDisabled = false;
+
 	$: transparency = settings.transparency;
 </script>
 
-<div class="snackbar" style="--snackbar-opacity: {$transparency};">
+<div class="snackbar" class:disabled={isDisabled} style="--snackbar-opacity: {$transparency};">
 	<div class="snackbar-inner">
 		<slot />
 	</div>
@@ -21,6 +23,11 @@
 		font-weight: 500;
 		font-variant-numeric: tabular-nums;
 		overflow: hidden;
+
+		&.disabled {
+			opacity: 0.5;
+			pointer-events: none;
+		}
 
 		&::before {
 			content: '';

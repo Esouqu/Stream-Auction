@@ -1,14 +1,17 @@
 <script lang="ts">
 	export let isToggled = false;
 	export let isDisabled = false;
+	export let isManualToggle = false;
 	export let on: (() => void) | null = null;
 	export let off: (() => void) | null = null;
 
 	function onToggle() {
-		isToggled = !isToggled;
+		if (on && !isToggled) on();
+		if (off && isToggled) off();
 
-		if (on && isToggled) on();
-		if (off && !isToggled) off();
+		if (!isManualToggle) {
+			isToggled = !isToggled;
+		}
 	}
 </script>
 

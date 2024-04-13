@@ -25,6 +25,7 @@ function createActionManager() {
   let _itemAddedAction: ISetting;
   let _leaderChangedAction: ISetting;
   let _addLotWhileSpinAction: boolean;
+  let _addByIdAction: boolean;
   let _currentExtendSpinPrice: number;
   let _wheelWinnerDelayTimeout: NodeJS.Timeout;
 
@@ -69,6 +70,7 @@ function createActionManager() {
     settings.itemAddedAction.subscribe((store) => _itemAddedAction = store);
     settings.leaderChangedAction.subscribe((store) => _leaderChangedAction = store);
     settings.addLotWhileSpinAction.subscribe((store) => _addLotWhileSpinAction = store);
+    settings.addByIdAction.subscribe((store) => _addByIdAction = store);
   }
 
   function startAuction() {
@@ -101,12 +103,12 @@ function createActionManager() {
 
     let lot: ILot | undefined;
 
-    if (replacedLotId && replacedLotId <= _lots.length) {
+    if (_addByIdAction && replacedLotId) {
       // If message have [#id]. get(lots).length = last generated lot id
       lot = findLotById(replacedLotId);
     } else {
-      // else try to find lot by string similarity
-      lot = findSameLot(str);
+      // else try to find exact same lot as donation message
+      lot = findLotByText(str);
     }
 
     return {
@@ -115,7 +117,7 @@ function createActionManager() {
     }
   }
 
-  function findSameLot(message: string) {
+  function findLotByText(message: string) {
     return _lots.find((item) => item.title.toLowerCase() === message.toLowerCase());
   }
 
@@ -189,6 +191,7 @@ function createActionManager() {
             wheel.extendSpin(_extendSpinAction.seconds * 1000);
             timer.add(_extendSpinAction.seconds * 1000);
           }
+
           settings.increaseExtendSpinPrice();
         }
 

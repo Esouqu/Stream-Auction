@@ -20,7 +20,6 @@
 				class="navigation__item"
 				class:active={route.url === $page.route.id}
 				data-title={route.title}
-				title={route.title}
 			>
 				<a href={route.url} class="navigation__route" draggable="false">
 					<div class="icon-wrapper" style="width: 30px; height: 30px;">

@@ -17,9 +17,11 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
       donationalertsSession = newSessionToken.access_token;
 
       // problem with cookies still persist
-      // if donationalerts session is expires and content of the page is not changed
+      // if return of that function is the same as previous, then
       // cookies is not refreshed on page reload
-      // have no idea how to fix it
+
+      // workaround is assigning randomId that will ensure that return content wiil be always different
+      // TODO change isAuthorizedToDonationAlerts to something more dynamic
     } else {
       // Handle the case where refreshing the session fails
       // You can redirect to a login page or handle it based on your requirements

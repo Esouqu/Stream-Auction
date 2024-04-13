@@ -12,7 +12,9 @@
 	import { page } from '$app/stores';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
+	let isCentrigugoToggleDisabled = false;
 
+	$: addByIdAction = settings.addByIdAction;
 	$: centrifugoState = centrifugo.state;
 	$: addLotWhileSpinAction = settings.addLotWhileSpinAction;
 	$: continueSpinAction = settings.extendSpinAction;
@@ -20,6 +22,11 @@
 	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
 	$: intensity = settings.intensity;
 	$: wheelWinnerDelay = settings.wheelWinnerDelay;
+	$: {
+		if ($centrifugoState !== SOCKET_STATE.OPEN) {
+			isCentrigugoToggleDisabled = false;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -29,7 +36,6 @@
 <section class="integrations-sections">
 	<div class="settings-wrapper">
 		<TitledSection>
-			<!-- <div style="display: flex; align-items: center; justify-content: center; height: 100%;"> -->
 			<Auth
 				icon={daIcon}
 				title="DonationAlerts"
@@ -40,7 +46,6 @@
 					isAuthorizedToDonationAlerts = false;
 				}}
 			/>
-			<!-- </div> -->
 			{#if isAuthorizedToDonationAlerts}
 				<div class="settings-row">
 					<div class="settings-column">
@@ -50,14 +55,28 @@
 								description="Отслеживать донаты пользователя и отображать их в очереди"
 							>
 								<Switch
-									on={() => centrifugo.connect()}
+									on={() => {
+										isCentrigugoToggleDisabled = true;
+										centrifugo.connect();
+									}}
 									off={() => centrifugo.disconnect()}
 									isToggled={$centrifugoState === SOCKET_STATE.OPEN}
-									isDisabled={$centrifugoState === SOCKET_STATE.CONNECTING}
+									isDisabled={$centrifugoState === SOCKET_STATE.CONNECTING ||
+										isCentrigugoToggleDisabled}
+									isManualToggle={true}
 								/>
 							</SettingWrapper>
 						</Snackbar>
-						<Snackbar>
+						<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
+							<SettingWrapper
+								title="Автодобавление по #ID"
+								description="Если в сообщении доната присутствует #ID, автоматически прибавляет сумму доната к варианту с этим ID"
+							>
+								<Switch bind:isToggled={$addByIdAction} />
+							</SettingWrapper>
+						</Snackbar>
+
+						<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 							<SettingWrapper
 								title="Задержка"
 								description="Определение победителя будет отложено на указанное значение, в течении которого можно продлить кручение или добавить вариант"
@@ -73,7 +92,7 @@
 								/>
 							</SettingWrapper>
 						</Snackbar>
-						<Snackbar>
+						<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 							<SettingWrapper
 								title="Жаришка нереальная"
 								description="С каждым донатом, который равен или выше заданного значения, увеличивается огонь на заднем фоне, который постепенно уменьшается"
@@ -92,7 +111,7 @@
 						</Snackbar>
 					</div>
 					<div class="settings-column">
-						<Snackbar>
+						<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 							<SettingWrapper
 								title="Вклин"
 								description="Возможность добавлять вариант во время кручения колеса"
@@ -100,7 +119,7 @@
 								<Switch bind:isToggled={$addLotWhileSpinAction} />
 							</SettingWrapper>
 						</Snackbar>
-						<Snackbar>
+						<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 							<SettingWrapper
 								title="Стоп колесо"
 								description="Если сумма доната равна заданному значению, добавляет вариант из доната и останавливает колесо"
@@ -116,7 +135,7 @@
 								/>
 							</SettingWrapper>
 						</Snackbar>
-						<Snackbar>
+						<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 							<SettingWrapper
 								title="Продлевать кручение"
 								description="Если сумма доната равна или превышает заданное значение, продлевает кручение колеса"

@@ -44,7 +44,6 @@
 
 	$: width = radius * 2;
 	$: textSize = (radius / 100) * 5;
-	$: pointerSize = radius / baseRadius;
 	$: wheelCenterSize = baseWheelCenterSize * (textSize / 20);
 	$: offsetCenter = radius + offset / 2;
 	$: angle = wheel.angle;
@@ -209,16 +208,14 @@
 		}
 	}
 
-	function getWinner(
-		angle: number,
-		targetPie: IPieItem[] = [...pie].sort((a, b) => a.startAngle - b.startAngle)
-	) {
+	function getWinner(angle: number) {
+		const sortedPie = [...pie].sort((a, b) => a.startAngle - b.startAngle);
 		let left = 0;
-		let right = targetPie.length - 1;
+		let right = sortedPie.length - 1;
 
 		while (left <= right) {
 			const mid = Math.floor((left + right) / 2);
-			const slice = targetPie[mid];
+			const slice = sortedPie[mid];
 
 			if (slice.startAngle <= angle && slice.endAngle >= angle) {
 				winner = slice;
@@ -248,6 +245,7 @@
 
 		isDragging = false;
 		wheel.angle.set(draggingAngle);
+		document.body.classList.remove('grabbing');
 	}
 
 	function onMove(x: number, y: number) {
@@ -263,6 +261,7 @@
 
 		onResize();
 
+		document.body.classList.add('grabbing');
 		winner = null;
 		isDragging = true;
 		draggingStartAngle = calculateAngle(x, y);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, slide } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import lots from '$lib/stores/lots';
 	import VirtualList from '$lib/components/VirtualList.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -89,7 +89,10 @@
 
 	<div style="position: absolute; right: 20px; top: 25px; z-index: 999; display: flex; gap: 5px;">
 		{#if isAddingLot}
-			<div style="display: flex;" transition:slide={{ axis: 'x', duration: 200 }}>
+			<div
+				style="display: flex; position: absolute; bottom: -65px; right: 0;"
+				transition:fly={{ y: -20, duration: 200 }}
+			>
 				<Input
 					--input-w="300px"
 					type="text"
@@ -112,7 +115,10 @@
 			</div>
 		{/if}
 		{#if isSearching}
-			<div style="display: flex;" transition:slide={{ axis: 'x', duration: 200 }}>
+			<div
+				style="position: absolute; bottom: -65px; right: 0;"
+				transition:fly={{ y: -20, duration: 200 }}
+			>
 				<Input
 					--input-w="300px"
 					type="text"
@@ -128,7 +134,7 @@
 			<Button
 				icon="listAddItem"
 				iconColor={isAddingLot ? 'white' : 'black'}
-				color={isAddingLot ? 'var(--primary-50)' : 'white'}
+				color={isAddingLot ? 'var(--primary-50)' : 'var(--inverse-surface)'}
 				isFilled={true}
 				on:click={addItem}
 			/>
@@ -138,7 +144,7 @@
 			<Button
 				icon="search"
 				iconColor={isSearching ? 'white' : 'black'}
-				color={isSearching ? 'var(--primary-50)' : 'white'}
+				color={isSearching ? 'var(--primary-50)' : 'var(--inverse-surface)'}
 				isFilled={true}
 				isDisabled={$lots.length < 1}
 				on:click={search}

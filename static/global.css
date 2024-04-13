@@ -76,6 +76,12 @@ body {
   background-position: center;
   transition: background-color .3s;
   overflow: hidden;
+
+  &.grabbing {
+    user-select: none;
+    cursor: grabbing;
+    pointer-events: none;
+  }
 }
 
 a {

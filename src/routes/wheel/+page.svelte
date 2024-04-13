@@ -43,6 +43,7 @@
 			id="spin-time"
 			suffix="сек"
 			label="Длительность"
+			isFilled={true}
 			isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
 			bind:value={spinDuration}
 		/>

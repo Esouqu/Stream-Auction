@@ -11,7 +11,7 @@ function createSettings() {
     url: '',
     type: 'image'
   }, 'background');
-  const transparency = storable(1, 'transparency');
+  const transparency = storable(0.7, 'transparency');
   const intensity = storable({
     isEnabled: false,
     price: 1000,
@@ -30,6 +30,7 @@ function createSettings() {
     price: 30,
     step: 10,
   }, 'extendSpinAction');
+  const addByIdAction = storable(true, 'addByIdAction');
   const addLotWhileSpinAction = storable(true, 'addLotWhileSpinAction');
   const itemAddedAction = storable({
     isEnabled: true,
@@ -41,8 +42,8 @@ function createSettings() {
   }, 'leaderChangedAction');
   const timerBaseTime = storable(10, 'timerBaseTime');
   const currentExtendSpinPrice = writable(get(extendSpinAction).price);
-  let minSpinDuration = storable(10, 'minSpinDuration');
-  let maxSpinDuration = storable(100, 'maxSpinDuration');
+  const minSpinDuration = storable(10, 'minSpinDuration');
+  const maxSpinDuration = storable(100, 'maxSpinDuration');
 
   function increaseExtendSpinPrice() {
     currentExtendSpinPrice.update((state) => state + get(extendSpinAction).step);
@@ -70,6 +71,7 @@ function createSettings() {
     currentExtendSpinPrice,
     minSpinDuration,
     maxSpinDuration,
+    addByIdAction,
     increaseExtendSpinPrice,
     resetBackground,
     setBackgroundType,
