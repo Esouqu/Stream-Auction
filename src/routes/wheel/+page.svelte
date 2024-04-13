@@ -1,6 +1,5 @@
 <script lang="ts">
 	import tooltip from '$lib/actions/tooltip';
-	import ActionPanel from '$lib/components/ActionPanel.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import Wheel from '$lib/components/Wheel.svelte';
