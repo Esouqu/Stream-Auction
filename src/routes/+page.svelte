@@ -64,7 +64,7 @@
 </svelte:head>
 
 <section class="auction-section">
-	<div class="virtual-list-wrapper">
+	<div class="list-wrapper">
 		<div class="list-headers">
 			<h4 style="min-width: 60px; margin-right: 10px; text-align: center;">ID</h4>
 			<h4 style="width: 100%; padding: 0 10.5px;">Название</h4>
@@ -90,7 +90,7 @@
 	<div style="position: absolute; right: 20px; top: 25px; z-index: 999; display: flex; gap: 5px;">
 		{#if isAddingLot}
 			<div
-				style="display: flex; position: absolute; bottom: -65px; right: 0;"
+				style="display: flex; position: absolute; bottom: -60px; right: 0;"
 				transition:fly={{ y: -20, duration: 200 }}
 			>
 				<Input
@@ -116,7 +116,7 @@
 		{/if}
 		{#if isSearching}
 			<div
-				style="position: absolute; bottom: -65px; right: 0;"
+				style="position: absolute; bottom: -60px; right: 0;"
 				transition:fly={{ y: -20, duration: 200 }}
 			>
 				<Input
@@ -173,7 +173,7 @@
 </section>
 
 <style lang="scss">
-	.virtual-list-wrapper {
+	.list-wrapper {
 		position: relative;
 		display: flex;
 		flex: 1 1 0;

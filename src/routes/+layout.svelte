@@ -25,9 +25,11 @@
 	import VirtualList from '$lib/components/VirtualList.svelte';
 	import TestKit from '$lib/components/TestKit.svelte';
 	import ActionPanel from '$lib/components/ActionPanel.svelte';
+	import Switch from '$lib/components/Switch.svelte';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
+	let isCentrigugoToggleDisabled = false;
 
 	$: centrifugoState = centrifugo.state;
 	$: transparency = settings.transparency;
@@ -35,6 +37,11 @@
 	$: background = settings.background;
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: total = getTotal($lots.map((l) => l.value));
+	$: {
+		if ($centrifugoState !== SOCKET_STATE.OPEN) {
+			isCentrigugoToggleDisabled = false;
+		}
+	}
 
 	onMount(() => {
 		actionManager.initialize();
@@ -87,7 +94,7 @@
 						<h4 style="width: 100%; padding: 0 10.5px;">Название</h4>
 						<h4 style="min-width: 90px; padding: 0 10.5px; text-align: center;">Процент</h4>
 					</div>
-					<VirtualList lots={sortedLots} minItems={11} let:item>
+					<VirtualList lots={sortedLots} let:item>
 						{@const { id, title, color } = item}
 						{@const percent = (item.value / total) * 100}
 
@@ -128,7 +135,18 @@
 					<div class="icon-wrapper" style="padding: 10px; width: 35px; height: 35px;">
 						<img src={daIcon} alt="DonationAlerts icon" />
 					</div>
-					<Indicator isActive={$centrifugoState === SOCKET_STATE.OPEN} />
+					<!-- <div class="default-title" style="margin-right: 10px;">DonationAlerts</div> -->
+					<!-- <Indicator isActive={$centrifugoState === SOCKET_STATE.OPEN} /> -->
+					<Switch
+						on={() => {
+							isCentrigugoToggleDisabled = true;
+							centrifugo.connect();
+						}}
+						off={() => centrifugo.disconnect()}
+						isToggled={$centrifugoState === SOCKET_STATE.OPEN}
+						isDisabled={$centrifugoState === SOCKET_STATE.CONNECTING || isCentrigugoToggleDisabled}
+						isManualToggle={true}
+					/>
 				</div>
 			{/if}
 		</div>

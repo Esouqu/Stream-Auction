@@ -95,7 +95,7 @@
 						<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 							<SettingWrapper
 								title="Жаришка нереальная"
-								description="С каждым донатом, который равен или выше заданного значения, увеличивается огонь на заднем фоне, который постепенно уменьшается"
+								description="С каждым донатом, сумма которого равна или выше заданного значения, увеличивается огонь на заднем фоне, который постепенно уменьшается"
 							>
 								<Switch bind:isToggled={$intensity.isEnabled} />
 							</SettingWrapper>

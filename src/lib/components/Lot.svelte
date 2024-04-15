@@ -23,9 +23,7 @@
 
 	onMount(() => {
 		return lots.lotValueChanged.subscribe((lot) => {
-			if (lot?.id === id) {
-				animate();
-			}
+			if (lot?.id === id) animate();
 		});
 	});
 
