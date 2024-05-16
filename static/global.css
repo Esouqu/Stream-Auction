@@ -1,33 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-/* @font-face {
-  font-family: 'San Francisco Pro';
-  font-style: normal;
-  font-weight: 400;
-  src: url('/fonts/San Francisco Pro/text/SF-Pro-Text-Regular.otf');
-}
-
-@font-face {
-  font-family: 'San Francisco Pro';
-  font-style: normal;
-  font-weight: 500;
-  src: url('/fonts/San Francisco Pro/text/SF-Pro-Text-Medium.otf');
-}
-
-@font-face {
-  font-family: 'San Francisco Pro';
-  font-style: normal;
-  font-weight: 600;
-  src: url('/fonts/San Francisco Pro/text/SF-Pro-Text-Semibold.otf');
-}
-
-@font-face {
-  font-family: 'San Francisco Pro';
-  font-style: normal;
-  font-weight: 700;
-  src: url('/fonts/San Francisco Pro/text/SF-Pro-Text-Bold.otf');
-} */
-
 :root {
   --color-orange: #F57D07;
   --donation-orange: #FF8E33;
@@ -86,6 +58,12 @@ body {
 
 a {
   color: var(--primary-60);
+}
+
+@supports (-moz-appearance:none) {
+  * {
+    scrollbar-width: thin;
+  }
 }
 
 *::selection {

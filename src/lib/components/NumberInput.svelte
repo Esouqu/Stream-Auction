@@ -81,6 +81,8 @@
 
 <style lang="scss">
 	.input {
+		-moz-appearance: textfield;
+		appearance: textfield;
 		position: relative;
 		padding: 10.5px;
 		// border: 1px solid var(--outline);

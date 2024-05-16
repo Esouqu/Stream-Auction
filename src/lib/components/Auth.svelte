@@ -36,7 +36,7 @@
 		&-title-wrapper {
 			display: flex;
 			align-items: center;
-			gap: 15px;
+			gap: 10px;
 		}
 
 		&_loggedIn {

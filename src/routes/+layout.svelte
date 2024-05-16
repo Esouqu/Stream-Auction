@@ -132,7 +132,7 @@
 			</div>
 			{#if isAuthorizedToDonationAlerts}
 				<div class="indicator-wrapper">
-					<div class="icon-wrapper" style="padding: 10px; width: 35px; height: 35px;">
+					<div class="icon-wrapper" style="padding: 10px;">
 						<img src={daIcon} alt="DonationAlerts icon" />
 					</div>
 					<!-- <div class="default-title" style="margin-right: 10px;">DonationAlerts</div> -->
