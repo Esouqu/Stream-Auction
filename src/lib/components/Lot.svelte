@@ -98,7 +98,7 @@
 	on:drop|preventDefault={(e) => handleDrop(e)}
 >
 	<div class="lot__id" style="--lot-id-color: {color};">#{id}</div>
-	<div class="lot-inputs-wrapper">
+	<div class="lot-inputs-wrapper" {title}>
 		<Input
 			--input-w-w="100%"
 			id="lot-text-{id}"
