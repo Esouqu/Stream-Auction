@@ -37,5 +37,5 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
   });
 
-  throw redirect(301, '/integrations');
+  throw redirect(301, '/settings');
 };

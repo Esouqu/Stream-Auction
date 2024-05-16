@@ -15,8 +15,8 @@
 		display: flex;
 		flex: 1;
 		flex-direction: column;
+		gap: 20px;
 		width: 100%;
-		margin-top: 20px;
 		overflow: hidden auto;
 	}
 </style>
