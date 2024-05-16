@@ -122,7 +122,7 @@
 
 		return items.map((item, idx) => {
 			const deg = (item.value / total) * 360;
-			const isUrl = extractUrl(item.title);
+			const url = extractUrl(item.title);
 
 			startAngle = idx && endAngle;
 			endAngle = !idx ? deg : startAngle + deg;
@@ -132,7 +132,7 @@
 				percent: getPercentFromTotal(item.value, total),
 				startAngle,
 				endAngle,
-				isUrl: !!isUrl
+				url
 			};
 		});
 	}
@@ -299,14 +299,10 @@
 				{@const title = `${winner.title} (${winner.percent}%)`}
 
 				<div class="winner" transition:fade={{ duration: 200 }}>
-					{#if winner.isUrl}
-						<a href={winner.title} target="_blank">
-							{title}
-						</a>
+					{#if winner.url}
+						<a href={winner.url} target="_blank">{title}</a>
 					{:else}
-						<span>
-							{title}
-						</span>
+						<span>{title}</span>
 					{/if}
 					{#if winner.donators.length > 0}
 						<div class="winner-donators">
@@ -345,7 +341,7 @@
 		font-size: 24px;
 		font-weight: bold;
 		text-align: center;
-		text-transform: uppercase;
+		// text-transform: uppercase;
 		/* white-space: nowrap; */
 		text-overflow: ellipsis;
 		color: white;

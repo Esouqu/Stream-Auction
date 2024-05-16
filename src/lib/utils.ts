@@ -107,7 +107,7 @@ export function formatTime(ms: number) {
 }
 
 export function extractUrl(str: string) {
-  const urlMatch = str.match(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}[^\s]+/g);
+  const urlMatch = str.match(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}[^\s]+/);
   // const urlMatch = str.match(/(https?:\/\/[^\s]+)/);
 
   if (urlMatch) return urlMatch[0];

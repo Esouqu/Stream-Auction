@@ -28,7 +28,7 @@ export interface IPieItem extends ILot {
   percent: string;
   startAngle: number;
   endAngle: number;
-  isUrl: boolean;
+  url?: string;
 }
 
 export interface IAuthTokenData {

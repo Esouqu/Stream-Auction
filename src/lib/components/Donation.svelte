@@ -46,14 +46,15 @@
 	}
 
 	function handleDragStart(e: DragEvent) {
-		const obj = {
-			id,
-			value: amount_in_user_currency,
-			username
-		};
+		e.dataTransfer?.setData(
+			'application/json',
+			JSON.stringify({
+				id,
+				value: amount_in_user_currency,
+				username
+			})
+		);
 		moveDirection = -1;
-
-		e.dataTransfer?.setData('application/json', JSON.stringify(obj));
 		isDragged = true;
 	}
 </script>

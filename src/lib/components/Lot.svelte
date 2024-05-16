@@ -67,7 +67,6 @@
 
 		lots.addValue(id, donation.value, donation.username);
 		donations.remove(donation.id);
-		e.dataTransfer?.clearData();
 		isHovered = false;
 	}
 
