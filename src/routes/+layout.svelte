@@ -34,6 +34,8 @@
 	$: transparency = settings.transparency;
 	$: intensity = settings.intensity;
 	$: background = settings.background;
+	$: isAutoScrollEnabled = settings.isAutoScrollEnabled;
+
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: total = getTotal($lots.map((l) => l.value));
 	$: {
@@ -93,7 +95,11 @@
 						<h4 style="width: 100%; padding: 0 10.5px;">Название</h4>
 						<h4 style="min-width: 90px; padding: 0 10.5px; text-align: center;">Процент</h4>
 					</div>
-					<VirtualList lots={sortedLots} let:item>
+					<VirtualList
+						lots={sortedLots}
+						isAutoScrollEnabled={$isAutoScrollEnabled.wheelList}
+						let:item
+					>
 						{@const { id, title, color } = item}
 						{@const percent = (item.value / total) * 100}
 
@@ -112,15 +118,7 @@
 	</div>
 	<div class="layout-section layout-section_center">
 		<div class="layout-section-wrapper">
-			<div
-				style="		position: relative;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 5px;
-			padding: 20px;
-			height: fit-content;"
-			>
+			<div class="navigation-wrapper">
 				<Navigation />
 			</div>
 			<slot />
@@ -144,8 +142,6 @@
 					<div class="icon-wrapper" style="padding: 10px;">
 						<img src={daIcon} alt="DonationAlerts icon" />
 					</div>
-					<!-- <div class="default-title" style="margin-right: 10px;">DonationAlerts</div> -->
-					<!-- <Indicator isActive={$centrifugoState === SOCKET_STATE.OPEN} /> -->
 					<Switch
 						on={() => {
 							isCentrigugoToggleDisabled = true;
@@ -173,6 +169,15 @@
 			margin: 10px 0;
 			letter-spacing: 0.5px;
 		}
+	}
+	.navigation-wrapper {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 5px;
+		padding: 20px;
+		height: fit-content;
 	}
 	.layout {
 		position: relative;

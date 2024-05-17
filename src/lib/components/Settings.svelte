@@ -39,6 +39,7 @@
 	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
 	$: intensity = settings.intensity;
 	$: wheelWinnerDelay = settings.wheelWinnerDelay;
+	$: isAutoScrollEnabled = settings.isAutoScrollEnabled;
 	$: {
 		if ($centrifugoState !== SOCKET_STATE.OPEN) {
 			isCentrigugoToggleDisabled = false;
@@ -234,35 +235,6 @@
 			</div>
 		</div>
 	</TitledSection>
-	<TitledSection title="Колесо">
-		<div class="settings-row">
-			<div class="settings-column">
-				<Snackbar>
-					<SettingWrapper
-						title="Диапазон случайного числа"
-						description="Диапазон в котором генерируется случайное число по нажатию кнопки генерации"
-					>
-						<div style="text-wrap: nowrap; min-width: 55px; text-align: center;">
-							От {$minSpinDuration}
-						</div>
-						<div style="text-wrap: nowrap; min-width: 55px; text-align: center;">
-							До {$maxSpinDuration}
-						</div>
-					</SettingWrapper>
-					<RangeSlider
-						--slider-width="100%"
-						isDoubleInput={true}
-						min={1}
-						max={300}
-						step={1}
-						bind:from={$minSpinDuration}
-						bind:to={$maxSpinDuration}
-					/>
-				</Snackbar>
-			</div>
-			<div class="settings-column" />
-		</div>
-	</TitledSection>
 	<TitledSection title="Фон">
 		<div class="settings-row">
 			<Snackbar>
@@ -314,6 +286,48 @@
 					bind:to={$backgroundTransparency}
 				/>
 			</Snackbar>
+		</div>
+	</TitledSection>
+	<TitledSection title="Остальное">
+		<div class="settings-row">
+			<div class="settings-column">
+				<Snackbar>
+					<SettingWrapper
+						title="Диапазон случайного числа"
+						description="Диапазон в котором генерируется случайное число по нажатию кнопки генерации"
+					>
+						<div style="text-wrap: nowrap; min-width: 55px; text-align: center;">
+							От {$minSpinDuration}
+						</div>
+						<div style="text-wrap: nowrap; min-width: 55px; text-align: center;">
+							До {$maxSpinDuration}
+						</div>
+					</SettingWrapper>
+					<RangeSlider
+						--slider-width="100%"
+						isDoubleInput={true}
+						min={1}
+						max={300}
+						step={1}
+						bind:from={$minSpinDuration}
+						bind:to={$maxSpinDuration}
+					/>
+				</Snackbar>
+			</div>
+			<div class="settings-column">
+				<Snackbar>
+					<SettingWrapper
+						title="Автоскролинг списка"
+						description="Списки на указанных страницах будут автоматически прокручиваться"
+					/>
+					<SettingWrapper title="На аукционе">
+						<Switch bind:isToggled={$isAutoScrollEnabled.auctionList} />
+					</SettingWrapper>
+					<SettingWrapper title="На колесе">
+						<Switch bind:isToggled={$isAutoScrollEnabled.wheelList} />
+					</SettingWrapper>
+				</Snackbar>
+			</div>
 		</div>
 	</TitledSection>
 </div>

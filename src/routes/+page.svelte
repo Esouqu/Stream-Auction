@@ -8,6 +8,7 @@
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import tooltip from '$lib/actions/tooltip';
 	import Lot from '$lib/components/Lot.svelte';
+	import settings from '$lib/stores/settings';
 
 	let text: string;
 	let value: number;
@@ -17,6 +18,7 @@
 	let titleInputElement: HTMLInputElement;
 	let searchLotInputElement: HTMLInputElement;
 
+	$: isAutoScrollEnabled = settings.isAutoScrollEnabled;
 	$: sortedLots = [...$lots]
 		.sort((a, b) => b.value - a.value)
 		.filter((l) => l.title.toLowerCase().includes(searchText.toLowerCase()));
@@ -73,7 +75,7 @@
 			<h4 style="margin-right: 10px; min-width: 81px; text-align: center; ">Действия</h4>
 		</div>
 
-		<VirtualList lots={sortedLots} let:item>
+		<VirtualList lots={sortedLots} isAutoScrollEnabled={$isAutoScrollEnabled.auctionList} let:item>
 			{@const percent = (item.value / total) * 100}
 			{@const { position, donators, contrastColor, ...rest } = item}
 
