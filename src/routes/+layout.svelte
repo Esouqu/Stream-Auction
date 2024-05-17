@@ -20,12 +20,11 @@
 	import TitledSection from '$lib/components/TitledSection.svelte';
 	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_White.svg';
 	import ViewerActions from '$lib/components/ViewerActions.svelte';
-	import Indicator from '$lib/components/Indicator.svelte';
 	import centrifugo from '$lib/stores/centrifugo';
 	import VirtualList from '$lib/components/VirtualList.svelte';
 	import TestKit from '$lib/components/TestKit.svelte';
-	import ActionPanel from '$lib/components/ActionPanel.svelte';
 	import Switch from '$lib/components/Switch.svelte';
+	import Navigation from '$lib/components/Navigation.svelte';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
@@ -113,7 +112,17 @@
 	</div>
 	<div class="layout-section layout-section_center">
 		<div class="layout-section-wrapper">
-			<ActionPanel />
+			<div
+				style="		position: relative;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 5px;
+			padding: 20px;
+			height: fit-content;"
+			>
+				<Navigation />
+			</div>
 			<slot />
 		</div>
 	</div>

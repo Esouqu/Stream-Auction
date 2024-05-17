@@ -2,12 +2,7 @@
 	import Navigation from './Navigation.svelte';
 </script>
 
-<div class="action-panel">
-	<Navigation />
-	<div style="z-index: 0; display: flex; gap: 5px;">
-		<slot />
-	</div>
-</div>
+<div class="action-panel" />
 
 <style lang="scss">
 	.action-panel {
