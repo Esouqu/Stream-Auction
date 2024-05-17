@@ -120,7 +120,7 @@
 	<div class="layout-section layout-section_right">
 		<div class="layout-wrapper">
 			<Timer />
-			<!-- <TestKit /> -->
+			<TestKit />
 			<div style="height: 100%; scrollbar-gutter: stable; overflow: hidden auto;">
 				<div class="donations-wrapper">
 					{#each $donations as { created_at, ...donation } (donation.id)}

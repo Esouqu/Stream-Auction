@@ -35,7 +35,7 @@
 		{/if}
 		{#if text}
 			<div
-				style="margin-left: 5px; font-size: 15px; font-weight: 700; line-height: 1; text-transform: uppercase; color: {textColor};"
+				style="margin-left: 5px; font-size: 15px; font-weight: 700; line-height: 1; color: {textColor};"
 			>
 				{text}
 			</div>

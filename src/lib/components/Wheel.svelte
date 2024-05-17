@@ -16,6 +16,7 @@
 	import { WHEEL_STATE, degreesToRadians, radiansToDegrees } from '$lib/constants';
 	import winnerSound from '$lib/assets/sounds/winner_sound.wav';
 	import { beforeNavigate } from '$app/navigation';
+	import anime from 'animejs';
 
 	const baseRadius = 360;
 	const offset = 20;
@@ -24,6 +25,7 @@
 
 	export let winner: IPieItem | null = null;
 
+	let prevWinner: IPieItem | null = null;
 	let radius = baseRadius;
 	let isDragging = false;
 	let isSettingsShown = true;
@@ -40,11 +42,14 @@
 	let wheelX: number;
 	let wheelY: number;
 	let resizeElement: HTMLDivElement;
+	let pointerElement: SVGSVGElement;
 	let pie: IPieItem[] = [];
+	let sortedPie: IPieItem[] = [];
+	let pointerAnimation: anime.AnimeInstance;
 
 	$: width = radius * 2;
 	$: textSize = (radius / 100) * 5;
-	$: wheelCenterSize = baseWheelCenterSize * (textSize / 20);
+	$: wheelCenterSize = baseWheelCenterSize * (textSize / 13);
 	$: offsetCenter = radius + offset / 2;
 	$: angle = wheel.angle;
 	$: normalizedAngle = wheel.normalizedAngle;
@@ -57,6 +62,11 @@
 			drawChart(pie);
 		}
 	}
+	$: {
+		if (wheelState === WHEEL_STATE.SPINNING && prevWinner?.id !== winner?.id) {
+			pointerAnimation.restart();
+		}
+	}
 
 	beforeNavigate(() => {
 		if (wheelState === WHEEL_STATE.STOPPED) wheel.state.set(WHEEL_STATE.IDLE);
@@ -67,13 +77,13 @@
 			const updatedPie = createPie(store);
 
 			pie = updatedPie;
+			sortedPie = [...updatedPie].sort((a, b) => a.startAngle - b.startAngle);
 			drawChart(updatedPie);
 
 			if (wheelState !== WHEEL_STATE.IDLE && wheelState !== WHEEL_STATE.STOPPED) {
 				getWinner($normalizedAngle);
 			}
 		});
-
 		const unsubWheelState = wheel.state.subscribe((store) => {
 			wheelState = store;
 
@@ -88,6 +98,12 @@
 		});
 
 		context = canvas.getContext('2d');
+		pointerAnimation = anime({
+			targets: pointerElement,
+			translateY: [-10, 0],
+			duration: 200,
+			easing: 'spring(0.5, 90, 20, 10)' // alternative: spring(0.5, 90, 20, 10) + delay + rotation
+		});
 
 		loadAudio();
 		onResize();
@@ -103,9 +119,6 @@
 		celebrationSound = new Audio(winnerSound);
 		celebrationSound.preload;
 		celebrationSound.volume = 0.2;
-
-		// spinSound.preload;
-		// spinSound.volume = 0.2;
 	}
 
 	function celebrate() {
@@ -150,7 +163,6 @@
 			offsetCenter + offsetCenter * offsetFromCenter * Math.sin(textAngle * degreesToRadians);
 
 		context.font = `700 ${textSize}px sans-serif`;
-		// context.font = '700 20px sans-serif';
 		context.textBaseline = 'middle';
 		context.textAlign = 'start';
 		context.fillStyle = color;
@@ -209,7 +221,7 @@
 	}
 
 	function getWinner(angle: number) {
-		const sortedPie = [...pie].sort((a, b) => a.startAngle - b.startAngle);
+		// const sortedPie = [...pie].sort((a, b) => a.startAngle - b.startAngle);
 		let left = 0;
 		let right = sortedPie.length - 1;
 
@@ -218,6 +230,8 @@
 			const slice = sortedPie[mid];
 
 			if (slice.startAngle <= angle && slice.endAngle >= angle) {
+				if (slice.id !== prevWinner?.id) prevWinner = winner;
+
 				winner = slice;
 				break;
 			} else if (slice.startAngle > angle) {
@@ -311,7 +325,7 @@
 					{/if}
 				</div>
 			{/if}
-			<svg id="pointer" viewBox="0 10 20 60">
+			<svg id="pointer" viewBox="0 10 20 60" bind:this={pointerElement}>
 				<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="buttonface" />
 			</svg>
 			<div class="wheel-center" style="width: {wheelCenterSize}px; height: {wheelCenterSize}px;" />
@@ -341,8 +355,6 @@
 		font-size: 24px;
 		font-weight: bold;
 		text-align: center;
-		// text-transform: uppercase;
-		/* white-space: nowrap; */
 		text-overflow: ellipsis;
 		color: white;
 		background-color: rgba(0, 0, 0, 0.5);
@@ -363,10 +375,12 @@
 	}
 	#pointer {
 		position: absolute;
-		top: -10px;
-		left: 50%;
+		top: -20px;
+		left: 0;
+		right: 0;
 		z-index: 2;
-		transform: translateX(-50%);
+		transform-origin: right top;
+		margin: 0 auto;
 		height: 60px;
 		pointer-events: none;
 		filter: drop-shadow(0px 2px 2px black);
@@ -386,6 +400,7 @@
 			width: 150px;
 			height: 150px;
 			background-color: white;
+			pointer-events: none;
 		}
 
 		&-canvas-wrapper {

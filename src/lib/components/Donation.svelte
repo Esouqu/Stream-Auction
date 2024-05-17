@@ -169,7 +169,6 @@
 			pointer-events: none;
 
 			& span:nth-child(1) {
-				// text-overflow: ellipsis;
 				word-break: break-word;
 				overflow: hidden;
 			}
