@@ -34,7 +34,7 @@ const tempLots = Array.from(new Array(100), (_, id) => {
 });
 
 function createLots() {
-  const lots = writable<ILot[]>(tempLots);
+  const lots = writable<ILot[]>(dev ? tempLots : []);
   const isLoading = writable(true);
   const itemAdded = signal(writable<ILot | undefined>());
   const lotValueChanged = signal(writable<ILot & { addedValue?: number } | undefined>());
