@@ -276,7 +276,7 @@
 			</Snackbar>
 			<Snackbar>
 				<SettingWrapper title="Прозрачность интерфейса">
-					<div>{Math.floor($backgroundTransparency * 100)}%</div>
+					<div style="line-height: 24px;">{Math.floor($backgroundTransparency * 100)}%</div>
 				</SettingWrapper>
 				<RangeSlider
 					--slider-width="100%"

@@ -131,6 +131,8 @@
 	on:scroll={onScroll}
 	on:mouseenter={pauseAutoScroll}
 	on:mouseleave={resumeAutoScroll}
+	on:dragenter={pauseAutoScroll}
+	on:dragleave={resumeAutoScroll}
 	bind:this={scrollElement}
 	aria-hidden
 >

@@ -47,7 +47,7 @@ function createSettings() {
   const autoScroll = storable({
     isAuctionListEnabled: true,
     isWheelListEnabled: true,
-    speed: 0.5,
+    speed: 1,
   }, 'autoScroll');
 
   function increaseExtendSpinPrice() {

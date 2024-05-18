@@ -1,36 +1,50 @@
 import colors from "$lib/colors";
 import type { ILot } from "$lib/interfaces";
-import { getContrastColor, getRandomColor } from "$lib/utils";
+import { getContrastColor, getRandomColor, getRandomInRange } from "$lib/utils";
 import { writable } from "svelte/store";
 import signal from "./signal";
 import db from "$lib/db";
-// import wordList from '../../../../../words/words.json';
+import { dev } from "$app/environment";
 
-// const tempLots = Array.from(new Array(100), (_, id) => {
-//   const color = getRandomColor(colors);
-//   const contrastColor = getContrastColor(color);
+function generateRandomWord(length: number) {
+  const charset = "abcdefghijklmnopqrstuvwxyz";
+  let randomWord = "";
 
-//   return {
-//     id: id + 1,
-//     title: wordList.words[Math.floor(Math.random() * wordList.words.length)].word,
-//     value: Math.floor(Math.random() * 100),
-//     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-//     color,
-//     contrastColor,
-//   }
-// });
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    randomWord += charset.charAt(randomIndex);
+  }
+
+  return randomWord;
+}
+
+const tempLots = Array.from(new Array(100), (_, id) => {
+  const color = getRandomColor(colors);
+  const contrastColor = getContrastColor(color);
+  const randomWord = generateRandomWord(getRandomInRange(5, 10));
+
+  return {
+    id: id + 1,
+    title: randomWord,
+    value: Math.floor(Math.random() * 100),
+    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color,
+    contrastColor,
+  }
+});
 
 function createLots() {
-  const lots = writable<ILot[]>([]);
+  const lots = writable<ILot[]>(tempLots);
   const isLoading = writable(true);
   const itemAdded = signal(writable<ILot | undefined>());
   const lotValueChanged = signal(writable<ILot & { addedValue?: number } | undefined>());
 
-  // let generatedId = tempLots.length;
-  let generatedId = 0;
+  let generatedId = dev ? tempLots.length : 0;
   let color = '';
 
   async function loadDatabaseItems() {
+    if (dev) return;
+
     isLoading.set(true);
 
     const dbItems = await db.lots.toArray();

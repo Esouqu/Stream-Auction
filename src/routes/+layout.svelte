@@ -25,6 +25,7 @@
 	import TestKit from '$lib/components/TestKit.svelte';
 	import Switch from '$lib/components/Switch.svelte';
 	import Navigation from '$lib/components/Navigation.svelte';
+	import { dev } from '$app/environment';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
@@ -128,7 +129,9 @@
 	<div class="layout-section layout-section_right">
 		<div class="layout-wrapper">
 			<Timer />
-			<!-- <TestKit /> -->
+			{#if dev}
+				<TestKit />
+			{/if}
 			<div style="height: 100%; scrollbar-gutter: stable; overflow: hidden auto;">
 				<div class="donations-wrapper">
 					{#each $donations as { created_at, ...donation } (donation.id)}
