@@ -34,7 +34,7 @@
 	$: transparency = settings.transparency;
 	$: intensity = settings.intensity;
 	$: background = settings.background;
-	$: isAutoScrollEnabled = settings.isAutoScrollEnabled;
+	$: autoScroll = settings.autoScroll;
 
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: total = getTotal($lots.map((l) => l.value));
@@ -97,7 +97,8 @@
 					</div>
 					<VirtualList
 						lots={sortedLots}
-						isAutoScrollEnabled={$isAutoScrollEnabled.wheelList}
+						isAutoScrollEnabled={$autoScroll.isWheelListEnabled}
+						autoScrollSpeed={$autoScroll.speed}
 						let:item
 					>
 						{@const { id, title, color } = item}

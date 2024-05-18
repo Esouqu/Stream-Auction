@@ -28,7 +28,6 @@
 	let prevWinner: IPieItem | null = null;
 	let radius = baseRadius;
 	let isDragging = false;
-	let isSettingsShown = true;
 	let draggingStartAngle = 0;
 	let draggingAngle = 0;
 
@@ -88,7 +87,6 @@
 			wheelState = store;
 
 			if (store === WHEEL_STATE.STOPPED) {
-				isSettingsShown = true;
 				getWinner($normalizedAngle);
 				celebrate();
 			}
@@ -221,7 +219,6 @@
 	}
 
 	function getWinner(angle: number) {
-		// const sortedPie = [...pie].sort((a, b) => a.startAngle - b.startAngle);
 		let left = 0;
 		let right = sortedPie.length - 1;
 

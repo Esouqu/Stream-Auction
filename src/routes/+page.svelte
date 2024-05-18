@@ -18,7 +18,7 @@
 	let titleInputElement: HTMLInputElement;
 	let searchLotInputElement: HTMLInputElement;
 
-	$: isAutoScrollEnabled = settings.isAutoScrollEnabled;
+	$: autoScroll = settings.autoScroll;
 	$: sortedLots = [...$lots]
 		.sort((a, b) => b.value - a.value)
 		.filter((l) => l.title.toLowerCase().includes(searchText.toLowerCase()));
@@ -75,7 +75,12 @@
 			<h4 style="margin-right: 10px; min-width: 81px; text-align: center; ">Действия</h4>
 		</div>
 
-		<VirtualList lots={sortedLots} isAutoScrollEnabled={$isAutoScrollEnabled.auctionList} let:item>
+		<VirtualList
+			lots={sortedLots}
+			isAutoScrollEnabled={$autoScroll.isAuctionListEnabled}
+			autoScrollSpeed={$autoScroll.speed}
+			let:item
+		>
 			{@const percent = (item.value / total) * 100}
 			{@const { position, donators, contrastColor, ...rest } = item}
 

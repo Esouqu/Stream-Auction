@@ -40,6 +40,10 @@
 		&.vertical {
 			flex-direction: column;
 			gap: 10px;
+
+			& .setting-wrapper-inner {
+				width: 100%;
+			}
 		}
 
 		&.additional {

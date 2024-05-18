@@ -39,7 +39,7 @@
 	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
 	$: intensity = settings.intensity;
 	$: wheelWinnerDelay = settings.wheelWinnerDelay;
-	$: isAutoScrollEnabled = settings.isAutoScrollEnabled;
+	$: autoScroll = settings.autoScroll;
 	$: {
 		if ($centrifugoState !== SOCKET_STATE.OPEN) {
 			isCentrigugoToggleDisabled = false;
@@ -320,12 +320,23 @@
 						title="Автоскролинг списка"
 						description="Списки на указанных страницах будут автоматически прокручиваться"
 					/>
+
 					<SettingWrapper title="На аукционе">
-						<Switch bind:isToggled={$isAutoScrollEnabled.auctionList} />
+						<Switch bind:isToggled={$autoScroll.isAuctionListEnabled} />
 					</SettingWrapper>
 					<SettingWrapper title="На колесе">
-						<Switch bind:isToggled={$isAutoScrollEnabled.wheelList} />
+						<Switch bind:isToggled={$autoScroll.isWheelListEnabled} />
 					</SettingWrapper>
+					<SettingWrapper title="Скорость">
+						<div>{$autoScroll.speed}</div>
+					</SettingWrapper>
+					<RangeSlider
+						--slider-width="100%"
+						min={0.1}
+						max={1.5}
+						step={0.1}
+						bind:to={$autoScroll.speed}
+					/>
 				</Snackbar>
 			</div>
 		</div>

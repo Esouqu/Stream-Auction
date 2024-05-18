@@ -4,37 +4,37 @@ import { getContrastColor, getRandomColor } from "$lib/utils";
 import { writable } from "svelte/store";
 import signal from "./signal";
 import db from "$lib/db";
-// import wordList from '../../../../words/words.json';
+import wordList from '../../../../../words/words.json';
 
-// const tempLots = Array.from(new Array(100), (_, id) => {
-//   const color = getRandomColor(colors);
-//   const contrastColor = getContrastColor(color);
+const tempLots = Array.from(new Array(100), (_, id) => {
+  const color = getRandomColor(colors);
+  const contrastColor = getContrastColor(color);
 
-//   return {
-//     id: id + 1,
-//     title: wordList.words[Math.floor(Math.random() * wordList.words.length)].word,
-//     value: Math.floor(Math.random() * 100),
-//     donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
-//     color,
-//     contrastColor,
-//   }
-// });
+  return {
+    id: id + 1,
+    title: wordList.words[Math.floor(Math.random() * wordList.words.length)].word,
+    value: Math.floor(Math.random() * 100),
+    donators: ['Archiedos', 'Cake', 'xQc', 'pokelawls'],
+    color,
+    contrastColor,
+  }
+});
 
 function createLots() {
-  const lots = writable<ILot[]>([]);
+  const lots = writable<ILot[]>(tempLots);
   const itemAdded = signal(writable<ILot | undefined>());
   const lotValueChanged = signal(writable<ILot & { addedValue?: number } | undefined>());
 
-  // let generatedId = tempLots.length;
-  let generatedId = 0;
+  let generatedId = tempLots.length;
+  // let generatedId = 0;
   let color = '';
 
   async function loadDatabaseItems() {
-    const dbItems = await db.lots.toArray();
-    const lotWithHighestId = await db.lots.orderBy('id').reverse().first();
+    // const dbItems = await db.lots.toArray();
+    // const lotWithHighestId = await db.lots.orderBy('id').reverse().first();
 
-    lots.set(dbItems);
-    generatedId = lotWithHighestId?.id || 0;
+    // lots.set(dbItems);
+    // generatedId = lotWithHighestId?.id || 0;
   }
 
   async function add(title: string, value: number, donator?: string) {

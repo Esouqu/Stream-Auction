@@ -44,10 +44,11 @@ function createSettings() {
   const currentExtendSpinPrice = writable(get(extendSpinAction).price);
   const minSpinDuration = storable(10, 'minSpinDuration');
   const maxSpinDuration = storable(100, 'maxSpinDuration');
-  const isAutoScrollEnabled = storable({
-    auctionList: true,
-    wheelList: true,
-  }, 'isAutoScrollEnabled');
+  const autoScroll = storable({
+    isAuctionListEnabled: true,
+    isWheelListEnabled: true,
+    speed: 0.5,
+  }, 'autoScroll');
 
   function increaseExtendSpinPrice() {
     currentExtendSpinPrice.update((state) => state + get(extendSpinAction).step);
@@ -76,7 +77,7 @@ function createSettings() {
     minSpinDuration,
     maxSpinDuration,
     addByIdAction,
-    isAutoScrollEnabled,
+    autoScroll,
     increaseExtendSpinPrice,
     resetBackground,
     setBackgroundType,

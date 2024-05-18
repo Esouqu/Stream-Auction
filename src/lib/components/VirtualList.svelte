@@ -7,8 +7,8 @@
 	const itemHeight = 42;
 	const itemsBuffer = 3;
 	const itemsBufferHeight = itemsBuffer * itemHeight;
-	const autoScrollSpeed = 1;
 
+	export let autoScrollSpeed = 0.5;
 	export let lots: ILot[] = [];
 	export let isAutoScrollEnabled = false;
 
@@ -53,6 +53,9 @@
 			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedLots.length);
 		}
 	}
+	// $: {
+	// 	if (lots.length > 0 && scrollElement) restartAutoScroll();
+	// }
 
 	function clearTimers() {
 		clearTimeout(scrollResumeTimeout);
@@ -87,7 +90,7 @@
 
 				restartAutoScroll();
 			}
-		}, 10);
+		}, 1);
 	}
 
 	function pauseAutoScroll() {
@@ -130,6 +133,8 @@
 		{#each visibleItems as item (item.id)}
 			<li
 				class="virtual-list-row"
+				class:odd={item.position % 2 === 0}
+				class:even={item.position % 2 === 1}
 				style="grid-row: {item.position};"
 				animate:flip={{ duration: 300 }}
 			>
@@ -162,8 +167,8 @@
 			border-bottom: 1px solid var(--outline-variant);
 			width: 100%;
 
-			&:nth-child(odd)::before,
-			&:nth-child(even)::before {
+			&.odd::before,
+			&.even::before {
 				content: '';
 				position: absolute;
 				top: 0;
@@ -173,15 +178,12 @@
 				opacity: var(--row-opacity, 1);
 			}
 
-			&:nth-child(odd)::before {
+			&.odd::before {
 				background-color: var(--surface-container);
 			}
-			&:nth-child(even)::before {
+			&.even::before {
 				background-color: var(--surface-container-high);
 			}
-			// &:last-child::before {
-			// 	border-bottom: 3px solid var(--primary-50);
-			// }
 
 			&:hover {
 				background-color: var(--primary-70-30);
