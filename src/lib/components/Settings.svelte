@@ -328,13 +328,13 @@
 						<Switch bind:isToggled={$autoScroll.isWheelListEnabled} />
 					</SettingWrapper>
 					<SettingWrapper title="Скорость">
-						<div>{$autoScroll.speed}</div>
+						<div>x{$autoScroll.speed}</div>
 					</SettingWrapper>
 					<RangeSlider
 						--slider-width="100%"
-						min={0.1}
-						max={1.5}
-						step={0.1}
+						min={0}
+						max={2}
+						step={0.5}
 						bind:to={$autoScroll.speed}
 					/>
 				</Snackbar>

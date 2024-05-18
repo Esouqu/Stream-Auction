@@ -22,6 +22,7 @@ import db from "$lib/db";
 
 function createLots() {
   const lots = writable<ILot[]>([]);
+  const isLoading = writable(true);
   const itemAdded = signal(writable<ILot | undefined>());
   const lotValueChanged = signal(writable<ILot & { addedValue?: number } | undefined>());
 
@@ -30,11 +31,15 @@ function createLots() {
   let color = '';
 
   async function loadDatabaseItems() {
+    isLoading.set(true);
+
     const dbItems = await db.lots.toArray();
     const lotWithHighestId = await db.lots.orderBy('id').reverse().first();
 
     lots.set(dbItems);
     generatedId = lotWithHighestId?.id || 0;
+
+    isLoading.set(false);
   }
 
   async function add(title: string, value: number, donator?: string) {
@@ -121,6 +126,7 @@ function createLots() {
     addValue,
     setValue,
     loadDatabaseItems,
+    isLoading,
     lotValueChanged,
     itemAdded,
   }

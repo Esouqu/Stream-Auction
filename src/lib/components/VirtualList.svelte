@@ -22,12 +22,12 @@
 	let isAutoScrollPaused = false;
 	let isScrollDown = true;
 	let scrollResumeTimeout: NodeJS.Timeout;
-	let scrollInterval: NodeJS.Timeout;
 	let scrollRestartTimeout: NodeJS.Timeout;
+	let scrollAnimationId: number;
 
 	onMount(() => {
 		minHeight = scrollElement.offsetHeight;
-		if (isAutoScrollEnabled) autoScroll();
+		if (isAutoScrollEnabled) restartAutoScroll();
 
 		return clearTimers;
 	});
@@ -53,51 +53,50 @@
 			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedLots.length);
 		}
 	}
-	// $: {
-	// 	if (lots.length > 0 && scrollElement) restartAutoScroll();
-	// }
+	$: if (isAutoScrollEnabled) restartAutoScroll(lots, 1000);
 
 	function clearTimers() {
 		clearTimeout(scrollResumeTimeout);
 		clearTimeout(scrollRestartTimeout);
-		clearInterval(scrollInterval);
+		cancelAnimationFrame(scrollAnimationId);
 	}
 
-	function restartAutoScroll(time = 2000) {
-		clearInterval(scrollInterval);
-		scrollRestartTimeout = setTimeout(() => {
-			autoScroll();
-		}, time);
-	}
-
-	function autoScroll() {
+	function animateFrame(frame: number) {
 		if (isAutoScrollPaused) return;
 
 		const maxHeight = scrollElement.scrollHeight - scrollElement.clientHeight;
 
-		scrollInterval = setInterval(() => {
-			scrollElement.scrollTop = scrollTop;
-			scrollTop = isScrollDown ? scrollTop + autoScrollSpeed : scrollTop - autoScrollSpeed;
+		scrollElement.scrollTop = scrollTop;
+		scrollTop = isScrollDown ? scrollTop + autoScrollSpeed : scrollTop - autoScrollSpeed;
+		scrollAnimationId = requestAnimationFrame(animateFrame);
 
-			if (isScrollDown && scrollTop >= maxHeight) {
-				scrollTop = maxHeight;
-				isScrollDown = false;
+		if (isScrollDown && scrollTop >= maxHeight) {
+			scrollTop = maxHeight;
+			isScrollDown = false;
 
-				restartAutoScroll();
-			} else if (scrollTop <= 0) {
-				scrollTop = 0;
-				isScrollDown = true;
+			restartAutoScroll();
+		} else if (scrollTop <= 0) {
+			scrollTop = 0;
+			isScrollDown = true;
 
-				restartAutoScroll();
-			}
-		}, 1);
+			restartAutoScroll();
+		}
 	}
 
-	function pauseAutoScroll() {
-		if (!isAutoScrollEnabled) return;
+	function startScrollAnimation() {
+		scrollAnimationId = requestAnimationFrame(animateFrame);
+	}
+
+	function restartAutoScroll(lots: ILot[] = [], after = 2000) {
+		if (!scrollElement || isAutoScrollPaused) return;
 
 		isAutoScrollPaused = true;
-		clearTimers();
+		cancelAnimationFrame(scrollAnimationId);
+
+		scrollRestartTimeout = setTimeout(() => {
+			isAutoScrollPaused = false;
+			startScrollAnimation();
+		}, after);
 	}
 
 	function resumeAutoScroll() {
@@ -107,11 +106,20 @@
 
 		scrollResumeTimeout = setTimeout(() => {
 			isAutoScrollPaused = false;
-			autoScroll();
+			startScrollAnimation();
 		}, 1000);
 	}
 
+	function pauseAutoScroll() {
+		if (!isAutoScrollEnabled) return;
+
+		isAutoScrollPaused = true;
+		clearTimers();
+	}
+
 	function onScroll(e: UIEvent) {
+		if (!isAutoScrollPaused && isAutoScrollEnabled) return;
+
 		const target = e.currentTarget as HTMLDivElement;
 
 		scrollTop = target.scrollTop;

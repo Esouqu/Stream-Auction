@@ -19,6 +19,7 @@
 	let searchLotInputElement: HTMLInputElement;
 
 	$: autoScroll = settings.autoScroll;
+	$: isLotsLoading = lots.isLoading;
 	$: sortedLots = [...$lots]
 		.sort((a, b) => b.value - a.value)
 		.filter((l) => l.title.toLowerCase().includes(searchText.toLowerCase()));
@@ -89,7 +90,11 @@
 
 		{#if $lots.length < 1}
 			<div class="no-lots" transition:fade>
-				<p>Лоты отсутствуют</p>
+				{#if $isLotsLoading}
+					Загрузка лотов...
+				{:else}
+					<p>Лоты отсутствуют</p>
+				{/if}
 			</div>
 		{/if}
 	</div>
