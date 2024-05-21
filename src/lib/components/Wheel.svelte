@@ -154,7 +154,7 @@
 		const maxTitleLength = 20;
 		const shortTitle = getShortenedText(title, maxTitleLength);
 		const textAngle = (startAngle + endAngle) / 2; // Find the middle angle of the slice
-		const offsetFromCenter = 0.85; // 0 = right at the center | 1 = right on the edge
+		const offsetFromCenter = 0.88; // 0 = near the center | 1 = near the edge
 		const textX =
 			offsetCenter + offsetCenter * offsetFromCenter * Math.cos(textAngle * degreesToRadians);
 		const textY =

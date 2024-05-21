@@ -1,4 +1,4 @@
-import { get, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 import settings from './settings';
 import { TIMER_STATE } from '$lib/constants';
 
@@ -27,7 +27,7 @@ function createCountdownTimer() {
     const elapsedTime = frameTIme - animationStartTime;
     const remaining = currentTime - elapsedTime;
 
-    if (remaining <= 0) {
+    if (remaining <= 0 || timerState === TIMER_STATE.IDLE) {
       currentTime = 0;
       animationPausedTime = 0;
       cancelAnimationFrame(animationId);
