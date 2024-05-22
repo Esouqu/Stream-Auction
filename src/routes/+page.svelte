@@ -63,7 +63,7 @@
 </script>
 
 <svelte:head>
-	<title>Варианты - Аукцион</title>
+	<title>Вклиновый Аукцион</title>
 </svelte:head>
 
 <section class="auction-section">

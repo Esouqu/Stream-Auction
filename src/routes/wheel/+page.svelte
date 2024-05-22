@@ -30,7 +30,7 @@
 </script>
 
 <svelte:head>
-	<title>Колесо - Аукцион</title>
+	<title>Колесо - Вклиновый Аукцион</title>
 </svelte:head>
 
 <section class="wheel-section">

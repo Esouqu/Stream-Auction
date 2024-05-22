@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Настройки - Аукцион</title>
+	<title>Настройки - Вклиновый Аукцион</title>
 </svelte:head>
 
 <section class="settings-section">
