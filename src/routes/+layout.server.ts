@@ -34,7 +34,8 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
     }
   }
 
-  console.log('hasUnseenUpdates:', hasUnseenUpdates);
+
+  console.log('lastVisit:', lastVisit, 'getLastUpdateDate:', getLastUpdateDate());
 
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
