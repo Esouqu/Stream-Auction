@@ -53,6 +53,14 @@ export interface IDonationAlertsUserData {
   socket_connection_token: string
 }
 
+export interface IDonatePayUserData {
+  id: number;
+  name: string;
+  avatar: string;
+  balance: number;
+  cashout_sum: number;
+}
+
 export interface IDonationDataFull {
   id: number | string;
   type: 'Twitch' | 'Donation Alerts';

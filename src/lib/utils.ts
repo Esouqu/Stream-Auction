@@ -194,6 +194,17 @@ export function isVideoOrImage(link: string) {
   }
 }
 
+export function formatDate(date: Date) {
+  const currentYear = new Date().getFullYear();
+  const dateYear = date.getFullYear();
+
+  return date.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: dateYear === currentYear ? undefined : 'numeric',
+  });
+}
+
 export function fireConfetti() {
   const count = 200;
   const defaults = {

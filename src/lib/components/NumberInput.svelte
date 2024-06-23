@@ -73,7 +73,7 @@
 		{placeholder}
 		{value}
 		bind:this={element}
-		on:keydown={handleKeyDown}
+		on:keydown|stopPropagation={handleKeyDown}
 		on:input|preventDefault={handleInput}
 		on:blur|preventDefault={handleBlur}
 	/>

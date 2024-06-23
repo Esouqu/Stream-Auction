@@ -26,7 +26,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		padding: 0 20px;
+		padding: var(--titled-section-p, 0 20px);
 		height: var(--titled-section-height, auto);
 		overflow: var(--titled-section-overflow, unset);
 

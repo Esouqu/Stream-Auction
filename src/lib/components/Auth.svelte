@@ -1,15 +1,14 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import TextButton from './TextButton.svelte';
 
 	export let icon: string;
 	export let title: string;
-	export let url: string;
 	export let isLoggedIn: boolean;
 	export let onLogout: () => void;
+	export let onLogIn: () => void;
 
 	function handleClick() {
-		!isLoggedIn ? goto(url) : onLogout();
+		!isLoggedIn ? onLogIn() : onLogout();
 	}
 </script>
 
@@ -29,9 +28,9 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 10px;
-		padding: 20px;
+		// padding: 20px;
 		border-radius: 5px;
-		background-color: var(--surface-container-highest);
+		// background-color: var(--surface-container-highest);
 
 		&-title-wrapper {
 			display: flex;

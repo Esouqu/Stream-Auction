@@ -24,7 +24,6 @@ function createActionManager() {
   let _stopSpinAction: { isEnabled: boolean; price: number };
   let _itemAddedAction: ISetting;
   let _leaderChangedAction: ISetting;
-  let _addLotWhileSpinAction: boolean;
   let _addByIdAction: boolean;
   let _currentExtendSpinPrice: number;
   let _wheelWinnerDelayTimeout: NodeJS.Timeout;
@@ -69,7 +68,6 @@ function createActionManager() {
     settings.stopSpinAction.subscribe((store) => _stopSpinAction = store);
     settings.itemAddedAction.subscribe((store) => _itemAddedAction = store);
     settings.leaderChangedAction.subscribe((store) => _leaderChangedAction = store);
-    settings.addLotWhileSpinAction.subscribe((store) => _addLotWhileSpinAction = store);
     settings.addByIdAction.subscribe((store) => _addByIdAction = store);
   }
 
@@ -141,18 +139,16 @@ function createActionManager() {
     const message = donation.message || '';
     const donationAmount = donation.amount_in_user_currency;
     const { lot, mostSimilarLot } = getSimilarLot(message);
-    const handleDonation = (isAddedForced: boolean = false) => {
-      if (lot) {
+    const handleDonation = (wouldSpinStop = false) => {
+      if (lot && !wouldSpinStop) {
         lots.addValue(lot.id, donationAmount, donation.username);
-      } else if (isAddedForced) {
-        lots.add(message, donationAmount, donation.username);
       }
 
       donations.add({
         ...donation,
         mostSimilarLot,
-        message: lot ? lot.title : message,
-        isInstant: isAddedForced || !!lot,
+        message: lot && !wouldSpinStop ? lot.title : message,
+        isInstant: !!lot && !wouldSpinStop,
       });
     }
 
@@ -166,23 +162,25 @@ function createActionManager() {
 
       case ACTION_MANAGER_STATE.DELAYING_WHEEL_WINNER:
       case ACTION_MANAGER_STATE.SPINNING_WHEEL: {
-        const isShouldStopSpin = _stopSpinAction.isEnabled && donationAmount === _stopSpinAction.price;
-        const isShouldExtendSpin = _extendSpinAction.isEnabled && donationAmount >= _currentExtendSpinPrice;
+        const isWheelWinnerDelayed = _state === ACTION_MANAGER_STATE.DELAYING_WHEEL_WINNER;
+        const isEnoughAmountToExtend = donationAmount >= _currentExtendSpinPrice;
+        const shouldStopSpin = _stopSpinAction.isEnabled && donationAmount === _stopSpinAction.price;
+        const shouldExtendSpin = _extendSpinAction.isEnabled && donationAmount >= _currentExtendSpinPrice;
 
-        if (!_addLotWhileSpinAction) {
+        if (!_extendSpinAction.isEnabled || (!isEnoughAmountToExtend && isWheelWinnerDelayed)) {
           donations.add({
             ...donation,
             isInstant: false,
           });
         } else {
-          handleDonation(isShouldStopSpin);
+          handleDonation(shouldStopSpin);
         }
 
-        if (isShouldStopSpin) {
+        if (shouldStopSpin) {
           wheel.stopSpin();
           timer.reset();
-        } else if (isShouldExtendSpin) {
-          if (_state === ACTION_MANAGER_STATE.DELAYING_WHEEL_WINNER) {
+        } else if (shouldExtendSpin) {
+          if (isWheelWinnerDelayed) {
             clearTimeout(_wheelWinnerDelayTimeout);
             state.set(ACTION_MANAGER_STATE.SPINNING_WHEEL);
             wheel.restartSpin(_extendSpinAction.seconds * 1000);

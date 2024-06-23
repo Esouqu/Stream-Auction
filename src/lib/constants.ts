@@ -21,6 +21,15 @@ export enum TIMER_STATE {
   IDLE = 'idle',
   PAUSED = 'paused',
   RUNNING = 'running',
+  INCREASING = 'increasing',
+  DECREASING = 'decreasing'
+}
+
+export enum CENTRIFUGE_STATE {
+  DISCONNECTED = 0,
+  CONNECTING = 1,
+  CONNECTED = 2,
+  CLOSED = 3,
 }
 
 export enum SOCKET_STATE {

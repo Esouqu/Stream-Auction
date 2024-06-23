@@ -16,15 +16,17 @@
 	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_White.svg';
 	import { SOCKET_STATE } from '$lib/constants';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isCentrigugoToggleDisabled = false;
-	let errorText: string = '';
+	let errorText = '';
 	let bgUrl: string;
 
 	$: minSpinDuration = settings.minSpinDuration;
 	$: maxSpinDuration = settings.maxSpinDuration;
 	$: timerBaseTime = settings.timerBaseTime;
+	$: timerKeyConfig = settings.timerKeyConfig;
 	$: itemAddedAction = settings.itemAddedAction;
 	$: leaderChangedAction = settings.leaderChangedAction;
 	$: timerState = timer.state;
@@ -33,7 +35,6 @@
 
 	$: addByIdAction = settings.addByIdAction;
 	$: centrifugoState = centrifugo.state;
-	$: addLotWhileSpinAction = settings.addLotWhileSpinAction;
 	$: continueSpinAction = settings.extendSpinAction;
 	$: stopSpinAction = settings.stopSpinAction;
 	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
@@ -62,11 +63,78 @@
 
 <div class="settings-wrapper">
 	<TitledSection>
+		<!-- <Auth
+			icon={donatePayIcon}
+			title="DonatePay"
+			isLoggedIn={isAuthorizedToDonatePay}
+			onLogIn={() => {
+				isPopupOpen = true;
+				guidePart = 0;
+			}}
+			onLogout={() => {
+				fetch('/api/donatepay/logout');
+				isAuthorizedToDonatePay = false;
+			}}
+		/> -->
+		<!-- <Popup bind:isOpened={isPopupOpen}>
+			{#if guidePart === 0}
+				<div style="display: flex; flex-direction: column; gap: 10px;">
+					<h2 style="margin: 0; text-align: center; text-wrap: pretty; color: var(--error);">
+						Не показывайте последующие действия третьим лицам!
+					</h2>
+					<TextButton text="Продолжить" on:click={() => (guidePart = 1)} />
+				</div>
+			{:else}
+				<div style="display: flex; flex-direction: column; gap: 10px;">
+					<p style="margin: 0;">
+						Перейдите на страницу <a href="https://donatepay.ru/page/api" target="_blank"
+							>https://donatepay.ru/page/api</a
+						>, затем скопируйте значение поля "Ваш API ключ" и вставьте его в поле ниже.
+					</p>
+					<Input
+						--input-w="500px"
+						--input-w-w="500px"
+						id="donatepay-api-key"
+						type="text"
+						placeholder="API Key"
+						isFilled={true}
+						maxlength={60}
+						onInput={() => (authError = '')}
+						bind:value={donatepayApiKey}
+					/>
+					{#if authError}
+						<p>{authError}</p>
+					{/if}
+					<TextButton
+						text="Подключить"
+						isDisabled={isLoadingDonatePayUser || donatepayApiKey.length !== 60 || authError !== ''}
+						on:click={async () => {
+							isLoadingDonatePayUser = true;
+
+							const user = await donatePayApi.getUser(donatepayApiKey);
+
+							if (user) {
+								await donatePayApi.auth(donatepayApiKey);
+								isAuthorizedToDonatePay = true;
+								isPopupOpen = false;
+							} else {
+								authError = 'Неверный API ключ';
+							}
+
+							isLoadingDonatePayUser = false;
+						}}
+					/>
+					{#if isLoadingDonatePayUser}
+						<div>Загрузка...</div>
+					{/if}
+				</div>
+			{/if}
+		</Popup> -->
 		<Auth
 			icon={daIcon}
 			title="DonationAlerts"
-			url="/api/donationalerts/auth"
 			isLoggedIn={isAuthorizedToDonationAlerts}
+			onLogIn={() => goto('/api/donationalerts/auth')}
 			onLogout={() => {
 				fetch('/api/donationalerts/logout');
 				isAuthorizedToDonationAlerts = false;
@@ -105,7 +173,7 @@
 					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 						<SettingWrapper
 							title="Задержка"
-							description="Определение победителя будет отложено на указанное значение, в течении которого можно продлить кручение или добавить вариант"
+							description="Определение победителя будет отложено на указанное значение, в течении которого можно активировать функцию 'Вклин'"
 						>
 							<Switch bind:isToggled={$wheelWinnerDelay.isEnabled} />
 						</SettingWrapper>
@@ -140,31 +208,7 @@
 					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 						<SettingWrapper
 							title="Вклин"
-							description="Возможность добавлять вариант во время кручения колеса"
-						>
-							<Switch bind:isToggled={$addLotWhileSpinAction} />
-						</SettingWrapper>
-					</Snackbar>
-					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
-						<SettingWrapper
-							title="Стоп колесо"
-							description="Если сумма доната равна заданному значению, добавляет вариант из доната и останавливает колесо"
-						>
-							<Switch bind:isToggled={$stopSpinAction.isEnabled} />
-						</SettingWrapper>
-						<SettingWrapper title="Стоимость" isDisabled={!$stopSpinAction.isEnabled}>
-							<NumberInput
-								id="wheel-2"
-								suffix="руб"
-								placeholder="Значение"
-								bind:value={$stopSpinAction.price}
-							/>
-						</SettingWrapper>
-					</Snackbar>
-					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
-						<SettingWrapper
-							title="Продлевать кручение"
-							description="Если сумма доната равна или превышает заданное значение, продлевает кручение колеса"
+							description="Если сумма доната равна или превышает итоговое значение, продлевает кручение колеса и добавляет вариант из доната"
 						>
 							<Switch bind:isToggled={$continueSpinAction.isEnabled} />
 						</SettingWrapper>
@@ -179,8 +223,24 @@
 						<SettingWrapper title="Прирост стоимости" isDisabled={!$continueSpinAction.isEnabled}>
 							<NumberInput id="wheel-4" suffix="руб" bind:value={$continueSpinAction.step} />
 						</SettingWrapper>
-						<SettingWrapper title="Длительность" isDisabled={!$continueSpinAction.isEnabled}>
+						<SettingWrapper title="Доп. время" isDisabled={!$continueSpinAction.isEnabled}>
 							<NumberInput id="wheel-5" suffix="сек" bind:value={$continueSpinAction.seconds} />
+						</SettingWrapper>
+					</Snackbar>
+					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
+						<SettingWrapper
+							title="Стоп колесо"
+							description="Останавливает колесо, если сумма доната равна заданному значению"
+						>
+							<Switch bind:isToggled={$stopSpinAction.isEnabled} />
+						</SettingWrapper>
+						<SettingWrapper title="Стоимость" isDisabled={!$stopSpinAction.isEnabled}>
+							<NumberInput
+								id="wheel-2"
+								suffix="руб"
+								placeholder="Значение"
+								bind:value={$stopSpinAction.price}
+							/>
 						</SettingWrapper>
 					</Snackbar>
 				</div>
@@ -205,6 +265,16 @@
 					</SettingWrapper>
 				</Snackbar>
 				<Snackbar>
+					<SettingWrapper
+						title="Горячие клавиши"
+						description="[ ↑ ] - прибавить, [ ↓ ] - убавить, [←] - вернуть на исходную, [→] - запустить / приостановить"
+					>
+						<Switch bind:isToggled={$timerKeyConfig.isEnabled} />
+					</SettingWrapper>
+				</Snackbar>
+			</div>
+			<div class="settings-column">
+				<Snackbar>
 					<SettingWrapper title="Добавлять время за новый вариант">
 						<Switch bind:isToggled={$itemAddedAction.isEnabled} />
 					</SettingWrapper>
@@ -217,8 +287,6 @@
 						/>
 					</SettingWrapper>
 				</Snackbar>
-			</div>
-			<div class="settings-column">
 				<Snackbar>
 					<SettingWrapper title="Добавлять время за смену лидера">
 						<Switch bind:isToggled={$leaderChangedAction.isEnabled} />
@@ -321,7 +389,7 @@
 						description="Списки на указанных страницах будут автоматически прокручиваться"
 					/>
 
-					<SettingWrapper title="На аукционе">
+					<SettingWrapper title="На лотах">
 						<Switch bind:isToggled={$autoScroll.isAuctionListEnabled} />
 					</SettingWrapper>
 					<SettingWrapper title="На колесе">

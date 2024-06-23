@@ -11,7 +11,7 @@
 	import LotPreview from '$lib/components/LotPreview.svelte';
 	import Rules from '$lib/components/Rules.svelte';
 	import IntensityTracker from '$lib/components/IntensityTracker.svelte';
-	import discordIconWhite from '$lib/assets/discord-logo/icon_clyde_white_RGB.svg';
+	import telegramIcon from '$lib/assets/telegram-logo/telegram-icon.svg';
 	import githubIconWhite from '$lib/assets/github-mark/github-mark-white.svg';
 	import boostyIcon from '$lib/assets/boosty_logo/White.svg';
 	import Contact from '$lib/components/Contact.svelte';
@@ -26,22 +26,26 @@
 	import Switch from '$lib/components/Switch.svelte';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import { dev } from '$app/environment';
+	import Popup from '$lib/components/Popup.svelte';
+	import Changelog from '$lib/components/Changelog.svelte';
+	import { getLastUpdateDate } from '$lib/changelog';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
-	let isCentrigugoToggleDisabled = false;
+	let isCentrifugoToggleDisabled = false;
 
 	$: centrifugoState = centrifugo.state;
 	$: transparency = settings.transparency;
 	$: intensity = settings.intensity;
 	$: background = settings.background;
 	$: autoScroll = settings.autoScroll;
+	$: hasNewUpdates = $page.data.lastVisit ? $page.data.lastVisit < getLastUpdateDate() : true;
 
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: total = getTotal($lots.map((l) => l.value));
 	$: {
 		if ($centrifugoState !== SOCKET_STATE.OPEN) {
-			isCentrigugoToggleDisabled = false;
+			isCentrifugoToggleDisabled = false;
 		}
 	}
 
@@ -50,6 +54,10 @@
 		lots.loadDatabaseItems();
 	});
 </script>
+
+<Popup isOpened={hasNewUpdates}>
+	<Changelog />
+</Popup>
 
 <div
 	class="layout"
@@ -89,6 +97,7 @@
 					--titled-section-height="100%"
 					--titled-section-justify="center"
 					--titled-section-gap="0px"
+					--titled-section-p="0px"
 					title="Варианты"
 				>
 					<div class="list-headers">
@@ -112,9 +121,9 @@
 				<Rules />
 			{/if}
 			<div style="display: flex; width: 100%; justify-content: center; gap: 10px;">
-				<Contact icon={boostyIcon} title="Поддержать" url="https://boosty.to/esouqu/donate" />
-				<Contact title="Esouqu" icon={githubIconWhite} url="https://github.com/Esouqu" />
-				<Contact title="nikogda" icon={discordIconWhite} />
+				<Contact icon={githubIconWhite} title="GitHub" url="https://github.com/Esouqu" />
+				<Contact icon={telegramIcon} title="Telegram" url="https://t.me/esouqu" />
+				<Contact icon={boostyIcon} title="Boosty" url="https://boosty.to/esouqu/donate" />
 			</div>
 		</div>
 	</div>
@@ -148,12 +157,12 @@
 					</div>
 					<Switch
 						on={() => {
-							isCentrigugoToggleDisabled = true;
+							isCentrifugoToggleDisabled = true;
 							centrifugo.connect();
 						}}
 						off={() => centrifugo.disconnect()}
 						isToggled={$centrifugoState === SOCKET_STATE.OPEN}
-						isDisabled={$centrifugoState === SOCKET_STATE.CONNECTING || isCentrigugoToggleDisabled}
+						isDisabled={$centrifugoState === SOCKET_STATE.CONNECTING || isCentrifugoToggleDisabled}
 						isManualToggle={true}
 					/>
 				</div>

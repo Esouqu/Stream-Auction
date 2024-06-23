@@ -11,3 +11,6 @@ vite.config.ts.timestamp-*
 todo.txt
 /src/routes/bomber
 /src/routes/api/twitch
+/src/routes/api/donatepay
+/src/lib/donatePayApi.ts
+/src/lib/stores/donatePay.ts

@@ -8,6 +8,7 @@
 	export let type: 'text' | 'number';
 	export let placeholder: string = '';
 	export let suffix: string = '';
+	export let maxlength = 524288;
 	export let isFilled = false;
 	export let isDisabled = false;
 	export let isPreventInput = false;
@@ -81,9 +82,10 @@
 		class="input"
 		{value}
 		{placeholder}
+		{maxlength}
 		spellcheck="false"
 		disabled={isDisabled}
-		on:keydown={handleKeyDown}
+		on:keydown|stopPropagation={handleKeyDown}
 		on:input|preventDefault={handleInput}
 		on:blur|preventDefault={handleBlur}
 		on:focus

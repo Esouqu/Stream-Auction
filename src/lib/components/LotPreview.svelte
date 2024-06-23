@@ -9,8 +9,8 @@
 	export let color: string;
 	export let percent: number;
 
-	let animation: anime.AnimeInstance;
 	let isHovered = false;
+	let animation: anime.AnimeInstance;
 	let element: HTMLDivElement;
 
 	onMount(() => {

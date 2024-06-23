@@ -31,7 +31,6 @@ function createSettings() {
     step: 10,
   }, 'extendSpinAction');
   const addByIdAction = storable(true, 'addByIdAction');
-  const addLotWhileSpinAction = storable(true, 'addLotWhileSpinAction');
   const itemAddedAction = storable({
     isEnabled: true,
     seconds: 60,
@@ -41,6 +40,13 @@ function createSettings() {
     seconds: 120,
   }, 'leaderChangedAction');
   const timerBaseTime = storable(10, 'timerBaseTime');
+  const timerKeyConfig = storable({
+    isEnabled: true,
+    add: 'ArrowUp',
+    subtract: 'ArrowDown',
+    reset: 'ArrowLeft',
+    startOrPause: 'ArrowRight'
+  }, 'timerKeyConfig');
   const currentExtendSpinPrice = writable(get(extendSpinAction).price);
   const minSpinDuration = storable(10, 'minSpinDuration');
   const maxSpinDuration = storable(100, 'maxSpinDuration');
@@ -49,6 +55,7 @@ function createSettings() {
     isWheelListEnabled: true,
     speed: 1,
   }, 'autoScroll');
+
 
   function increaseExtendSpinPrice() {
     currentExtendSpinPrice.update((state) => state + get(extendSpinAction).step);
@@ -71,8 +78,8 @@ function createSettings() {
     extendSpinAction,
     itemAddedAction,
     leaderChangedAction,
-    addLotWhileSpinAction,
     timerBaseTime,
+    timerKeyConfig,
     currentExtendSpinPrice,
     minSpinDuration,
     maxSpinDuration,

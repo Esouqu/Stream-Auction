@@ -17,6 +17,7 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
+		justify-content: var(--snackbar-justify, auto);
 		border-radius: 5px;
 		width: 100%;
 		box-shadow: var(--elevation-1);

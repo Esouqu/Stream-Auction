@@ -6,6 +6,7 @@ declare global {
     // interface Locals {}
     interface PageData {
       isAuthorizedToDonationAlerts: boolean;
+      lastVisit: Date | undefined;
     }
     // interface Platform {}
   }

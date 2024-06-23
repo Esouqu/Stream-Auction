@@ -21,7 +21,7 @@
 	const baseRadius = 360;
 	const offset = 20;
 	const baseWheelCenterSize = 150;
-	const degreeCapForTextDisplay = Number(((400 / 100) * 3).toFixed(2));
+	const degreeCapForTextDisplay = Number(((400 / 100) * 2).toFixed(2));
 
 	export let winner: IPieItem | null = null;
 

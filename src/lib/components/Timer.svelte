@@ -1,22 +1,41 @@
 <script lang="ts">
 	import { TIMER_STATE, WHEEL_STATE } from '$lib/constants';
-	import { formatTime } from '$lib/utils';
 	import timer from '$lib/stores/timer';
 	import wheel from '$lib/stores/wheel';
 	import Button from './Button.svelte';
 	import actionManager from '$lib/stores/actionManager';
+	import settings from '$lib/stores/settings';
 
 	export let timeToAdd: number = 60000;
 
-	$: time = timer.time;
 	$: wheelState = wheel.state;
 	$: timerState = timer.state;
-	$: currentTime = formatTime($time);
+	$: timerKeyConfig = settings.timerKeyConfig;
+	$: formattedTime = timer.formattedTime;
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (!$timerKeyConfig.isEnabled || $wheelState !== WHEEL_STATE.IDLE) return;
+
+		if (e.code === $timerKeyConfig.add) timer.add(timeToAdd);
+		if (e.code === $timerKeyConfig.subtract) timer.subtract(timeToAdd);
+		if (e.code === $timerKeyConfig.reset) timer.reset();
+		if (e.code === $timerKeyConfig.startOrPause) {
+			if ($timerState === TIMER_STATE.RUNNING) timer.pause();
+			else timer.start();
+		}
+	}
 </script>
 
+<svelte:document on:keydown={(e) => handleKeydown(e)} />
+
 <div class="timer">
-	<p class="timer__time" class:delayed={$wheelState === WHEEL_STATE.DELAYED}>
-		{currentTime.min}:{currentTime.sec}:{currentTime.ms}
+	<p
+		class="timer__time"
+		class:up={$timerState === TIMER_STATE.INCREASING}
+		class:down={$timerState === TIMER_STATE.DECREASING}
+		class:delayed={$wheelState === WHEEL_STATE.DELAYED}
+	>
+		{$formattedTime.min}:{$formattedTime.sec}:{$formattedTime.ms}
 	</p>
 	<div class="timer-buttons-wrapper">
 		{#if $wheelState === WHEEL_STATE.SPINNING}
@@ -58,10 +77,19 @@
 			font-weight: 600;
 			font-variant-numeric: tabular-nums;
 			letter-spacing: 6px;
+			transition: color 0.3s;
 			user-select: none;
 
 			&.delayed {
 				animation: blink 0.5s infinite alternate ease-in;
+			}
+
+			&.up {
+				color: var(--primary-50);
+			}
+
+			&.down {
+				color: var(--error);
 			}
 		}
 	}

@@ -49,7 +49,7 @@
 
 	function getLotsArray() {
 		return Array.from(new Array(amountOfLotsToAdd), () => {
-			const randomWord = generateRandomWord(getRandomInRange(5, 10));
+			const randomWord = generateRandomWord(getRandomInRange(5, 100));
 
 			return {
 				title: randomWord,
