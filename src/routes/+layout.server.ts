@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
   const lastVisit = cookies.get('lastVisit');
+  const hasUnseenUpdates = lastVisit ? new Date(lastVisit) < getLastUpdateDate() : true;
   let donationalertsSession = cookies.get('daSession');
   let donationalertsRefreshToken = cookies.get('daRefreshToken');
 
@@ -33,9 +34,11 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
     }
   }
 
+  console.log('hasUnseenUpdates:', hasUnseenUpdates);
+
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
-    hasUnseenUpdates: lastVisit ? new Date(lastVisit) < getLastUpdateDate() : true,
+    hasUnseenUpdates,
     randomId: uuidv4(),
   }
 };
