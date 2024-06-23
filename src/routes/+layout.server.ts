@@ -1,11 +1,9 @@
-import { getLastUpdateDate } from "$lib/changelog";
 import type { IDonationAlertsRefreshToken } from "$lib/interfaces";
 import type { LayoutServerLoad } from "./$types";
 import { v4 as uuidv4 } from 'uuid';
 
 export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
   const lastVisit = cookies.get('lastVisit');
-  const hasUnseenUpdates = lastVisit ? new Date(lastVisit) < getLastUpdateDate() : true;
   let donationalertsSession = cookies.get('daSession');
   let donationalertsRefreshToken = cookies.get('daRefreshToken');
 
@@ -34,12 +32,9 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
     }
   }
 
-
-  console.log('lastVisit:', lastVisit, 'getLastUpdateDate:', getLastUpdateDate());
-
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
-    hasUnseenUpdates,
+    lastVisit: lastVisit ? new Date(lastVisit) : undefined,
     randomId: uuidv4(),
   }
 };
