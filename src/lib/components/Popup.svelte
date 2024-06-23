@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
-	export let isOpened: boolean;
+	export let isOpened = false;
 	export let onClose: (() => void) | null = null;
 
 	let element: HTMLDivElement;
