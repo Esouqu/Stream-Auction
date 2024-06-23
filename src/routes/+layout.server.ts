@@ -1,3 +1,4 @@
+import { getLastUpdateDate } from "$lib/changelog";
 import type { IDonationAlertsRefreshToken } from "$lib/interfaces";
 import type { LayoutServerLoad } from "./$types";
 import { v4 as uuidv4 } from 'uuid';
@@ -34,7 +35,7 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
 
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
-    lastVisit: lastVisit ? new Date(lastVisit) : undefined,
+    hasUnseenUpdates: lastVisit ? new Date(lastVisit) < getLastUpdateDate() : true,
     randomId: uuidv4(),
   }
 };

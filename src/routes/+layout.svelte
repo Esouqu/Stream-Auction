@@ -28,7 +28,6 @@
 	import { dev } from '$app/environment';
 	import Popup from '$lib/components/Popup.svelte';
 	import Changelog from '$lib/components/Changelog.svelte';
-	import { getLastUpdateDate } from '$lib/changelog';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
@@ -39,7 +38,6 @@
 	$: intensity = settings.intensity;
 	$: background = settings.background;
 	$: autoScroll = settings.autoScroll;
-	$: hasNewUpdates = $page.data.lastVisit ? $page.data.lastVisit < getLastUpdateDate() : true;
 
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: total = getTotal($lots.map((l) => l.value));
@@ -55,7 +53,7 @@
 	});
 </script>
 
-<Popup isOpened={hasNewUpdates}>
+<Popup isOpened={$page.data.hasUnseenUpdates}>
 	<Changelog />
 </Popup>
 
