@@ -28,6 +28,7 @@ function createSettings() {
     isEnabled: true,
     seconds: 60,
     price: 30,
+    stepType: 'fixed',
     step: 10,
   }, 'extendSpinAction');
   const addByIdAction = storable(true, 'addByIdAction');
@@ -57,8 +58,12 @@ function createSettings() {
   }, 'autoScroll');
 
 
-  function increaseExtendSpinPrice() {
-    currentExtendSpinPrice.update((state) => state + get(extendSpinAction).step);
+  function increaseExtendSpinPrice(amount?: number) {
+    if (!amount) {
+      currentExtendSpinPrice.update((state) => state + get(extendSpinAction).step);
+    } else {
+      currentExtendSpinPrice.set(amount)
+    }
   }
 
   function resetBackground() {

@@ -14,7 +14,7 @@
 	import wheel from '$lib/stores/wheel';
 	import type { ILot, IPieItem } from '$lib/interfaces';
 	import { WHEEL_STATE, degreesToRadians, radiansToDegrees } from '$lib/constants';
-	import winnerSound from '$lib/assets/sounds/winner_sound.wav';
+	import winnerSound from '$lib/assets/sounds/winner-sound.mp3';
 	import { beforeNavigate } from '$app/navigation';
 	import anime from 'animejs';
 

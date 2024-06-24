@@ -17,6 +17,7 @@
 	import { SOCKET_STATE } from '$lib/constants';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import ButtonSelect from './ButtonSelect.svelte';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isCentrigugoToggleDisabled = false;
@@ -220,11 +221,35 @@
 								bind:value={$continueSpinAction.price}
 							/>
 						</SettingWrapper>
-						<SettingWrapper title="Прирост стоимости" isDisabled={!$continueSpinAction.isEnabled}>
-							<NumberInput id="wheel-4" suffix="руб" bind:value={$continueSpinAction.step} />
-						</SettingWrapper>
+
 						<SettingWrapper title="Доп. время" isDisabled={!$continueSpinAction.isEnabled}>
 							<NumberInput id="wheel-5" suffix="сек" bind:value={$continueSpinAction.seconds} />
+						</SettingWrapper>
+						<SettingWrapper
+							title="Тип прироста стоимости"
+							description={`Увеличение стоимости ${
+								$continueSpinAction.stepType === 'fixed'
+									? 'на заданное значение'
+									: 'до суммы самого большого доната за время кручения колеса'
+							}`}
+							isDisabled={!$continueSpinAction.isEnabled}
+							isAdditional={true}
+							isVertical={true}
+						>
+							<ButtonSelect
+								options={[
+									{ title: 'Фиксированный', value: 'fixed' },
+									{ title: 'От суммы доната', value: 'biggestDonation' }
+								]}
+								bind:currentOption={$continueSpinAction.stepType}
+							/>
+						</SettingWrapper>
+						<SettingWrapper
+							title="Прирост стоимости"
+							isDisabled={!$continueSpinAction.isEnabled ||
+								$continueSpinAction.stepType !== 'fixed'}
+						>
+							<NumberInput id="wheel-4" suffix="руб" bind:value={$continueSpinAction.step} />
 						</SettingWrapper>
 					</Snackbar>
 					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>

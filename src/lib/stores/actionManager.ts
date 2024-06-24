@@ -20,13 +20,18 @@ function createActionManager() {
   let _lots: ILot[] = [];
   let _previousLotsLeader: ILot;
   let _wheelWinnerDelay: ISetting;
-  let _extendSpinAction: ISetting & { price: number; step: number };
+  let _extendSpinAction: ISetting & {
+    price: number;
+    stepType: string;
+    step: number;
+  };
   let _stopSpinAction: { isEnabled: boolean; price: number };
   let _itemAddedAction: ISetting;
   let _leaderChangedAction: ISetting;
   let _addByIdAction: boolean;
   let _currentExtendSpinPrice: number;
   let _wheelWinnerDelayTimeout: NodeJS.Timeout;
+  let _biggestAmount = 0;
 
   function initialize() {
     state.subscribe((store) => _state = store);
@@ -82,6 +87,8 @@ function createActionManager() {
   }
 
   function startWheelSpin(ms: number) {
+    _biggestAmount = 0;
+
     timer.reset();
     timer.start(ms);
     state.set(ACTION_MANAGER_STATE.SPINNING_WHEEL);
@@ -166,6 +173,9 @@ function createActionManager() {
         const isEnoughAmountToExtend = donationAmount >= _currentExtendSpinPrice;
         const shouldStopSpin = _stopSpinAction.isEnabled && donationAmount === _stopSpinAction.price;
         const shouldExtendSpin = _extendSpinAction.isEnabled && donationAmount >= _currentExtendSpinPrice;
+        const isDonationAmountBigger = donationAmount >= _biggestAmount;
+
+        _biggestAmount = isDonationAmountBigger ? donationAmount : _biggestAmount;
 
         if (!_extendSpinAction.isEnabled || (!isEnoughAmountToExtend && isWheelWinnerDelayed)) {
           donations.add({
@@ -190,7 +200,7 @@ function createActionManager() {
             timer.add(_extendSpinAction.seconds * 1000);
           }
 
-          settings.increaseExtendSpinPrice();
+          settings.increaseExtendSpinPrice(_extendSpinAction.stepType === 'fixed' ? undefined : _biggestAmount);
         }
 
         break;

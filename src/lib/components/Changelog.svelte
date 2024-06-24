@@ -6,15 +6,17 @@
 <div class="changelog">
 	<div class="medium-title" style="margin-bottom: 24px;">Обновления</div>
 	<div class="changelog-inner">
-		{#each changelog as { createdAt, added, changed, fixed }}
+		{#each changelog as section}
+			{@const { createdAt, added, changed, fixed } = section}
+
 			<div class="changelog-section">
 				<div class="changelog__date medium-title">{formatDate(createdAt)}</div>
 				<div>
-					{#each [added, changed, fixed] as subsection}
+					{#each [added, changed, fixed] as subsection, idx}
 						{#if subsection}
-							<div class="changelog-subsection {subsection.id}">
+							<div class="changelog-subsection {Object.keys(section)[idx]}">
 								<ul class="changelog-subsection-list support-text">
-									{#each subsection.content as update}
+									{#each subsection as update}
 										<li>{update}</li>
 									{/each}
 								</ul>

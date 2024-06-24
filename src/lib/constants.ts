@@ -46,7 +46,7 @@ export enum NAVIGATION_ROUTES {
 }
 
 export const routes: IRoute[] = [
-  { id: 0, title: 'Лоты', icon: listIcon, url: NAVIGATION_ROUTES.LOTS },
+  { id: 0, title: 'Список', icon: listIcon, url: NAVIGATION_ROUTES.LOTS },
   { id: 1, title: 'Колесо', icon: pieIcon, url: NAVIGATION_ROUTES.WHEEL },
   { id: 2, title: 'Настройки', icon: settingsIcon, url: NAVIGATION_ROUTES.SETTINGS },
 ];

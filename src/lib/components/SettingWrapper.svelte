@@ -30,6 +30,7 @@
 
 		&:not(:first-child) {
 			align-items: center;
+			font-size: 14px;
 		}
 
 		&.disabled {

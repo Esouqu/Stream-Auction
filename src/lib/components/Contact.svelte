@@ -5,7 +5,7 @@
 </script>
 
 <a href={url} target="_blank" class="contact" class:clickable={!!url}>
-	<div class="icon-wrapper" style="padding: 10px;">
+	<div class="icon-wrapper">
 		<img src={icon} alt="Contact" />
 	</div>
 	<div class="contact-title">
@@ -18,6 +18,7 @@
 		position: relative;
 		display: flex;
 		align-items: center;
+		gap: 6px;
 		transition: 0.2s;
 		pointer-events: none;
 		text-decoration: none;

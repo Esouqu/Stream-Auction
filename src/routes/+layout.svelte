@@ -120,7 +120,7 @@
 			{:else}
 				<Rules />
 			{/if}
-			<div style="display: flex; width: 100%; justify-content: center; gap: 10px;">
+			<div style="display: flex; width: 100%; justify-content: center; gap: 12px;">
 				<Contact icon={githubIconWhite} title="GitHub" url="https://github.com/Esouqu" />
 				<Contact icon={telegramIcon} title="Telegram" url="https://t.me/esouqu" />
 				<Contact icon={boostyIcon} title="Boosty" url="https://boosty.to/esouqu/donate" />

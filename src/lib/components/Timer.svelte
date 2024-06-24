@@ -80,6 +80,10 @@
 			transition: color 0.3s;
 			user-select: none;
 
+			@media (max-width: 1366px) {
+				font-size: 60px;
+			}
+
 			&.delayed {
 				animation: blink 0.5s infinite alternate ease-in;
 			}
