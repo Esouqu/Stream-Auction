@@ -9,7 +9,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   const wheelWarningDate = new Date('2024-06-30 10:30:03');
 
   if (lastSeenUpdates) {
-    const haveSeenUpdates = new Date(lastSeenUpdates) > getLastUpdateDate();
+    const haveSeenUpdates = new Date(Date.parse(lastSeenUpdates)) > getLastUpdateDate();
 
     event.locals.haveSeenUpdates = haveSeenUpdates;
 
@@ -19,9 +19,9 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   if (lastSeenWarning) {
-    const haveSeenWarning = new Date(lastSeenWarning) > wheelWarningDate;
+    const haveSeenWarning = new Date(Date.parse(lastSeenWarning)) > wheelWarningDate;
 
-    console.log('seen warning:', new Date(lastSeenWarning), lastSeenWarning, '\nwarning date: ', wheelWarningDate, new Date(wheelWarningDate));
+    console.log('seen warning:', new Date(Date.parse(lastSeenWarning)), lastSeenWarning, '\nwarning date: ', wheelWarningDate);
     event.locals.haveSeenWarning = haveSeenWarning;
 
     if (haveSeenWarning) event.fetch('/api/seen-warning', { method: 'POST' });
