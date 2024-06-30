@@ -1,16 +1,10 @@
 class VisitApi {
-  public setLastSeenUpdates(date = new Date().toISOString()) {
-    fetch('/api/seen-updates', {
-      method: 'POST',
-      body: JSON.stringify({ createdAt: date })
-    });
+  public setLastSeenUpdates() {
+    fetch('/api/seen-updates', { method: 'POST' });
   }
 
-  public setLastSeenWarning(date = new Date().toISOString()) {
-    fetch('/api/seen-warning', {
-      method: 'POST',
-      body: JSON.stringify({ createdAt: date })
-    });
+  public setLastSeenWarning() {
+    fetch('/api/seen-warning', { method: 'POST' });
   }
 }
 

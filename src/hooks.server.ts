@@ -6,32 +6,25 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const lastSeenUpdates = event.cookies.get('lastSeenUpdates');
   const lastSeenWarning = event.cookies.get('lastSeenWarning');
-  const wheelWarningDate = new Date('2024-06-30 10:30:03').toUTCString();
+  const wheelWarningDate = new Date('2024-06-30 10:30:03');
 
   if (lastSeenUpdates) {
-    const haveSeenUpdates = new Date(lastSeenUpdates) > new Date(getLastUpdateDate());
+    const haveSeenUpdates = new Date(lastSeenUpdates) > getLastUpdateDate();
 
-    console.log('last seen updates: ', new Date(lastSeenUpdates), 'last updates: ', new Date(getLastUpdateDate()))
     event.locals.haveSeenUpdates = haveSeenUpdates;
 
-    if (haveSeenUpdates) event.fetch('/api/seen-updates', {
-      method: 'POST',
-      body: JSON.stringify({ createdAt: new Date().toUTCString() })
-    });
+    if (haveSeenUpdates) event.fetch('/api/seen-updates', { method: 'POST' });
   } else {
     event.locals.haveSeenUpdates = false;
   }
 
   if (lastSeenWarning) {
-    const haveSeenWarning = new Date(lastSeenWarning) > new Date(wheelWarningDate);
+    const haveSeenWarning = new Date(lastSeenWarning) > wheelWarningDate;
 
-    console.log('last seen warning: ', new Date(lastSeenWarning), 'last warning: ', new Date(getLastUpdateDate()))
+    console.log('seen warning:', new Date(lastSeenWarning), lastSeenWarning, '\nwarning date: ', wheelWarningDate, new Date(wheelWarningDate));
     event.locals.haveSeenWarning = haveSeenWarning;
 
-    if (haveSeenWarning) event.fetch('/api/seen-warning', {
-      method: 'POST',
-      body: JSON.stringify({ createdAt: new Date().toUTCString() })
-    });
+    if (haveSeenWarning) event.fetch('/api/seen-warning', { method: 'POST' });
   } else {
     event.locals.haveSeenWarning = false;
   }

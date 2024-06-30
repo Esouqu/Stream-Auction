@@ -4,7 +4,7 @@ interface IUpdate {
     changed?: string[];
     fixed?: string[];
   },
-  createdAt: string;
+  createdAt: Date;
 }
 
 export const changelog: IUpdate[] = [
@@ -21,7 +21,7 @@ export const changelog: IUpdate[] = [
         "Список вариантов: неправильно определялся предыдущий лидер после обновления страницы, если были сохраненные варианты.",
       ],
     },
-    createdAt: new Date('2024-06-30 11:17:58').toUTCString(),
+    createdAt: new Date('2024-06-30 11:17:58'),
   },
   {
     changes: {
@@ -29,7 +29,7 @@ export const changelog: IUpdate[] = [
         "DonationAlerts: добавлена новая настройка.\n\nВклин - Тип прироста стоимости\nНастройка имеет две опции: 'Фиксированный' и 'От суммы доната'.\nВ первом случае стоимость будет увеличиваться на заданное вами значение, во втором - до суммы самого большого доната за время кручения колеса.",
       ],
     },
-    createdAt: new Date('2024-06-24 07:14:52').toUTCString(),
+    createdAt: new Date('2024-06-24 07:14:52'),
   },
   {
     changes: {
@@ -43,13 +43,13 @@ export const changelog: IUpdate[] = [
         "Увеличен минимально возможный размер секции колеса для отображения текста."
       ],
     },
-    createdAt: new Date('2024-06-23 14:52:14').toUTCString(),
+    createdAt: new Date('2024-06-23 14:52:14'),
   },
 ]
 
 export function getLastUpdateDate() {
   const sorted = [...changelog].sort((a, b) => {
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return b.createdAt.getTime() - a.createdAt.getTime();
   })
 
   return sorted[0].createdAt;
