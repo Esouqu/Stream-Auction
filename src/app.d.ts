@@ -9,6 +9,8 @@ declare global {
     }
     interface PageData {
       isAuthorizedToDonationAlerts: boolean;
+      haveSeenUpdates: boolean;
+      haveSeenWarning: boolean;
     }
     // interface Platform {}
   }
