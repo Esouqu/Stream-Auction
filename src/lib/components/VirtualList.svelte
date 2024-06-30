@@ -62,7 +62,7 @@
 	}
 
 	function animateFrame(frame: number) {
-		if (isAutoScrollPaused) return;
+		if (isAutoScrollPaused || !scrollElement) return;
 
 		const maxHeight = scrollElement.scrollHeight - scrollElement.clientHeight;
 
