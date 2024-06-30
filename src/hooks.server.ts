@@ -11,6 +11,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (lastSeenUpdates) {
     const haveSeenUpdates = new Date(lastSeenUpdates) > new Date(getLastUpdateDate());
 
+    console.log('last seen updates: ', new Date(lastSeenUpdates), 'last updates: ', new Date(getLastUpdateDate()))
     event.locals.haveSeenUpdates = haveSeenUpdates;
 
     if (haveSeenUpdates) event.fetch('/api/seen-updates', {
@@ -24,6 +25,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (lastSeenWarning) {
     const haveSeenWarning = new Date(lastSeenWarning) > new Date(wheelWarningDate);
 
+    console.log('last seen warning: ', new Date(lastSeenWarning), 'last warning: ', new Date(getLastUpdateDate()))
     event.locals.haveSeenWarning = haveSeenWarning;
 
     if (haveSeenWarning) event.fetch('/api/seen-warning', {
