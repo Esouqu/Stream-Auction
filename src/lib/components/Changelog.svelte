@@ -10,7 +10,7 @@
 			{@const { createdAt, changes } = section}
 
 			<div class="changelog-section">
-				<div class="changelog__date medium-title">{formatDate(createdAt)}</div>
+				<div class="changelog__date medium-title">{formatDate(new Date(createdAt))}</div>
 				<div>
 					{#each Object.entries(changes) as [title, update]}
 						{#if update}

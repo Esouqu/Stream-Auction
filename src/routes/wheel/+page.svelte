@@ -18,6 +18,7 @@
 	import diceIconBlack from '$lib/assets/dice_icon_black.svg';
 	import listRemoveItemBlack from '$lib/assets/list_remove_icon_black.svg';
 	import { page } from '$app/stores';
+	import visitApi from '$lib/visitManager';
 
 	let spinDuration = 10;
 	let winner: IPieItem | null;
@@ -48,7 +49,7 @@
 <Popup
 	width="200px"
 	isOpened={!$page.data.haveSeenWarning}
-	onClose={() => fetch('/api/seen-warning', { method: 'POST' })}
+	onClose={() => visitApi.setLastSeenWarning()}
 >
 	<div style="display: flex; flex-direction: column; align-items: center;">
 		<Icon src={warningIcon} />

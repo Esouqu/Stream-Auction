@@ -28,6 +28,7 @@
 	import intensityTracker from '$lib/stores/intensityTracker';
 	import Popup from '$lib/components/Popup.svelte';
 	import Changelog from '$lib/components/Changelog.svelte';
+	import visitApi from '$lib/visitManager';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
@@ -52,10 +53,7 @@
 	});
 </script>
 
-<Popup
-	isOpened={!$page.data.haveSeenUpdates}
-	onClose={() => fetch('/api/seen-updates', { method: 'POST' })}
->
+<Popup isOpened={!$page.data.haveSeenUpdates} onClose={() => visitApi.setLastSeenUpdates()}>
 	<Changelog />
 </Popup>
 
