@@ -53,6 +53,8 @@
 	onMount(() => {
 		if ($lastSeenUpdates) {
 			haveSeenUpdates = new Date($lastSeenUpdates) > changelog[0].createdAt;
+		} else {
+			haveSeenUpdates = false;
 		}
 
 		actionManager.initialize();

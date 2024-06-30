@@ -36,6 +36,8 @@
 	onMount(() => {
 		if ($lastSeenWarning) {
 			haveSeenWarning = new Date($lastSeenWarning) > WARNING_DATE;
+		} else {
+			haveSeenWarning = false;
 		}
 	});
 
