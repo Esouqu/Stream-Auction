@@ -40,7 +40,7 @@
 	$: stopSpinAction = settings.stopSpinAction;
 	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
 	$: intensity = settings.intensity;
-	$: wheelWinnerDelay = settings.wheelWinnerDelay;
+	$: spinStopDelay = settings.spinStopDelay;
 	$: autoScroll = settings.autoScroll;
 	$: {
 		if ($centrifugoState !== SOCKET_STATE.OPEN) {
@@ -165,7 +165,7 @@
 					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 						<SettingWrapper
 							title="Автодобавление по #ID"
-							description="Если в сообщении доната присутствует #ID, автоматически прибавляет сумму доната к варианту с этим ID"
+							description="Автоматически прибавлять сумму доната к варианту с указанным #ID в сообщении доната"
 						>
 							<Switch bind:isToggled={$addByIdAction} />
 						</SettingWrapper>
@@ -174,33 +174,16 @@
 					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 						<SettingWrapper
 							title="Задержка"
-							description="Определение победителя будет отложено на указанное значение, в течении которого можно активировать функцию 'Вклин'"
+							description="Откладывать определение победителя на указанное значение, в течении которого можно активировать только функцию 'Вклин' или 'Стоп колесо'"
 						>
-							<Switch bind:isToggled={$wheelWinnerDelay.isEnabled} />
+							<Switch bind:isToggled={$spinStopDelay.isEnabled} />
 						</SettingWrapper>
-						<SettingWrapper title="Длительность" isDisabled={!$wheelWinnerDelay.isEnabled}>
+						<SettingWrapper title="Длительность" isDisabled={!$spinStopDelay.isEnabled}>
 							<NumberInput
 								id="wheel-1"
 								suffix="сек"
 								placeholder="Значение"
-								bind:value={$wheelWinnerDelay.seconds}
-							/>
-						</SettingWrapper>
-					</Snackbar>
-					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
-						<SettingWrapper
-							title="Жаришка нереальная"
-							description="С каждым донатом, сумма которого равна или выше заданного значения, увеличивается огонь на заднем фоне, который постепенно уменьшается"
-						>
-							<Switch bind:isToggled={$intensity.isEnabled} />
-						</SettingWrapper>
-						<SettingWrapper title="Стоимость" isDisabled={!$intensity.isEnabled}>
-							<NumberInput
-								--input-w="90px"
-								id="flame"
-								suffix="руб"
-								placeholder="Значение"
-								bind:value={$intensity.price}
+								bind:value={$spinStopDelay.seconds}
 							/>
 						</SettingWrapper>
 					</Snackbar>
@@ -209,7 +192,7 @@
 					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 						<SettingWrapper
 							title="Вклин"
-							description="Если сумма доната равна или превышает итоговое значение, продлевает кручение колеса и добавляет вариант из доната"
+							description="Продлевает кручение колеса и добавляет вариант из доната, если сумма доната равна или превышает итоговое значение"
 						>
 							<Switch bind:isToggled={$continueSpinAction.isEnabled} />
 						</SettingWrapper>
@@ -255,7 +238,7 @@
 					<Snackbar isDisabled={$centrifugoState !== SOCKET_STATE.OPEN}>
 						<SettingWrapper
 							title="Стоп колесо"
-							description="Останавливает колесо, если сумма доната равна заданному значению"
+							description="В любой момент времени останавливает колесо на текущей позиции без дальнейшей задержки, если сумма доната равна указанному значению"
 						>
 							<Switch bind:isToggled={$stopSpinAction.isEnabled} />
 						</SettingWrapper>
@@ -406,6 +389,23 @@
 						bind:to={$maxSpinDuration}
 					/>
 				</Snackbar>
+				<Snackbar>
+					<SettingWrapper
+						title="Жаришка нереальная"
+						description="Усиливает огонь на заднем фоне после добавления суммы к варианту, равной или больше заданного значения."
+					>
+						<Switch bind:isToggled={$intensity.isEnabled} />
+					</SettingWrapper>
+					<SettingWrapper title="Стоимость" isDisabled={!$intensity.isEnabled}>
+						<NumberInput
+							--input-w="90px"
+							id="flame"
+							suffix="руб"
+							placeholder="Значение"
+							bind:value={$intensity.price}
+						/>
+					</SettingWrapper>
+				</Snackbar>
 			</div>
 			<div class="settings-column">
 				<Snackbar>
@@ -414,7 +414,7 @@
 						description="Списки на указанных страницах будут автоматически прокручиваться"
 					/>
 
-					<SettingWrapper title="На лотах">
+					<SettingWrapper title="На аукционе">
 						<Switch bind:isToggled={$autoScroll.isAuctionListEnabled} />
 					</SettingWrapper>
 					<SettingWrapper title="На колесе">
@@ -449,11 +449,19 @@
 		gap: 10px;
 		flex: 1;
 		flex-direction: column;
+
+		@media (max-width: 1466px) {
+			width: 100%;
+		}
 	}
 	.settings-row {
 		display: flex;
 		align-items: flex-start;
 		gap: 10px;
 		flex-direction: row;
+
+		@media (max-width: 1466px) {
+			flex-direction: column;
+		}
 	}
 </style>

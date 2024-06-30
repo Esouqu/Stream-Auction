@@ -11,6 +11,7 @@
 	export let isFilled = false;
 	export let isPreventInput = false;
 	export let isBorderless = false;
+	export let isBlack = false;
 	export let onEnter: (() => void) | null = null;
 	export let onInput: (() => void) | null = null;
 	export let onBlur: (() => void) | null = null;
@@ -56,6 +57,7 @@
 	class:filled={isFilled}
 	class:labeled={label}
 	class:borderless={isBorderless}
+	class:black={isBlack}
 	data-suffix={suffix}
 >
 	{#if label}
@@ -85,9 +87,8 @@
 		appearance: textfield;
 		position: relative;
 		padding: 10.5px;
-		// border: 1px solid var(--outline);
 		border: 0;
-		border-radius: 5px;
+		border-radius: 8px;
 		outline: 1px solid var(--outline);
 		width: var(--input-w, 90px);
 		line-height: 1;
@@ -95,7 +96,7 @@
 		text-overflow: ellipsis;
 		text-decoration: none;
 		letter-spacing: 0.25px;
-		box-shadow: 0 0px 0px 0 var(--primary-70);
+		box-shadow: inset 0 0px 0px 0 var(--primary-70);
 		color: var(--on-surface);
 		background-color: transparent;
 		transition: box-shadow 0.3s, background-color 0.2s, outline-color 0.2s, border-color 0.2s;
@@ -193,11 +194,22 @@
 						z-index: 999;
 						outline: none;
 						border-color: transparent;
-						box-shadow: 0 3px 0px 0 var(--primary-70);
+						box-shadow: inset 0 -3px 0px 0 var(--primary-70);
 					}
 
 					&:hover:not(:focus):not(:disabled) {
 						background-color: var(--hover-white);
+						cursor: default;
+					}
+				}
+			}
+
+			&.black {
+				& .input {
+					color: var(--on-inverse-surface);
+
+					&:hover:not(:focus):not(:disabled) {
+						background-color: var(--hover-black);
 						cursor: default;
 					}
 				}
@@ -213,6 +225,7 @@
 				font-size: 16px;
 				font-weight: 400;
 				opacity: 0.7;
+				pointer-events: none;
 			}
 		}
 

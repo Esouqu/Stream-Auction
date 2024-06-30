@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, fly, slide } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import lots from '$lib/stores/lots';
 	import VirtualList from '$lib/components/VirtualList.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -9,6 +9,13 @@
 	import tooltip from '$lib/actions/tooltip';
 	import Lot from '$lib/components/Lot.svelte';
 	import settings from '$lib/stores/settings';
+	import listAddIcon from '$lib/assets/list_add_icon.svg';
+	import listAddIconBlack from '$lib/assets/list_add_icon_black.svg';
+	import searchIcon from '$lib/assets/search_icon.svg';
+	import searchIconBlack from '$lib/assets/search_icon_black.svg';
+	import trashcanIconBlack from '$lib/assets/trashcan_sweep_icon_black.svg';
+	import rubleIcon from '$lib/assets/currency_ruble_icon.svg';
+	import Spinner from '$lib/components/Spinner.svelte';
 
 	let text: string;
 	let value: number;
@@ -82,18 +89,17 @@
 			autoScrollSpeed={$autoScroll.speed}
 			let:item
 		>
-			{@const percent = (item.value / total) * 100}
-			{@const { position, donators, contrastColor, ...rest } = item}
+			{@const { donators, contrastColor, url, position, ...rest } = item}
 
-			<Lot {...rest} {percent} />
+			<Lot {...rest} />
 		</VirtualList>
 
 		{#if $lots.length < 1}
 			<div class="no-lots" transition:fade>
 				{#if $isLotsLoading}
-					Загрузка лотов...
+					<Spinner --spinner-size="35px" />
 				{:else}
-					<p>Лоты отсутствуют</p>
+					<p>Варианты отсутствуют</p>
 				{/if}
 			</div>
 		{/if}
@@ -144,20 +150,16 @@
 		{/if}
 		<div use:tooltip={{ content: 'Добавить лот' }}>
 			<Button
-				icon="listAddItem"
-				iconColor={isAddingLot ? 'white' : 'black'}
-				color={isAddingLot ? 'var(--primary-50)' : 'var(--inverse-surface)'}
-				isFilled={true}
+				icon={isAddingLot ? listAddIcon : listAddIconBlack}
+				color={isAddingLot ? 'active' : 'default'}
 				on:click={addItem}
 			/>
 		</div>
 
 		<div use:tooltip={{ content: 'Поиск' }}>
 			<Button
-				icon="search"
-				iconColor={isSearching ? 'white' : 'black'}
-				color={isSearching ? 'var(--primary-50)' : 'var(--inverse-surface)'}
-				isFilled={true}
+				icon={isSearching ? searchIcon : searchIconBlack}
+				color={isSearching ? 'active' : 'default'}
 				isDisabled={$lots.length < 1}
 				on:click={search}
 			/>
@@ -166,10 +168,7 @@
 		{#key $lots}
 			<div use:tooltip={{ content: `Удалить все лоты (${$lots.length})` }}>
 				<Button
-					icon="trashcanSweep"
-					iconColor="white"
-					color="var(--error)"
-					isFilled={true}
+					icon={trashcanIconBlack}
 					isDisabled={$lots.length < 1}
 					on:click={() => lots.removeAll()}
 				/>
@@ -178,7 +177,7 @@
 
 		{#key total}
 			<div use:tooltip={{ content: `Общая сумма (${total})` }}>
-				<Button icon="ruble" iconColor="white" isInteractive={false} />
+				<Button icon={rubleIcon} color="transparent" isInteractive={false} />
 			</div>
 		{/key}
 	</div>

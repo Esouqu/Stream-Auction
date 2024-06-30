@@ -3,10 +3,12 @@
 declare global {
   namespace App {
     // interface Error {}
-    // interface Locals {}
+    interface Locals {
+      haveSeenUpdates: boolean;
+      haveSeenWarning: boolean;
+    }
     interface PageData {
       isAuthorizedToDonationAlerts: boolean;
-      lastVisit: Date | undefined;
     }
     // interface Platform {}
   }

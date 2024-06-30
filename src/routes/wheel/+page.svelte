@@ -10,15 +10,27 @@
 	import settings from '$lib/stores/settings';
 	import wheel from '$lib/stores/wheel';
 	import { getRandomInRange } from '$lib/utils';
+	import Popup from '$lib/components/Popup.svelte';
+	import Icon from '$lib/components/Icon.svelte';
+	import warningIcon from '$lib/assets/warning_icon.svg';
+	import stopCycleIconBlack from '$lib/assets/stop_cycle_icon_black.svg';
+	import cycleIconBlack from '$lib/assets/cycle_icon_black.svg';
+	import diceIconBlack from '$lib/assets/dice_icon_black.svg';
+	import listRemoveItemBlack from '$lib/assets/list_remove_icon_black.svg';
+	import { page } from '$app/stores';
 
 	let spinDuration = 10;
 	let winner: IPieItem | null;
 
 	$: wheelState = wheel.state;
-	$: currentExtendSpinPrice = settings.currentExtendSpinPrice;
-	$: extendSpinAction = settings.extendSpinAction;
 	$: minSpinDuration = settings.minSpinDuration;
 	$: maxSpinDuration = settings.maxSpinDuration;
+
+	$: isWheelActive = $wheelState === WHEEL_STATE.DELAYED || $wheelState === WHEEL_STATE.SPINNING;
+
+	function setRandomDuration() {
+		spinDuration = getRandomInRange($minSpinDuration, $maxSpinDuration);
+	}
 
 	function deleteWinner() {
 		if (!winner) return;
@@ -33,77 +45,63 @@
 	<title>Колесо - Вклиновый Аукцион</title>
 </svelte:head>
 
+<Popup
+	width="200px"
+	isOpened={!$page.data.haveSeenWarning}
+	onClose={() => fetch('/api/seen-warning', { method: 'POST' })}
+>
+	<div style="display: flex; flex-direction: column; align-items: center;">
+		<Icon src={warningIcon} />
+		<h4 style="text-align: center;">
+			Рекомедуется включить аппаратное ускорение в браузере для более плавной анимации колеса.<br />
+			Варианты сохранятся при перезагрузке страницы.
+		</h4>
+	</div>
+</Popup>
+
 <section class="wheel-section">
 	<Wheel bind:winner />
-	<div
-		style="position: absolute; right: 20px; top: 25px; z-index: 999; display: flex; gap: 5px; align-items: center;"
-	>
-		<NumberInput
-			id="spin-time"
-			suffix="сек"
-			label="Длительность"
-			isFilled={true}
-			isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
-			bind:value={spinDuration}
-		/>
-		<div use:tooltip={{ content: 'Сгенерировать случайное число' }}>
+	<div class="action-buttons-wrapper">
+		<div class="spin-duration-wrapper" class:disabled={isWheelActive}>
 			<Button
-				icon="dice"
-				iconColor="black"
-				isFilled={true}
-				isDisabled={$wheelState === WHEEL_STATE.SPINNING || $wheelState === WHEEL_STATE.DELAYED}
-				on:click={() => {
-					spinDuration = getRandomInRange($minSpinDuration, $maxSpinDuration);
-				}}
+				--button-border-radius="8px 0 0 8px"
+				icon={diceIconBlack}
+				color="transparent"
+				hoverColor="black"
+				tooltipProps={{ content: 'Сгенерировать число' }}
+				on:click={setRandomDuration}
 			/>
-		</div>
-		{#if $wheelState === WHEEL_STATE.DELAYED || $wheelState === WHEEL_STATE.SPINNING}
-			<div use:tooltip={{ content: 'Остановить' }}>
-				<Button
-					icon="stopCycle"
-					iconColor="white"
-					color="var(--error)"
-					isFilled={true}
-					on:click={() => {
-						actionManager.stopWheelSpin();
-						currentExtendSpinPrice.set($extendSpinAction.price);
-					}}
+			<div use:tooltip={{ content: 'Длительность' }}>
+				<NumberInput
+					--input-w-w="90px"
+					--input-w="auto"
+					id="spin-time"
+					suffix="сек"
+					isBlack={true}
+					isBorderless={true}
+					bind:value={spinDuration}
 				/>
 			</div>
+		</div>
+		{#if isWheelActive}
+			<Button
+				icon={stopCycleIconBlack}
+				tooltipProps={{ content: 'Остановить' }}
+				on:click={() => actionManager.stopWheelSpin()}
+			/>
 		{:else}
-			<div use:tooltip={{ content: 'Крутить' }}>
-				<Button
-					icon="cycle"
-					iconColor="black"
-					isFilled={true}
-					on:click={() => {
-						actionManager.startWheelSpin(spinDuration * 1000);
-						currentExtendSpinPrice.set($extendSpinAction.price);
-					}}
-				/>
-			</div>
-		{/if}
-
-		<div use:tooltip={{ content: 'Удалить лот' }}>
 			<Button
-				icon="listRemoveItem"
-				iconColor="white"
-				color="var(--error)"
-				isFilled={true}
-				isDisabled={!winner ||
-					$wheelState === WHEEL_STATE.SPINNING ||
-					$wheelState === WHEEL_STATE.DELAYED}
-				on:click={deleteWinner}
+				icon={cycleIconBlack}
+				tooltipProps={{ content: 'Крутить' }}
+				on:click={() => actionManager.startWheelSpin(spinDuration * 1000)}
 			/>
-		</div>
-		<div
-			use:tooltip={{
-				content:
-					'Рекомедуется включить аппаратное ускорение в браузере для более плавной анимации колеса'
-			}}
-		>
-			<Button icon="warning" iconColor="white" isInteractive={false} />
-		</div>
+		{/if}
+		<Button
+			icon={listRemoveItemBlack}
+			isDisabled={!winner || isWheelActive}
+			tooltipProps={{ content: 'Удалить победителя' }}
+			on:click={deleteWinner}
+		/>
 	</div>
 </section>
 
@@ -115,5 +113,27 @@
 		justify-content: center;
 		width: 100%;
 		overflow: hidden;
+	}
+	.action-buttons-wrapper {
+		position: absolute;
+		right: 20px;
+		top: 25px;
+		z-index: 999;
+		display: flex;
+		gap: 5px;
+		align-items: center;
+	}
+	.spin-duration-wrapper {
+		display: flex;
+		align-items: center;
+		border-radius: 8px;
+		color: var(--on-inverse-surface);
+		background-color: var(--inverse-surface);
+		overflow: hidden;
+
+		&.disabled {
+			opacity: 0.3;
+			pointer-events: none;
+		}
 	}
 </style>

@@ -3,12 +3,10 @@
 	import { flip } from 'svelte/animate';
 	import { page } from '$app/stores';
 	import { NAVIGATION_ROUTES, SOCKET_STATE } from '$lib/constants';
-	import { getTotal } from '$lib/utils';
 	import lots from '$lib/stores/lots';
 	import donations from '$lib/stores/donations';
 	import Donation from '$lib/components/Donation.svelte';
 	import Timer from '$lib/components/Timer.svelte';
-	import LotPreview from '$lib/components/LotPreview.svelte';
 	import Rules from '$lib/components/Rules.svelte';
 	import IntensityTracker from '$lib/components/IntensityTracker.svelte';
 	import telegramIcon from '$lib/assets/telegram-logo/telegram-icon.svg';
@@ -17,7 +15,6 @@
 	import Contact from '$lib/components/Contact.svelte';
 	import settings from '$lib/stores/settings';
 	import actionManager from '$lib/stores/actionManager';
-	import TitledSection from '$lib/components/TitledSection.svelte';
 	import daIcon from '$lib/assets/donationalerts-logo/DA_Alert_White.svg';
 	import ViewerActions from '$lib/components/ViewerActions.svelte';
 	import centrifugo from '$lib/stores/centrifugo';
@@ -26,9 +23,11 @@
 	import Switch from '$lib/components/Switch.svelte';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import { dev } from '$app/environment';
+	import Icon from '$lib/components/Icon.svelte';
+	import Lot from '$lib/components/Lot.svelte';
+	import intensityTracker from '$lib/stores/intensityTracker';
 	import Popup from '$lib/components/Popup.svelte';
 	import Changelog from '$lib/components/Changelog.svelte';
-	import { getLastUpdateDate } from '$lib/changelog';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
@@ -37,12 +36,10 @@
 	$: centrifugoState = centrifugo.state;
 	$: transparency = settings.transparency;
 	$: intensity = settings.intensity;
+	$: currentIntensityLevel = intensityTracker.currentLevel;
 	$: background = settings.background;
 	$: autoScroll = settings.autoScroll;
-	$: hasNewUpdates = $page.data.lastVisit ? $page.data.lastVisit < getLastUpdateDate() : true;
-
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
-	$: total = getTotal($lots.map((l) => l.value));
 	$: {
 		if ($centrifugoState !== SOCKET_STATE.OPEN) {
 			isCentrifugoToggleDisabled = false;
@@ -55,7 +52,10 @@
 	});
 </script>
 
-<Popup isOpened={hasNewUpdates}>
+<Popup
+	isOpened={!$page.data.haveSeenUpdates}
+	onClose={() => fetch('/api/seen-updates', { method: 'POST' })}
+>
 	<Changelog />
 </Popup>
 
@@ -80,11 +80,8 @@
 	{/if}
 
 	{#if $intensity.isEnabled}
-		<div style="position: fixed; z-index: 0; width: 100%; opacity: 0.7;">
-			<IntensityTracker
-				minIntensityValue={$intensity.price}
-				isDonationsOn={$centrifugoState === SOCKET_STATE.OPEN}
-			/>
+		<div style="position: fixed; z-index: 0; width: 100%;">
+			<IntensityTracker level={$currentIntensityLevel} />
 		</div>
 	{/if}
 
@@ -92,14 +89,7 @@
 		<div class="layout-wrapper">
 			{#if $page.route.id === NAVIGATION_ROUTES.WHEEL}
 				<ViewerActions />
-				<TitledSection
-					--titled-section-overflow="hidden"
-					--titled-section-height="100%"
-					--titled-section-justify="center"
-					--titled-section-gap="0px"
-					--titled-section-p="0px"
-					title="Варианты"
-				>
+				<div class="list-wrapper">
 					<div class="list-headers">
 						<h4 style="min-width: 60px; margin-right: 10px; text-align: center;">ID</h4>
 						<h4 style="width: 100%; padding: 0 10.5px;">Название</h4>
@@ -111,16 +101,15 @@
 						autoScrollSpeed={$autoScroll.speed}
 						let:item
 					>
-						{@const { id, title, color } = item}
-						{@const percent = (item.value / total) * 100}
+						{@const { contrastColor, donators, url, position, ...rest } = item}
 
-						<LotPreview {id} {title} {color} {percent} />
+						<Lot {...rest} isCompact={true} />
 					</VirtualList>
-				</TitledSection>
+				</div>
 			{:else}
 				<Rules />
 			{/if}
-			<div style="display: flex; width: 100%; justify-content: center; gap: 12px;">
+			<div class="contacts-wrapper">
 				<Contact icon={githubIconWhite} title="GitHub" url="https://github.com/Esouqu" />
 				<Contact icon={telegramIcon} title="Telegram" url="https://t.me/esouqu" />
 				<Contact icon={boostyIcon} title="Boosty" url="https://boosty.to/esouqu/donate" />
@@ -137,10 +126,10 @@
 	</div>
 	<div class="layout-section layout-section_right">
 		<div class="layout-wrapper">
-			<Timer />
 			{#if dev}
 				<TestKit />
 			{/if}
+			<Timer />
 			<div style="height: 100%; scrollbar-gutter: stable; overflow: hidden auto;">
 				<div class="donations-wrapper">
 					{#each $donations as { created_at, ...donation } (donation.id)}
@@ -152,9 +141,7 @@
 			</div>
 			{#if isAuthorizedToDonationAlerts}
 				<div class="indicator-wrapper">
-					<div class="icon-wrapper" style="padding: 10px;">
-						<img src={daIcon} alt="DonationAlerts icon" />
-					</div>
+					<Icon src={daIcon} />
 					<Switch
 						on={() => {
 							isCentrifugoToggleDisabled = true;
@@ -224,7 +211,6 @@
 			flex-direction: column;
 			flex: 1 1 0;
 			justify-content: center;
-			// border-radius: 10px 10px 0 0;
 			width: 100%;
 			height: calc(100% - 83px);
 		}
@@ -251,6 +237,12 @@
 		}
 	}
 
+	.contacts-wrapper {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+		gap: 12px;
+	}
 	.donations-wrapper {
 		display: flex;
 		flex: 1;
@@ -264,5 +256,13 @@
 		justify-content: center;
 		align-items: center;
 		padding-top: 20px;
+		gap: 10px;
+	}
+	.list-wrapper {
+		display: flex;
+		flex-direction: column;
+		border-bottom: 3px solid var(--primary-50);
+		height: 100%;
+		overflow: hidden;
 	}
 </style>

@@ -1,12 +1,12 @@
-import { writable } from 'svelte/store';
 import donations from './donations';
 import settings from './settings';
 import timer from './timer';
 import wheel from './wheel';
 import lots from './lots';
 import type { IDonationData, ILot } from '$lib/interfaces';
-import { compareStrings } from '$lib/utils';
-import { ACTION_MANAGER_STATE, WHEEL_STATE } from '$lib/constants';
+import { ACTION_MANAGER_STATE, CENTRIFUGE_STATE, DONATION_EVENT, SOCKET_STATE, TIMER_STATE, WHEEL_STATE } from '$lib/constants';
+import intensityTracker from './intensityTracker';
+import centrifugo from './centrifugo';
 
 interface ISetting {
   isEnabled: boolean;
@@ -14,206 +14,246 @@ interface ISetting {
 }
 
 function createActionManager() {
-  const state = writable(ACTION_MANAGER_STATE.IDLE);
+  let _state = ACTION_MANAGER_STATE.IDLE;
+  let _largestDonation = 0;
 
-  let _state: ACTION_MANAGER_STATE = ACTION_MANAGER_STATE.IDLE;
-  let _lots: ILot[] = [];
-  let _previousLotsLeader: ILot;
-  let _wheelWinnerDelay: ISetting;
-  let _extendSpinAction: ISetting & {
+  let wheelState = WHEEL_STATE.IDLE;
+  let centrifugoState = SOCKET_STATE.CLOSED;
+  let currentExtendSpinPrice: number;
+  let spinStopDelay: ISetting;
+  let itemAddedAction: ISetting;
+  let leaderChangedAction: ISetting;
+  let addByIdAction: boolean;
+  let stopSpinAction: { isEnabled: boolean; price: number };
+  let extendSpinAction: ISetting & {
     price: number;
     stepType: string;
     step: number;
   };
-  let _stopSpinAction: { isEnabled: boolean; price: number };
-  let _itemAddedAction: ISetting;
-  let _leaderChangedAction: ISetting;
-  let _addByIdAction: boolean;
-  let _currentExtendSpinPrice: number;
-  let _wheelWinnerDelayTimeout: NodeJS.Timeout;
-  let _biggestAmount = 0;
+  let intensitySetting: { isEnabled: boolean; price: number };
 
   function initialize() {
-    state.subscribe((store) => _state = store);
-    lots.subscribe((store) => {
-      const newLeader = [...store].sort((a, b) => b.value - a.value)[0];
+    settings.spinStopDelay.subscribe((store) => spinStopDelay = store);
+    settings.extendSpinAction.subscribe((store) => extendSpinAction = store);
+    settings.currentExtendSpinPrice.subscribe((store) => currentExtendSpinPrice = store);
+    settings.stopSpinAction.subscribe((store) => stopSpinAction = store);
+    settings.itemAddedAction.subscribe((store) => itemAddedAction = store);
+    settings.leaderChangedAction.subscribe((store) => leaderChangedAction = store);
+    settings.addByIdAction.subscribe((store) => addByIdAction = store);
+    settings.intensity.subscribe((store) => intensitySetting = store);
+    centrifugo.state.subscribe((store) => centrifugoState = store);
 
-      if (_state === ACTION_MANAGER_STATE.AUCTIONING) {
-        if (!_previousLotsLeader && newLeader) _previousLotsLeader = newLeader;
+    lots.lastAddedItem.subscribe(_handleLastAddedLot);
+    lots.lastUpdatedItem.subscribe(_handleLastUpdatedLot);
+    lots.currentLeader.subscribe(_handleCurrentLeader);
+    timer.state.subscribe(_handleTimerState)
+    wheel.state.subscribe(_handleWheelState);
+  }
 
-        if (newLeader?.value > _previousLotsLeader.value && _previousLotsLeader.id !== newLeader.id) {
-          if (_leaderChangedAction.isEnabled) timer.add(_leaderChangedAction.seconds * 1000);
-
-          _previousLotsLeader = newLeader;
-        };
-
-        if (_itemAddedAction?.isEnabled && store.length > _lots.length) timer.add(_itemAddedAction.seconds * 1000);
+  function _handleWheelState(state: WHEEL_STATE) {
+    switch (state) {
+      case WHEEL_STATE.SPINNING: {
+        _state = ACTION_MANAGER_STATE.SPINNING_WHEEL;
+        break;
       }
+      case WHEEL_STATE.DELAYED: {
+        _state = ACTION_MANAGER_STATE.DELAYING_SPIN_STOP;
+        timer.start(spinStopDelay.seconds * 1000);
 
-      _lots = store;
-    });
-    wheel.state.subscribe((store) => {
-      if (store === WHEEL_STATE.STOPPED) {
-        state.set(ACTION_MANAGER_STATE.IDLE);
+        break;
       }
-
-      if (_wheelWinnerDelay?.isEnabled && store === WHEEL_STATE.DELAYED) {
-        state.set(ACTION_MANAGER_STATE.DELAYING_WHEEL_WINNER);
-        timer.start(_wheelWinnerDelay.seconds * 1000);
-
-        _wheelWinnerDelayTimeout = setTimeout(() => {
-          wheel.state.set(WHEEL_STATE.STOPPED);
-        }, _wheelWinnerDelay.seconds * 1000);
+      case WHEEL_STATE.STOPPED: {
+        _state = ACTION_MANAGER_STATE.IDLE;
+        break;
       }
-    });
+    }
 
-    settings.wheelWinnerDelay.subscribe((store) => _wheelWinnerDelay = store);
-    settings.extendSpinAction.subscribe((store) => _extendSpinAction = store);
-    settings.currentExtendSpinPrice.subscribe((store) => _currentExtendSpinPrice = store);
-    settings.stopSpinAction.subscribe((store) => _stopSpinAction = store);
-    settings.itemAddedAction.subscribe((store) => _itemAddedAction = store);
-    settings.leaderChangedAction.subscribe((store) => _leaderChangedAction = store);
-    settings.addByIdAction.subscribe((store) => _addByIdAction = store);
+    wheelState = state;
   }
 
-  function startAuction() {
-    timer.start();
-    state.set(ACTION_MANAGER_STATE.AUCTIONING);
-  }
+  function _handleTimerState(timerState: TIMER_STATE) {
+    const isTimerStopped = timerState === TIMER_STATE.STOPPED;
+    const isSpinStopDelayed = wheelState === WHEEL_STATE.DELAYED;
 
-  function pauseAuction() {
-    timer.pause();
-    state.set(ACTION_MANAGER_STATE.IDLE);
-  }
-
-  function startWheelSpin(ms: number) {
-    _biggestAmount = 0;
-
-    timer.reset();
-    timer.start(ms);
-    state.set(ACTION_MANAGER_STATE.SPINNING_WHEEL);
-    wheel.startSpin(ms);
-  }
-
-  function stopWheelSpin() {
-    timer.reset();
-    state.set(ACTION_MANAGER_STATE.IDLE);
-    wheel.stopSpin();
-  }
-
-  function getSimilarLot(str: string) {
-    const lotId = str.match(/\B(\#[\d]+\b)(?!;)/);
-    const replacedLotId = lotId && Number(lotId[0].replace('#', ''));
-    // const url = extractUrl(str);
-
-    let lot: ILot | undefined;
-
-    if (_addByIdAction && replacedLotId) {
-      // If message have [#id]. get(lots).length = last generated lot id
-      lot = findLotById(replacedLotId);
+    if (spinStopDelay.isEnabled && centrifugoState === SOCKET_STATE.OPEN) {
+      if (isTimerStopped && isSpinStopDelayed) {
+        stopWheelSpin();
+      }
     } else {
-      // else try to find exact same lot as donation message
-      lot = findLotByText(str);
-    }
-
-    return {
-      lot,
-      mostSimilarLot: findLotBySimilarity(str),
-    }
-  }
-
-  function findLotByText(message: string) {
-    return _lots.find((item) => item.title.toLowerCase() === message.toLowerCase());
-  }
-
-  function findLotById(id: number) {
-    return _lots.find((item) => item.id === id);
-  }
-
-  function findLotBySimilarity(message: string): ILot | undefined {
-    const MERGE_THRESHOLD = 60;
-
-    for (const l of _lots) {
-      if (l.title === message) return l;
-
-      const comparePercent = compareStrings(message, l.title);
-
-      if (comparePercent > MERGE_THRESHOLD) return l;
-    }
-  }
-
-  function processDonation(donation: IDonationData) {
-    const message = donation.message || '';
-    const donationAmount = donation.amount_in_user_currency;
-    const { lot, mostSimilarLot } = getSimilarLot(message);
-    const handleDonation = (wouldSpinStop = false) => {
-      if (lot && !wouldSpinStop) {
-        lots.addValue(lot.id, donationAmount, donation.username);
+      if (isTimerStopped) {
+        stopWheelSpin();
       }
-
-      donations.add({
-        ...donation,
-        mostSimilarLot,
-        message: lot && !wouldSpinStop ? lot.title : message,
-        isInstant: !!lot && !wouldSpinStop,
-      });
     }
+  }
+
+  function _handleLastUpdatedLot(lot?: ILot & { addedValue: number }) {
+    if (!lot) return;
 
     switch (_state) {
       case ACTION_MANAGER_STATE.IDLE:
       case ACTION_MANAGER_STATE.AUCTIONING: {
-        handleDonation();
-
+        increaseIntensity(Math.abs(lot.addedValue));
         break;
       }
+    }
+  }
 
-      case ACTION_MANAGER_STATE.DELAYING_WHEEL_WINNER:
+  function _handleLastAddedLot(lot?: ILot) {
+    if (!lot) return;
+
+    switch (_state) {
+      case ACTION_MANAGER_STATE.IDLE: {
+        increaseIntensity(lot.value);
+        break;
+      }
+      case ACTION_MANAGER_STATE.AUCTIONING: {
+        increaseIntensity(lot.value);
+        timer.add(itemAddedAction.seconds * 1000);
+        break;
+      }
+    }
+  }
+
+  function _handleCurrentLeader(lot: ILot | null) {
+    switch (_state) {
+      case ACTION_MANAGER_STATE.AUCTIONING: {
+        if (!leaderChangedAction.isEnabled || !lot) break;
+
+        timer.add(leaderChangedAction.seconds * 1000);
+        break;
+      }
+    }
+  }
+
+  function _addLotFromDonation(donation: IDonationData) {
+    const donationAmount = donation.amount_in_user_currency;
+    const donationMessage = donation.message || '';
+    const { lot, mostSimilarLot } = lots.getSimilarLot(donationMessage, addByIdAction);
+    const message = lot ? lot.title : donationMessage;
+    const isInstant = !!lot;
+
+    if (lot) lots.addValue(lot.id, donationAmount, donation.username);
+    donations.add({ ...donation, message, mostSimilarLot, isInstant });
+  }
+  function _onExtendSpinEvent(spinExtendAmount: number | undefined, shouldRestartSpin: boolean) {
+    if (shouldRestartSpin) {
+      timer.start(extendSpinAction.seconds * 1000);
+      wheel.restartSpin(extendSpinAction.seconds * 1000);
+    } else {
+      timer.add(extendSpinAction.seconds * 1000);
+      wheel.extendSpin(extendSpinAction.seconds * 1000);
+    }
+
+    settings.increaseExtendSpinPrice(spinExtendAmount);
+  }
+  function _activateEvent(donation: IDonationData, donationEvent: DONATION_EVENT, isSpinStopDelayed: boolean) {
+    const spinExtendAmount = extendSpinAction.stepType === 'fixed' ? undefined : _largestDonation;
+
+    switch (donationEvent) {
+      case DONATION_EVENT.EXTEND: {
+        _addLotFromDonation(donation);
+        _onExtendSpinEvent(spinExtendAmount, isSpinStopDelayed);
+        break;
+      }
+      case DONATION_EVENT.STOP: {
+        donations.add({ ...donation, isInstant: false });
+        stopWheelSpin();
+        break;
+      }
+    }
+  }
+  function _updateLargestDonation(newDonationAmount: number) {
+    if (newDonationAmount < _largestDonation) return;
+
+    _largestDonation = newDonationAmount;
+  }
+  function _getDonationEvent(donationAmount: number) {
+    const isExtendSpinEvent = extendSpinAction.isEnabled && donationAmount >= currentExtendSpinPrice;
+    const isSpinStopEvent = stopSpinAction.isEnabled && donationAmount === stopSpinAction.price;
+
+    if (isSpinStopEvent) return DONATION_EVENT.STOP;
+    if (isExtendSpinEvent) return DONATION_EVENT.EXTEND;
+  }
+
+  function _getIntensityLevelsToAdd(addedAmount: number) {
+    const priceX4 = intensitySetting.price * 4;
+    const priceX3 = intensitySetting.price * 3;
+    const priceX2 = intensitySetting.price * 2;
+
+    if (addedAmount >= priceX4) return 4;
+    if (addedAmount >= priceX3) return 3;
+    if (addedAmount >= priceX2) return 2;
+    return 1;
+  }
+
+  function increaseIntensity(addedValue: number) {
+    if (addedValue < intensitySetting.price) return;
+
+    const levelsToAdd = _getIntensityLevelsToAdd(addedValue);
+    intensityTracker.increaseLevel(levelsToAdd);
+  }
+
+  function startAuction() {
+    _state = ACTION_MANAGER_STATE.AUCTIONING;
+    timer.start();
+  }
+  function pauseAuction() {
+    timer.pause();
+    _state = ACTION_MANAGER_STATE.IDLE;
+  }
+
+  function startWheelSpin(ms: number) {
+    _largestDonation = 0;
+
+    timer.reset();
+    timer.start(ms);
+    wheel.startSpin(ms);
+  }
+  function stopWheelSpin() {
+    timer.reset();
+    wheel.stopSpin();
+
+    settings.currentExtendSpinPrice.set(extendSpinAction.price);
+  }
+
+  function processDonation(donation: IDonationData) {
+    const donationEvent = _getDonationEvent(donation.amount_in_user_currency);
+
+    _updateLargestDonation(donation.amount_in_user_currency);
+
+    switch (_state) {
+      case ACTION_MANAGER_STATE.IDLE:
+      case ACTION_MANAGER_STATE.AUCTIONING: {
+        _addLotFromDonation(donation);
+        break;
+      }
+      case ACTION_MANAGER_STATE.DELAYING_SPIN_STOP: {
+        if (!donationEvent) {
+          donations.add({ ...donation, isInstant: false });
+          break;
+        }
+
+        _activateEvent(donation, donationEvent, true);
+        break;
+      }
       case ACTION_MANAGER_STATE.SPINNING_WHEEL: {
-        const isWheelWinnerDelayed = _state === ACTION_MANAGER_STATE.DELAYING_WHEEL_WINNER;
-        const isEnoughAmountToExtend = donationAmount >= _currentExtendSpinPrice;
-        const shouldStopSpin = _stopSpinAction.isEnabled && donationAmount === _stopSpinAction.price;
-        const shouldExtendSpin = _extendSpinAction.isEnabled && donationAmount >= _currentExtendSpinPrice;
-        const isDonationAmountBigger = donationAmount >= _biggestAmount;
-
-        _biggestAmount = isDonationAmountBigger ? donationAmount : _biggestAmount;
-
-        if (!_extendSpinAction.isEnabled || (!isEnoughAmountToExtend && isWheelWinnerDelayed)) {
-          donations.add({
-            ...donation,
-            isInstant: false,
-          });
-        } else {
-          handleDonation(shouldStopSpin);
+        if (!donationEvent) {
+          _addLotFromDonation(donation);
+          break;
         }
 
-        if (shouldStopSpin) {
-          wheel.stopSpin();
-          timer.reset();
-        } else if (shouldExtendSpin) {
-          if (isWheelWinnerDelayed) {
-            clearTimeout(_wheelWinnerDelayTimeout);
-            state.set(ACTION_MANAGER_STATE.SPINNING_WHEEL);
-            wheel.restartSpin(_extendSpinAction.seconds * 1000);
-            timer.start(_extendSpinAction.seconds * 1000);
-          } else {
-            wheel.extendSpin(_extendSpinAction.seconds * 1000);
-            timer.add(_extendSpinAction.seconds * 1000);
-          }
-
-          settings.increaseExtendSpinPrice(_extendSpinAction.stepType === 'fixed' ? undefined : _biggestAmount);
-        }
-
+        _activateEvent(donation, donationEvent, false);
         break;
       }
     }
   }
 
   return {
-    state,
     initialize,
+    increaseIntensity,
+    processDonation,
     startWheelSpin,
     stopWheelSpin,
-    processDonation,
     startAuction,
     pauseAuction,
   }

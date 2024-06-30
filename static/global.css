@@ -112,17 +112,6 @@ a {
   }
 }
 
-.icon-wrapper {
-  display: flex;
-  width: 30px;
-  height: 30px;
-
-  & img {
-    width: 100%;
-    object-fit: contain;
-  }
-}
-
 .default-title {
   margin: 0;
   font-weight: 500;

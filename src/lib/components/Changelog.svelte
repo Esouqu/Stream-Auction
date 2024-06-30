@@ -7,17 +7,17 @@
 	<div class="medium-title" style="margin-bottom: 24px;">Обновления</div>
 	<div class="changelog-inner">
 		{#each changelog as section}
-			{@const { createdAt, added, changed, fixed } = section}
+			{@const { createdAt, changes } = section}
 
 			<div class="changelog-section">
 				<div class="changelog__date medium-title">{formatDate(createdAt)}</div>
 				<div>
-					{#each [added, changed, fixed] as subsection, idx}
-						{#if subsection}
-							<div class="changelog-subsection {Object.keys(section)[idx]}">
-								<ul class="changelog-subsection-list support-text">
-									{#each subsection as update}
-										<li>{update}</li>
+					{#each Object.entries(changes) as [title, update]}
+						{#if update}
+							<div class="changelog-update {title}">
+								<ul class="changelog-update-list support-text">
+									{#each update as updateText}
+										<li>{updateText}</li>
 									{/each}
 								</ul>
 							</div>
@@ -66,21 +66,22 @@
 				content: '';
 				position: absolute;
 				top: 50%;
-				left: -44px;
+				left: -45px;
 				translate: 0 -50%;
 				border-radius: 100px;
-				width: 12px;
-				height: 12px;
+				width: 13px;
+				height: 13px;
+				box-shadow: var(--elevation-1);
 				background-color: var(--on-surface);
 			}
 		}
-		&-subsection {
+		&-update {
 			display: flex;
 			flex-direction: column;
 			gap: 10px;
 			padding: 20px;
 			border-radius: 8px;
-			box-shadow: var(--elevation-1);
+			box-shadow: var(--elevation-3);
 
 			&:not(:last-child) {
 				margin-bottom: 16px;

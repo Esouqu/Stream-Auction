@@ -5,6 +5,9 @@
 	import Textarea from './Textarea.svelte';
 	import downArrow from '$lib/assets/arrow_drop_down_icon.svg';
 	import upArrow from '$lib/assets/arrow_drop_up_icon.svg';
+	import plusIconBlack from '$lib/assets/add_icon_black.svg';
+	import deleteIcon from '$lib/assets/close_icon.svg';
+	import deleteIconBlack from '$lib/assets/close_icon_black.svg';
 
 	interface IDropdownEvents {
 		optiondeleted: {
@@ -40,7 +43,7 @@
 	function deleteOption(index: number) {
 		options = options.filter((_, idx) => idx !== index);
 
-		selectedOption = 0;
+		if (selectedOption !== 0) selectedOption -= 1;
 		dispatch('optiondeleted', { index });
 	}
 
@@ -69,19 +72,24 @@
 				--textarea-align="center"
 				--textarea-font-size="28px"
 				--textarea-h="48px"
+				--textarea-border-radius="8px 0 0 8px"
 				id="dropdown-title"
 				isResizable={true}
 				bind:isEditable={isEditMode}
 				bind:element={textareaElement}
 				bind:value={titleText}
 			/>
-			<button
-				type="button"
-				class="dropdown__button"
-				on:click|stopPropagation={() => (isDropped = !isDropped)}
-			>
-				<img src={isDropped ? upArrow : downArrow} alt="Dropdown up arrow" draggable="false" />
-			</button>
+			<div class="dropdown__button">
+				<Button
+					--button-w="100%"
+					--button-border-radius="0"
+					icon={isDropped ? upArrow : downArrow}
+					iconSize="36px"
+					color="transparent"
+					hoverColor="black"
+					on:click={() => (isDropped = !isDropped)}
+				/>
+			</div>
 		</div>
 	</div>
 	{#if isDropped && options.length > 0}
@@ -98,19 +106,27 @@
 					on:click|stopPropagation={() => selectOption(idx)}
 				>
 					{option}
-					<div style="position: absolute; top: 50%; right: 6px; translate: 0 -50%; display: flex;">
-						<Button
-							icon="delete"
-							iconColor={idx === selectedOption ? 'white' : 'black'}
-							isDisabled={options.length < 2}
-							on:click={() => deleteOption(idx)}
-						/>
-					</div>
+					{#if idx !== selectedOption}
+						<div class="delete-button-wrapper">
+							<Button
+								icon={idx === selectedOption ? deleteIcon : deleteIconBlack}
+								color="transparent"
+								on:click={() => deleteOption(idx)}
+							/>
+						</div>
+					{/if}
 				</li>
 			{/each}
 			{#if !isReadonly}
-				<div style="display: flex; align-items: center; justify-content: center; margin-top: 10px;">
-					<Button --button-size="100%" icon="plus" iconColor="black" on:click={addOption} />
+				<div class="add-option-wrapper">
+					<Button
+						--button-w="100%"
+						--button-border-radius="0"
+						icon={plusIconBlack}
+						color="transparent"
+						hoverColor="black"
+						on:click={addOption}
+					/>
 				</div>
 			{/if}
 		</ul>
@@ -123,13 +139,12 @@
 		margin-bottom: 10px;
 		width: 100%;
 		font-size: 20px;
-		border-radius: 5px;
-		/* border: 1px solid var(--outline); */
+		border-radius: 8px 0 0 8px;
 
 		&-selected-wrapper {
 			display: flex;
 			flex-direction: column;
-			padding: 0px 52px;
+			padding: 0px 46px;
 			gap: 10px;
 		}
 
@@ -146,21 +161,9 @@
 			&_head {
 				position: relative;
 				width: 100%;
-				border-radius: 5px;
 				font-size: 28px;
 				background-color: transparent;
 				user-select: none;
-			}
-
-			&:not(:last-child)::after {
-				content: '';
-				position: absolute;
-				left: 0;
-				bottom: -1px;
-				display: block;
-				width: 100%;
-				height: 1px;
-				background-color: var(--outline-variant);
 			}
 
 			&:not(.dropdown__item_head) {
@@ -174,7 +177,7 @@
 			}
 
 			&:hover:not(.dropdown__item_head, .dropdown__item_selected) {
-				background-color: var(--primary-70);
+				background-color: var(--hover-black);
 			}
 
 			&:disabled {
@@ -185,28 +188,19 @@
 		&__button {
 			position: absolute;
 			top: 50%;
-			right: -52px;
+			right: -46px;
 			translate: 0 -50%;
 			display: flex;
 			align-items: center;
 			border: 0;
+			border-radius: 0 8px 8px 0;
 			height: 100%;
-			/* padding: 0; */
 			background-color: transparent;
 			transition: 0.3s;
 			cursor: pointer;
 
 			&:hover {
 				background-color: rgba(255, 255, 255, 0.1);
-			}
-
-			&::before {
-				content: '';
-				position: absolute;
-				left: 0;
-				width: 1px;
-				height: 100%;
-				background-color: var(--outline);
 			}
 		}
 
@@ -216,12 +210,25 @@
 			left: 0;
 			margin: 0;
 			padding: 10px 0;
-			border-radius: 5px;
+			border-radius: 0 0 8px 8px;
 			width: 100%;
 			list-style-type: none;
 			color: var(--on-inverse-surface);
 			background-color: var(--inverse-surface);
 			overflow: hidden;
 		}
+	}
+	.delete-button-wrapper {
+		position: absolute;
+		top: 50%;
+		right: 6px;
+		translate: 0 -50%;
+		display: flex;
+	}
+	.add-option-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 10px;
 	}
 </style>

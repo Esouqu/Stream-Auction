@@ -50,7 +50,7 @@
 		width: 100%;
 		height: var(--textarea-h, auto);
 		padding: 10px;
-		border-radius: 5px;
+		border-radius: var(--textarea-border-radius, 8px);
 		border: 1px solid var(--outline);
 		outline: 0px solid transparent;
 		font-size: var(--textarea-font-size, 20px);

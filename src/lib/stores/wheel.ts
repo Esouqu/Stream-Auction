@@ -29,7 +29,7 @@ function createWheel() {
   let wheelWinnerDelay: { isEnabled: boolean, seconds: number };
 
   state.subscribe((store) => _state = store);
-  settings.wheelWinnerDelay.subscribe((store) => wheelWinnerDelay = store);
+  settings.spinStopDelay.subscribe((store) => wheelWinnerDelay = store);
 
   function _giveMoment(currentTime: number) {
     if (!spinStartTime) spinStartTime = currentTime;

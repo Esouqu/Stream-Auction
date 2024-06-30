@@ -7,6 +7,10 @@
 	import donationalertsIcon from '$lib/assets/donationalerts-logo/DA_Alert_White.svg';
 	import settings from '$lib/stores/settings';
 	import { getShortenedText } from '$lib/utils';
+	import plusIcon from '$lib/assets/add_icon.svg';
+	import deleteIcon from '$lib/assets/close_icon.svg';
+	import listAddIcon from '$lib/assets/list_add_icon.svg';
+	import Icon from './Icon.svelte';
 
 	export let id: number | string;
 	export let type: 'Twitch' | 'Donation Alerts';
@@ -72,8 +76,8 @@
 	in:fly={{ y: 100 }}
 	out:fly={{ x: 300 * moveDirection }}
 >
-	<div class="donation-icon icon-wrapper">
-		<img src={donationalertsIcon} alt="Donationalerts Icon" draggable="false" />
+	<div class="donation-icon">
+		<Icon src={donationalertsIcon} />
 	</div>
 	<div class="donation" class:donation_small={isInstant}>
 		{#if isInstant}
@@ -88,16 +92,18 @@
 				<p class="donation__description">{message}</p>
 			</div>
 
-			<div class="donation-buttons-wrapper">
-				<Button icon="listAddItem" on:click={addVariant} />
+			<div class="donation-actions-wrapper">
+				<Button icon={listAddIcon} color="transparent" on:click={addVariant} />
 				{#if mostSimilarLot}
 					<Button
-						icon="plus"
-						text={getShortenedText(mostSimilarLot.title, 21)}
+						--button-overflow="hidden"
+						icon={plusIcon}
+						color="transparent"
+						text={mostSimilarLot.title}
 						on:click={addSimilarVariant}
 					/>
 				{/if}
-				<Button icon="delete" on:click={removeDonation} />
+				<Button icon={deleteIcon} color="transparent" on:click={removeDonation} />
 			</div>
 		{/if}
 	</div>
@@ -126,6 +132,8 @@
 		}
 
 		&-icon {
+			display: flex;
+			align-items: center;
 			padding: 0 8px;
 			height: auto;
 			width: 24px;
@@ -181,7 +189,7 @@
 			overflow: hidden;
 		}
 
-		&-buttons-wrapper {
+		&-actions-wrapper {
 			display: flex;
 			justify-content: space-between;
 			width: 100%;

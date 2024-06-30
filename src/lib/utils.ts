@@ -86,12 +86,27 @@ export function compareStrings(str1: string, str2: string) {
   return Math.round(similarity);
 }
 
-export function getShortenedText(title: string, maxLength: number): string {
-  return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
+export function getShortenedText(str: string, fontStyle: string, maxWidth: number) {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  if (!context) return str;
+
+  context.font = fontStyle;
+
+  let truncatedStr = str;
+  let width = context.measureText(truncatedStr).width;
+
+  while (width > maxWidth && truncatedStr.length > 0) {
+    truncatedStr = truncatedStr.slice(0, -1);
+    width = context.measureText(truncatedStr).width;
+  }
+
+  return truncatedStr + (truncatedStr !== str ? '...' : '');
 }
 
 export function getPercentFromTotal(value: number, total: number, decimals: number = 1) {
-  return ((value / total) * 100).toFixed(decimals);
+  return ((value / total) * 100).toFixed(decimals) + '%';
 }
 
 export function formatTime(ms: number) {
@@ -208,7 +223,7 @@ export function formatDate(date: Date) {
 export function fireConfetti() {
   const count = 200;
   const defaults = {
-    origin: { y: 0.75 }
+    origin: { y: 0.7 }
   };
 
   function fire(particleRatio: number, opts: confetti.Options) {

@@ -110,7 +110,7 @@
 		text-overflow: ellipsis;
 		letter-spacing: 0.25px;
 		color: var(--on-surface);
-		box-shadow: 0 0 0 0 var(--primary-70);
+		box-shadow: inset 0 0 0 0 var(--primary-70);
 		background-color: transparent;
 		transition: outline-color 0.3s;
 		overflow: hidden;
@@ -150,7 +150,7 @@
 						z-index: 999;
 						outline: none;
 						border-color: transparent;
-						box-shadow: 0 3px 0px 0 var(--primary-70);
+						box-shadow: inset 0 -3px 0px 0 var(--primary-70);
 					}
 
 					&:hover:not(:focus):not(:disabled) {

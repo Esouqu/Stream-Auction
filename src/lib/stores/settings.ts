@@ -16,7 +16,7 @@ function createSettings() {
     isEnabled: false,
     price: 1000,
   }, 'intensity');
-  const wheelWinnerDelay = storable({
+  const spinStopDelay = storable({
     isEnabled: false,
     seconds: 3,
   }, 'wheelWinnerDelay');
@@ -78,7 +78,7 @@ function createSettings() {
     background,
     transparency,
     intensity,
-    wheelWinnerDelay,
+    spinStopDelay,
     stopSpinAction,
     extendSpinAction,
     itemAddedAction,

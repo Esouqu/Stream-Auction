@@ -18,18 +18,17 @@
 	import { beforeNavigate } from '$app/navigation';
 	import anime from 'animejs';
 
-	const baseRadius = 360;
-	const offset = 20;
-	const baseWheelCenterSize = 150;
-	const degreeCapForTextDisplay = Number(((400 / 100) * 2).toFixed(2));
+	const canvasOffset = 20;
+	const baseHoleSize = 150;
+	const textMinAngleCap = 8;
 
 	export let winner: IPieItem | null = null;
 
-	let prevWinner: IPieItem | null = null;
-	let radius = baseRadius;
+	let radius = 360;
 	let isDragging = false;
 	let draggingStartAngle = 0;
 	let draggingAngle = 0;
+	let prevWinner: IPieItem | null = null;
 
 	let wheelState: WHEEL_STATE = WHEEL_STATE.IDLE;
 	let celebrationSound: HTMLAudioElement;
@@ -48,8 +47,9 @@
 
 	$: width = radius * 2;
 	$: textSize = (radius / 100) * 5;
-	$: wheelCenterSize = baseWheelCenterSize * (textSize / 13);
-	$: offsetCenter = radius + offset / 2;
+	$: maxSliceTextWidth = radius - (holeSize - 40);
+	$: holeSize = baseHoleSize * (textSize / 13);
+	$: offsetCenter = radius + canvasOffset / 2;
 	$: angle = wheel.angle;
 	$: normalizedAngle = wheel.normalizedAngle;
 	$: canvasRotation = isDragging ? draggingAngle : $angle;
@@ -72,28 +72,12 @@
 	});
 
 	onMount(() => {
-		const unsubLots = lots.subscribe((store) => {
-			const updatedPie = createPie(store);
+		loadAudio();
+		onResize();
+		drawChart(pie);
 
-			pie = updatedPie;
-			sortedPie = [...updatedPie].sort((a, b) => a.startAngle - b.startAngle);
-			drawChart(updatedPie);
-
-			if (wheelState !== WHEEL_STATE.IDLE && wheelState !== WHEEL_STATE.STOPPED) {
-				getWinner($normalizedAngle);
-			}
-		});
-		const unsubWheelState = wheel.state.subscribe((store) => {
-			wheelState = store;
-
-			if (store === WHEEL_STATE.STOPPED) {
-				getWinner($normalizedAngle);
-				celebrate();
-			}
-			if (store !== WHEEL_STATE.IDLE && store !== WHEEL_STATE.DELAYED) {
-				drawChart(pie);
-			}
-		});
+		const unsubLots = lots.subscribe(onLotsUpdated);
+		const unsubWheelState = wheel.state.subscribe(onWheelStateChanged);
 
 		context = canvas.getContext('2d');
 		pointerAnimation = anime({
@@ -103,15 +87,35 @@
 			easing: 'spring(0.5, 90, 20, 10)' // alternative: spring(0.5, 90, 20, 10) + delay + rotation
 		});
 
-		loadAudio();
-		onResize();
-		drawChart(pie);
-
 		return () => {
 			unsubLots();
 			unsubWheelState();
 		};
 	});
+
+	function onLotsUpdated(items: ILot[]) {
+		const updatedPie = createPie(items);
+
+		pie = updatedPie;
+		sortedPie = [...updatedPie].sort((a, b) => a.startAngle - b.startAngle);
+		drawChart(updatedPie);
+
+		if (wheelState !== WHEEL_STATE.IDLE && wheelState !== WHEEL_STATE.STOPPED) {
+			getWinner($normalizedAngle);
+		}
+	}
+
+	function onWheelStateChanged(state: WHEEL_STATE) {
+		wheelState = state;
+
+		if (state === WHEEL_STATE.STOPPED) {
+			getWinner($normalizedAngle);
+			celebrate();
+		}
+		if (state !== WHEEL_STATE.IDLE && state !== WHEEL_STATE.DELAYED) {
+			drawChart(pie);
+		}
+	}
 
 	function loadAudio() {
 		celebrationSound = new Audio(winnerSound);
@@ -133,43 +137,40 @@
 
 		return items.map((item, idx) => {
 			const deg = (item.value / total) * 360;
-			const url = extractUrl(item.title);
 
 			startAngle = idx && endAngle;
 			endAngle = !idx ? deg : startAngle + deg;
 
 			return {
 				...item,
-				percent: getPercentFromTotal(item.value, total),
 				startAngle,
-				endAngle,
-				url
+				endAngle
 			};
 		});
 	}
 
 	function drawPieSliceText(title: string, color: string, startAngle: number, endAngle: number) {
-		if (!context || endAngle - startAngle < degreeCapForTextDisplay) return;
+		if (!context || endAngle - startAngle < textMinAngleCap) return;
 
-		const maxTitleLength = 20;
-		const shortTitle = getShortenedText(title, maxTitleLength);
-		const textAngle = (startAngle + endAngle) / 2; // Find the middle angle of the slice
+		const fontStyle = `700 ${textSize}px sans-serif`;
+		const shortTitle = getShortenedText(title, fontStyle, maxSliceTextWidth);
+		const midAngle = (startAngle + endAngle) / 2;
 		const offsetFromCenter = 0.88; // 0 = near the center | 1 = near the edge
 		const textX =
-			offsetCenter + offsetCenter * offsetFromCenter * Math.cos(textAngle * degreesToRadians);
+			offsetCenter + offsetCenter * offsetFromCenter * Math.cos(midAngle * degreesToRadians);
 		const textY =
-			offsetCenter + offsetCenter * offsetFromCenter * Math.sin(textAngle * degreesToRadians);
+			offsetCenter + offsetCenter * offsetFromCenter * Math.sin(midAngle * degreesToRadians);
 
-		context.font = `700 ${textSize}px sans-serif`;
+		context.font = fontStyle;
 		context.textBaseline = 'middle';
 		context.textAlign = 'start';
 		context.fillStyle = color;
 
-		context.save(); // Save the current canvas state
-		context.translate(textX, textY); // Move the canvas origin to the text position
-		context.rotate((textAngle + 180) * degreesToRadians); // Rotate the canvas by textAngle - 90 degrees
+		context.save();
+		context.translate(textX, textY);
+		context.rotate((midAngle + 180) * degreesToRadians); // Rotate the canvas by midAngle - 90 degrees
 		context.fillText(shortTitle, 0, 0);
-		context.restore(); // Restore the canvas state to remove the translation and rotation
+		context.restore();
 	}
 
 	function drawPieSlice(
@@ -241,7 +242,7 @@
 
 	function onResize() {
 		const resizeHeight = resizeElement.clientHeight;
-		radius = Math.floor(resizeHeight / 2 - offset * 2);
+		radius = Math.floor(resizeHeight / 2 - canvasOffset * 2);
 
 		setTimeout(() => drawChart(pie), 1);
 
@@ -297,8 +298,8 @@
 <div
 	style="
 		display: contents;
-		--wheel-h: {width - offset / 2}px;
-		--wheel-w: {width - offset / 2}px;
+		--wheel-h: {width - canvasOffset / 2}px;
+		--wheel-w: {width - canvasOffset / 2}px;
 	"
 >
 	<div
@@ -307,7 +308,7 @@
 	>
 		<div class="wheel">
 			{#if winner !== null}
-				{@const title = `${winner.title} (${winner.percent}%)`}
+				{@const title = `${winner.title} (${winner.percent})`}
 
 				<div class="winner" transition:fade={{ duration: 200 }}>
 					{#if winner.url}
@@ -325,7 +326,7 @@
 			<svg id="pointer" viewBox="0 10 20 60" bind:this={pointerElement}>
 				<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="buttonface" />
 			</svg>
-			<div class="wheel-center" style="width: {wheelCenterSize}px; height: {wheelCenterSize}px;" />
+			<div class="wheel-center" style="width: {holeSize}px; height: {holeSize}px;" />
 			<div
 				style="--wheel-rotation: {canvasRotation}deg; --wheel-outline: {winner?.color}"
 				class="wheel-canvas-wrapper"
@@ -334,7 +335,7 @@
 				bind:this={wheelElement}
 				on:mousedown={(e) => onGrab(e.clientX, e.clientY)}
 			>
-				<canvas bind:this={canvas} width={width + offset} height={width + offset} />
+				<canvas bind:this={canvas} width={width + canvasOffset} height={width + canvasOffset} />
 			</div>
 		</div>
 	</div>

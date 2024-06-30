@@ -13,21 +13,18 @@ function createCountdownTimer() {
   let animationStartTime = 0;
   let animationPausedTime = 0;
   let startTime = baseTime;
-  // let prevState: TIMER_STATE;
   let _state: TIMER_STATE;
 
-  state.subscribe((newState) => {
-    // if (!_isChangingTime()) prevState = _state || newState;
-    _state = newState;
-  });
-  settings.timerBaseTime.subscribe((s) => {
-    const minutesInMs = s * 1000 * 60;
+  state.subscribe((newState) => _state = newState);
+  settings.timerBaseTime.subscribe(onTimerBaseTimeChanged);
 
-    if (_state === TIMER_STATE.RUNNING) reset();
+  function onTimerBaseTimeChanged(minutes: number) {
+    const minutesInMs = minutes * 1000 * 60;
+
     baseTime = minutesInMs;
     startTime = baseTime;
     time.set(minutesInMs);
-  });
+  }
 
   function tick(now: number) {
     const elapsedTime = now - animationStartTime;
@@ -54,17 +51,13 @@ function createCountdownTimer() {
     animationId = requestAnimationFrame(tick);
   }
 
-  // function _isChangingTime() {
-  //   return _state === TIMER_STATE.DECREASING || _state === TIMER_STATE.INCREASING;
-  // }
-
   function stop() {
     cancelAnimationFrame(animationId);
 
     animationPausedTime = 0;
     startTime = 0;
     time.set(0);
-    state.set(TIMER_STATE.IDLE);
+    state.set(TIMER_STATE.STOPPED);
   }
 
   function start(ms?: number) {
@@ -85,23 +78,15 @@ function createCountdownTimer() {
   }
 
   function add(ms: number) {
-    // state.set(TIMER_STATE.INCREASING);
-
     startTime += ms;
     time.update((prevTime) => prevTime + ms);
-
-    // state.set(prevState);
   }
 
   function subtract(ms: number) {
     if (get(time) <= 0) return;
 
-    // state.set(TIMER_STATE.DECREASING);
-
     startTime = Math.max(0, startTime - ms);
     time.update((prevTime) => Math.max(0, prevTime - ms));
-
-    // state.set(prevState);
   }
 
   function reset() {
@@ -115,12 +100,8 @@ function createCountdownTimer() {
   }
 
   function setTime(ms: number) {
-    // state.set(TIMER_STATE.DECREASING);
-
     startTime = ms;
     time.set(ms);
-
-    // state.set(prevState);
   }
 
   return {

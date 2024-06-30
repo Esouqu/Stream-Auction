@@ -1,71 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import flameGif from '$lib/assets/flame.gif';
-	import donations from '$lib/stores/donations';
-	import lots from '$lib/stores/lots';
 	import { page } from '$app/stores';
 	import { NAVIGATION_ROUTES } from '$lib/constants';
 
-	const INTENSITY_DECREASE_TIME = 15;
-	const MAX_INTENSITY = 4;
-
-	export let minIntensityValue: number;
-	export let isDonationsOn: boolean;
-	export let isVisible = false;
-
-	let intensityAmount = 0;
-	let intensityIntervalId: NodeJS.Timeout;
-
-	onMount(() => {
-		const unsubDonations = donations.itemAdded.subscribe((donation) => {
-			if (isDonationsOn && donation) processValue(donation.amount_in_user_currency);
-		});
-		const unsubLots = lots.itemAdded.subscribe((lot) => {
-			if (!isDonationsOn && lot) processValue(lot.value);
-		});
-		const unsubLotsValue = lots.lotValueChanged.subscribe((lot) => {
-			if (!isDonationsOn && lot?.addedValue) processValue(lot.addedValue);
-		});
-
-		return () => {
-			unsubDonations();
-			unsubLots();
-			unsubLotsValue();
-		};
-	});
-
-	function processValue(value: number) {
-		if (value < minIntensityValue) return;
-
-		let toAdd = 1;
-
-		if (value >= minIntensityValue * 2) {
-			toAdd = 2;
-		}
-
-		if (value >= minIntensityValue * 4) {
-			toAdd = 4;
-		}
-
-		intensityAmount =
-			intensityAmount + toAdd > MAX_INTENSITY ? MAX_INTENSITY : intensityAmount + toAdd;
-
-		clearInterval(intensityIntervalId);
-
-		intensityIntervalId = setInterval(() => {
-			if (intensityAmount < 1) clearInterval(intensityIntervalId);
-
-			intensityAmount = intensityAmount - 1 > 0 ? intensityAmount - 1 : 0;
-		}, INTENSITY_DECREASE_TIME * 1000);
-	}
+	export let level: number;
 </script>
 
 {#if $page.route.id === NAVIGATION_ROUTES.LOTS}
-	<div
-		style="--flame-gif: url({flameGif}); --flame-size: {40 + 15 * intensityAmount}vh;"
-		class="flame"
-		class:visible={isVisible}
-	/>
+	<div style="--flame-gif: url({flameGif}); --flame-size: {40 + 15 * level}vh;" class="flame" />
 {/if}
 
 <style lang="scss">
@@ -81,5 +23,6 @@
 		background-position-y: 170%;
 		background-position-x: center;
 		transition: background-size 3s ease-in-out;
+		opacity: 0.7;
 	}
 </style>

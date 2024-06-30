@@ -103,6 +103,7 @@
 		if (!isAutoScrollEnabled) return;
 
 		isAutoScrollPaused = false;
+		clearTimeout(scrollResumeTimeout);
 
 		scrollResumeTimeout = setTimeout(() => {
 			isAutoScrollPaused = false;
@@ -111,7 +112,7 @@
 	}
 
 	function pauseAutoScroll() {
-		if (!isAutoScrollEnabled) return;
+		if (!isAutoScrollEnabled || isAutoScrollPaused) return;
 
 		isAutoScrollPaused = true;
 		clearTimers();
@@ -131,8 +132,7 @@
 	on:scroll={onScroll}
 	on:mouseenter={pauseAutoScroll}
 	on:mouseleave={resumeAutoScroll}
-	on:dragenter={pauseAutoScroll}
-	on:dragleave={resumeAutoScroll}
+	on:dragover={pauseAutoScroll}
 	bind:this={scrollElement}
 	aria-hidden
 >
@@ -174,9 +174,11 @@
 		&-row {
 			position: relative;
 			display: flex;
-			border-bottom: 1px solid var(--outline-variant);
 			width: 100%;
 
+			&:not(:last-child) {
+				border-bottom: 1px solid var(--outline-variant);
+			}
 			&.odd::before,
 			&.even::before {
 				content: '';

@@ -19,16 +19,16 @@ export interface ILot {
   id: number;
   title: string;
   value: number;
+  percent: string;
   color: string;
   contrastColor: string;
   donators: string[];
+  url?: string;
 }
 
 export interface IPieItem extends ILot {
-  percent: string;
   startAngle: number;
   endAngle: number;
-  url?: string;
 }
 
 export interface IAuthTokenData {

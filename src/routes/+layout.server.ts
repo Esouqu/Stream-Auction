@@ -3,11 +3,8 @@ import type { LayoutServerLoad } from "./$types";
 import { v4 as uuidv4 } from 'uuid';
 
 export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
-  const lastVisit = cookies.get('lastVisit');
   let donationalertsSession = cookies.get('daSession');
   let donationalertsRefreshToken = cookies.get('daRefreshToken');
-
-  cookies.set('lastVisit', new Date().toString(), { path: '/' });
 
   if (!donationalertsSession && donationalertsRefreshToken) {
     const refreshTokenResponse = await fetch('/api/donationalerts/refresh', { method: 'POST' })
@@ -34,7 +31,6 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
 
   return {
     isAuthorizedToDonationAlerts: !!donationalertsSession,
-    lastVisit: lastVisit ? new Date(lastVisit) : undefined,
     randomId: uuidv4(),
   }
 };

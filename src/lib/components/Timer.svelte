@@ -5,6 +5,11 @@
 	import Button from './Button.svelte';
 	import actionManager from '$lib/stores/actionManager';
 	import settings from '$lib/stores/settings';
+	import startIcon from '$lib/assets/play_icon.svg';
+	import pauseIcon from '$lib/assets/pause_icon.svg';
+	import resetIcon from '$lib/assets/replay_icon.svg';
+	import upArrowIcon from '$lib/assets/arrow_up_icon.svg';
+	import downArrowIcon from '$lib/assets/arrow_down_icon.svg';
 
 	export let timeToAdd: number = 60000;
 
@@ -29,12 +34,7 @@
 <svelte:document on:keydown={(e) => handleKeydown(e)} />
 
 <div class="timer">
-	<p
-		class="timer__time"
-		class:up={$timerState === TIMER_STATE.INCREASING}
-		class:down={$timerState === TIMER_STATE.DECREASING}
-		class:delayed={$wheelState === WHEEL_STATE.DELAYED}
-	>
+	<p class="timer__time" class:delayed={$wheelState === WHEEL_STATE.DELAYED}>
 		{$formattedTime.min}:{$formattedTime.sec}:{$formattedTime.ms}
 	</p>
 	<div class="timer-buttons-wrapper">
@@ -44,13 +44,33 @@
 			<h3>Задержка...</h3>
 		{:else}
 			{#if $timerState !== TIMER_STATE.RUNNING}
-				<Button icon="start" size={40} on:click={() => actionManager.startAuction()} />
+				<Button
+					icon={startIcon}
+					color="transparent"
+					iconSize="40px"
+					on:click={() => actionManager.startAuction()}
+				/>
 			{:else if $timerState === TIMER_STATE.RUNNING}
-				<Button icon="pause" size={40} on:click={() => actionManager.pauseAuction()} />
+				<Button
+					icon={pauseIcon}
+					iconSize="40px"
+					color="transparent"
+					on:click={() => actionManager.pauseAuction()}
+				/>
 			{/if}
-			<Button icon="reset" size={40} on:click={() => timer.reset()} />
-			<Button icon="upArrow" size={40} on:click={() => timer.add(timeToAdd)} />
-			<Button icon="downArrow" size={40} on:click={() => timer.subtract(timeToAdd)} />
+			<Button icon={resetIcon} color="transparent" iconSize="40px" on:click={() => timer.reset()} />
+			<Button
+				icon={upArrowIcon}
+				color="transparent"
+				iconSize="40px"
+				on:click={() => timer.add(timeToAdd)}
+			/>
+			<Button
+				icon={downArrowIcon}
+				color="transparent"
+				iconSize="40px"
+				on:click={() => timer.subtract(timeToAdd)}
+			/>
 		{/if}
 	</div>
 </div>
@@ -86,14 +106,6 @@
 
 			&.delayed {
 				animation: blink 0.5s infinite alternate ease-in;
-			}
-
-			&.up {
-				color: var(--primary-50);
-			}
-
-			&.down {
-				color: var(--error);
 			}
 		}
 	}

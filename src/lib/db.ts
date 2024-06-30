@@ -7,7 +7,7 @@ class Database extends Dexie {
   constructor() {
     super('Database');
     this.version(1).stores({
-      lots: 'id, title, value, color, contrastColor, donators',
+      lots: 'id, title, value, color, contrastColor, donators, url, percent',
     });
   }
 }

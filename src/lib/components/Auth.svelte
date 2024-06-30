@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from './Icon.svelte';
 	import TextButton from './TextButton.svelte';
 
 	export let icon: string;
@@ -14,9 +15,7 @@
 
 <div class={`${isLoggedIn ? 'auth_loggedIn' : 'auth'}`}>
 	<div class="auth-title-wrapper">
-		<div class="icon-wrapper">
-			<img src={icon} alt="{title} Brand Icon" />
-		</div>
+		<Icon src={icon} />
 		<h3 class="medium-title">{title}</h3>
 	</div>
 	<TextButton text={isLoggedIn ? 'Выйти' : 'Подключить'} on:click={handleClick} />
@@ -28,9 +27,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 10px;
-		// padding: 20px;
 		border-radius: 5px;
-		// background-color: var(--surface-container-highest);
 
 		&-title-wrapper {
 			display: flex;

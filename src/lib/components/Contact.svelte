@@ -1,13 +1,13 @@
 <script lang="ts">
+	import Icon from './Icon.svelte';
+
 	export let title: string;
 	export let icon: string;
 	export let url: string = '';
 </script>
 
 <a href={url} target="_blank" class="contact" class:clickable={!!url}>
-	<div class="icon-wrapper">
-		<img src={icon} alt="Contact" />
-	</div>
+	<Icon src={icon} />
 	<div class="contact-title">
 		{title}
 	</div>
