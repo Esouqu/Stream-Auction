@@ -8,13 +8,10 @@ export const handle: Handle = async ({ event, resolve }) => {
   const lastSeenWarning = event.cookies.get('lastSeenWarning');
   const wheelWarningDate = new Date('2024-06-30 10:30:03');
 
-  console.log('lastSeenUpdates: ', lastSeenUpdates);
-  console.log('lastSeenWarning: ', lastSeenWarning);
-
   if (lastSeenUpdates) {
     const haveSeenUpdates = new Date(lastSeenUpdates) > getLastUpdateDate();
 
-    console.log('haveSeenUpdates: ', haveSeenUpdates);
+    console.log('lastSeenUpdates: ', new Date(lastSeenUpdates), 'last update: ', getLastUpdateDate());
     if (haveSeenUpdates) event.fetch('/api/seen-updates', { method: 'POST' });
     event.locals.haveSeenUpdates = haveSeenUpdates;
   } else {
@@ -24,7 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (lastSeenWarning) {
     const haveSeenWarning = new Date(lastSeenWarning) > wheelWarningDate;
 
-    console.log('haveSeenWarning: ', haveSeenWarning);
+    console.log('lastSeenWarning: ', new Date(lastSeenWarning), 'last warning: ', wheelWarningDate);
     if (haveSeenWarning) event.fetch('/api/seen-warning', { method: 'POST' });
     event.locals.haveSeenWarning = haveSeenWarning;
   } else {
