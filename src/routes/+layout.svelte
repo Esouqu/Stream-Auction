@@ -28,11 +28,13 @@
 	import intensityTracker from '$lib/stores/intensityTracker';
 	import Popup from '$lib/components/Popup.svelte';
 	import Changelog from '$lib/components/Changelog.svelte';
-	import visitApi from '$lib/visitManager';
+	import visitManager from '$lib/stores/visitManager';
+	import { changelog } from '$lib/changelog';
 
 	let isAuthorizedToDonationAlerts = $page.data.isAuthorizedToDonationAlerts;
 	let isBackgroundVideoPaused = false;
 	let isCentrifugoToggleDisabled = false;
+	let haveSeenUpdates = true;
 
 	$: centrifugoState = centrifugo.state;
 	$: transparency = settings.transparency;
@@ -40,6 +42,7 @@
 	$: currentIntensityLevel = intensityTracker.currentLevel;
 	$: background = settings.background;
 	$: autoScroll = settings.autoScroll;
+	$: lastSeenUpdates = visitManager.lastSeenUpdates;
 	$: sortedLots = [...$lots].sort((a, b) => b.value - a.value);
 	$: {
 		if ($centrifugoState !== SOCKET_STATE.OPEN) {
@@ -48,12 +51,16 @@
 	}
 
 	onMount(() => {
+		if ($lastSeenUpdates) {
+			haveSeenUpdates = new Date($lastSeenUpdates) > changelog[0].createdAt;
+		}
+
 		actionManager.initialize();
 		lots.loadDatabaseItems();
 	});
 </script>
 
-<Popup isOpened={!$page.data.haveSeenUpdates} onClose={() => visitApi.setLastSeenUpdates()}>
+<Popup isOpened={!haveSeenUpdates} onClose={() => visitManager.setLastSeenUpdates()}>
 	<Changelog />
 </Popup>
 

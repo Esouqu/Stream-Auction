@@ -17,17 +17,27 @@
 	import cycleIconBlack from '$lib/assets/cycle_icon_black.svg';
 	import diceIconBlack from '$lib/assets/dice_icon_black.svg';
 	import listRemoveItemBlack from '$lib/assets/list_remove_icon_black.svg';
-	import { page } from '$app/stores';
-	import visitApi from '$lib/visitManager';
+	import visitManager from '$lib/stores/visitManager';
+	import { onMount } from 'svelte';
+
+	const WARNING_DATE = new Date('2024-06-30 16:02:02');
 
 	let spinDuration = 10;
 	let winner: IPieItem | null;
+	let haveSeenWarning = true;
 
 	$: wheelState = wheel.state;
 	$: minSpinDuration = settings.minSpinDuration;
 	$: maxSpinDuration = settings.maxSpinDuration;
+	$: lastSeenWarning = visitManager.lastSeenWarning;
 
 	$: isWheelActive = $wheelState === WHEEL_STATE.DELAYED || $wheelState === WHEEL_STATE.SPINNING;
+
+	onMount(() => {
+		if ($lastSeenWarning) {
+			haveSeenWarning = new Date($lastSeenWarning) > WARNING_DATE;
+		}
+	});
 
 	function setRandomDuration() {
 		spinDuration = getRandomInRange($minSpinDuration, $maxSpinDuration);
@@ -46,11 +56,7 @@
 	<title>Колесо - Вклиновый Аукцион</title>
 </svelte:head>
 
-<Popup
-	width="200px"
-	isOpened={!$page.data.haveSeenWarning}
-	onClose={() => visitApi.setLastSeenWarning()}
->
+<Popup width="200px" isOpened={!haveSeenWarning} onClose={() => visitManager.setLastSeenWarning()}>
 	<div style="display: flex; flex-direction: column; align-items: center;">
 		<Icon src={warningIcon} />
 		<h4 style="text-align: center;">
