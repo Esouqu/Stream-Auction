@@ -46,11 +46,3 @@ export const changelog: IUpdate[] = [
     createdAt: new Date('2024-06-23 14:52:14'),
   },
 ]
-
-export function getLastUpdateDate() {
-  const sorted = [...changelog].sort((a, b) => {
-    return b.createdAt.getTime() - a.createdAt.getTime();
-  })
-
-  return sorted[0].createdAt;
-}
