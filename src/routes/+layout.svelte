@@ -46,7 +46,6 @@
 		}
 	}
 
-	$: console.log('layout haveSeenUpdates: ', $page.data.haveSeenUpdates);
 	onMount(() => {
 		actionManager.initialize();
 		lots.loadDatabaseItems();
