@@ -103,7 +103,7 @@
 						<h4 style="min-width: 90px; padding: 0 10.5px; text-align: center;">Процент</h4>
 					</div>
 					<VirtualList
-						lots={sortedLots}
+						items={sortedLots}
 						isAutoScrollEnabled={$autoScroll.isWheelListEnabled}
 						autoScrollSpeed={$autoScroll.speed}
 						let:item
@@ -169,7 +169,7 @@
 	.list-headers {
 		display: flex;
 		padding: 0 6px 0 0;
-		border-radius: 10px 10px 0 0;
+		border-radius: 8px 8px 0 0;
 		background-color: var(--primary-50);
 
 		& h4 {
@@ -268,7 +268,6 @@
 	.list-wrapper {
 		display: flex;
 		flex-direction: column;
-		border-bottom: 3px solid var(--primary-50);
 		height: 100%;
 		overflow: hidden;
 	}

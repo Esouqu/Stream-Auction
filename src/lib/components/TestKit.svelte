@@ -27,7 +27,7 @@
 			id: Math.floor(Math.random() * 100000),
 			username: username || 'Аноним',
 			type: 'Donation Alerts',
-			message,
+			message: $lots[getRandomInRange(0, $lots.length - 1)].title,
 			amount: $currentExtendSpinPrice,
 			amount_in_user_currency: $currentExtendSpinPrice,
 			currency,

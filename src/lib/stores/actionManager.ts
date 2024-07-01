@@ -108,7 +108,11 @@ function createActionManager() {
       }
       case ACTION_MANAGER_STATE.AUCTIONING: {
         increaseIntensity(lot.value);
-        timer.add(itemAddedAction.seconds * 1000);
+
+        if (itemAddedAction.isEnabled) {
+          timer.add(itemAddedAction.seconds * 1000);
+        }
+
         break;
       }
     }

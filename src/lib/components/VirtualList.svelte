@@ -3,37 +3,51 @@
 	import settings from '$lib/stores/settings';
 	import type { ILot } from '$lib/interfaces';
 	import { onMount } from 'svelte';
+	import lots from '$lib/stores/lots';
+
+	enum AUTOSCROLL_STATE {
+		IDLE = 'idle',
+		PAUSED = 'paused',
+		RUNNING = 'running'
+	}
 
 	const itemHeight = 42;
 	const itemsBuffer = 3;
 	const itemsBufferHeight = itemsBuffer * itemHeight;
+	const borderSize = 3;
+	const lotsUpdateDelay = 2000;
+	const directionChangeDelay = 3000;
 
+	export let items: ILot[] = [];
 	export let autoScrollSpeed = 0.5;
-	export let lots: ILot[] = [];
 	export let isAutoScrollEnabled = false;
 
+	let state = AUTOSCROLL_STATE.IDLE;
+	let visibleItems: (ILot & { position: number })[] = [];
 	let scrollTop = 0;
+	let isScrollDown = true;
 	let scrollElement: HTMLDivElement;
 	let startIndex: number;
 	let endIndex: number;
 	let minHeight: number;
-	let visibleItems: (ILot & { position: number })[] = [];
-
-	let isAutoScrollPaused = false;
-	let isScrollDown = true;
-	let scrollResumeTimeout: NodeJS.Timeout;
-	let scrollRestartTimeout: NodeJS.Timeout;
 	let scrollAnimationId: number;
+	let scrollResumeTimeout: NodeJS.Timeout;
 
 	onMount(() => {
 		minHeight = scrollElement.offsetHeight;
-		if (isAutoScrollEnabled) restartAutoScroll();
 
-		return clearTimers;
+		const unsubLastAddedLot = lots.lastAddedItem.subscribe(onLotsUpdate);
+		const unsubLastUpdatedLot = lots.lastUpdatedItem.subscribe(onLotsUpdate);
+
+		return () => {
+			unsubLastAddedLot();
+			unsubLastUpdatedLot();
+			stopAnimation();
+		};
 	});
 
 	$: transparency = settings.transparency;
-	$: mappedLots = [...lots].map((l, idx) => ({ ...l, position: idx + 1 }));
+	$: mappedLots = items.map((l, idx) => ({ ...l, position: idx + 1 }));
 	$: {
 		if (scrollElement) {
 			// Position of the top of the viewport
@@ -50,19 +64,28 @@
 			startIndex = Math.max(0, potentialStartIndex);
 			endIndex = Math.max(startIndex, clampedEndIndex);
 			visibleItems = mappedLots.slice(startIndex, endIndex);
-			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedLots.length);
+			minHeight =
+				Math.max(scrollElement.offsetHeight, itemHeight * mappedLots.length) - borderSize * 2;
 		}
 	}
-	$: if (isAutoScrollEnabled) restartAutoScroll(lots, 1000);
 
-	function clearTimers() {
+	function onLotsUpdate(_lot: (ILot & { addedValue?: number }) | undefined) {
+		if (!isAutoScrollEnabled || isPaused()) return;
+
+		resumeAutoScroll(lotsUpdateDelay);
+	}
+
+	function isPaused() {
+		return state === AUTOSCROLL_STATE.PAUSED;
+	}
+
+	function stopAnimation() {
 		clearTimeout(scrollResumeTimeout);
-		clearTimeout(scrollRestartTimeout);
 		cancelAnimationFrame(scrollAnimationId);
 	}
 
 	function animateFrame(frame: number) {
-		if (isAutoScrollPaused || !scrollElement) return;
+		if (!scrollElement || isPaused()) return;
 
 		const maxHeight = scrollElement.scrollHeight - scrollElement.clientHeight;
 
@@ -74,52 +97,38 @@
 			scrollTop = maxHeight;
 			isScrollDown = false;
 
-			restartAutoScroll();
+			resumeAutoScroll(directionChangeDelay);
+			return;
 		} else if (scrollTop <= 0) {
 			scrollTop = 0;
 			isScrollDown = true;
 
-			restartAutoScroll();
+			resumeAutoScroll(directionChangeDelay);
+			return;
 		}
 	}
 
-	function startScrollAnimation() {
-		scrollAnimationId = requestAnimationFrame(animateFrame);
-	}
+	function resumeAutoScroll(after: number, _lots: ILot[] = []) {
+		if (!scrollElement || !isAutoScrollEnabled) return;
 
-	function restartAutoScroll(lots: ILot[] = [], after = 2000) {
-		if (!scrollElement || isAutoScrollPaused) return;
+		stopAnimation();
+		state = AUTOSCROLL_STATE.PAUSED;
 
-		isAutoScrollPaused = true;
-		cancelAnimationFrame(scrollAnimationId);
-
-		scrollRestartTimeout = setTimeout(() => {
-			isAutoScrollPaused = false;
-			startScrollAnimation();
+		scrollResumeTimeout = setTimeout(() => {
+			state = AUTOSCROLL_STATE.RUNNING;
+			scrollAnimationId = requestAnimationFrame(animateFrame);
 		}, after);
 	}
 
-	function resumeAutoScroll() {
+	function pauseAutoScroll() {
 		if (!isAutoScrollEnabled) return;
 
-		isAutoScrollPaused = false;
-		clearTimeout(scrollResumeTimeout);
-
-		scrollResumeTimeout = setTimeout(() => {
-			isAutoScrollPaused = false;
-			startScrollAnimation();
-		}, 1000);
-	}
-
-	function pauseAutoScroll() {
-		if (!isAutoScrollEnabled || isAutoScrollPaused) return;
-
-		isAutoScrollPaused = true;
-		clearTimers();
+		state = AUTOSCROLL_STATE.PAUSED;
+		stopAnimation();
 	}
 
 	function onScroll(e: UIEvent) {
-		if (!isAutoScrollPaused && isAutoScrollEnabled) return;
+		if (!isPaused() && isAutoScrollEnabled) return;
 
 		const target = e.currentTarget as HTMLDivElement;
 
@@ -131,8 +140,9 @@
 	class="virtual-list-wrapper"
 	on:scroll={onScroll}
 	on:mouseenter={pauseAutoScroll}
-	on:mouseleave={resumeAutoScroll}
+	on:mouseleave={() => resumeAutoScroll(directionChangeDelay)}
 	on:dragover={pauseAutoScroll}
+	on:dragleave={() => resumeAutoScroll(directionChangeDelay)}
 	bind:this={scrollElement}
 	aria-hidden
 >
@@ -165,6 +175,8 @@
 		transition: height 0.2s ease 0.2s;
 
 		&-wrapper {
+			border: 3px solid var(--primary-50);
+			border-radius: 0 0 8px 8px;
 			height: 100%;
 			overflow-y: auto;
 			overflow-x: hidden;

@@ -84,7 +84,7 @@
 		</div>
 
 		<VirtualList
-			lots={sortedLots}
+			items={sortedLots}
 			isAutoScrollEnabled={$autoScroll.isAuctionListEnabled}
 			autoScrollSpeed={$autoScroll.speed}
 			let:item
@@ -195,7 +195,6 @@
 		display: flex;
 		flex: 1;
 		flex-direction: column;
-		border-bottom: 3px solid var(--primary-50);
 		width: 100%;
 	}
 	.no-lots {
@@ -211,7 +210,7 @@
 	.list-headers {
 		display: flex;
 		padding: 0 6px 0 0;
-		border-radius: 10px 10px 0 0;
+		border-radius: 8px 8px 0 0;
 		background-color: var(--primary-50);
 
 		& h4 {
