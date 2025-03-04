@@ -141,7 +141,7 @@
 <div
 	class="relative grid w-full grid-cols-[3.5rem_1fr_8rem_auto] bg-opacity-10 text-sm transition-colors data-[hovered=true]:bg-opacity-50"
 	data-hovered={isHovered}
-	style="height: {itemHeight}rem; background-color: rgb({color.r} {color.g} {color.b} / var(--tw-bg-opacity));"
+	style="background-color: rgb({color.r} {color.g} {color.b} / var(--tw-bg-opacity));"
 	role="banner"
 	{ondragover}
 	{ondragleave}

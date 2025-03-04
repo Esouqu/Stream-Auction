@@ -7,7 +7,6 @@
 
 	interface Props {
 		items: ILot[];
-		itemSize: number;
 		scrollElement?: HTMLDivElement | null;
 		noFlipMode?: boolean;
 		empty?: Snippet;
@@ -16,10 +15,11 @@
 
 	const itemsBuffer = 10;
 
-	let { items, itemSize, scrollElement = $bindable(null), empty, children }: Props = $props();
+	let { items, scrollElement = $bindable(null), empty, children }: Props = $props();
 
 	let scrollTop = $state(0);
-	let itemHeight = $derived.by(() => remToPx(itemSize));
+	let itemHeight = $state(remToPx(2.5));
+	// let itemHeight = $derived.by(() => remToPx(itemSize));
 	let itemsBufferHeight = $derived(itemsBuffer * itemHeight);
 	let minHeight = $state(0);
 	let visibleItems: (ILot & { position: number })[] = $state([]);
@@ -47,14 +47,22 @@
 			const endIndex = Math.max(startIndex, clampedEndIndex);
 
 			visibleItems = mappedItems.slice(startIndex, endIndex);
-		}
-	});
-
-	$effect(() => {
-		if (scrollElement) {
 			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedItems.length);
 		}
 	});
+
+	// $effect(() => {
+	// 	if (scrollElement) {
+	// 		minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedItems.length);
+	// 	}
+	// });
+
+	function onresize() {
+		itemHeight = remToPx(2.5);
+		if (scrollElement) {
+			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedItems.length);
+		}
+	}
 
 	function onscroll(e: UIEvent) {
 		const target = e.target as HTMLDivElement;
@@ -62,6 +70,8 @@
 		scrollTop = target.scrollTop;
 	}
 </script>
+
+<svelte:window {onresize} />
 
 <ScrollArea class="relative flex h-full" bind:ref={scrollElement} {onscroll}>
 	<div

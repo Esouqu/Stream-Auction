@@ -6,8 +6,8 @@
 	import VirtualList from './components/VirtualList.svelte';
 	import PlusIcon from 'lucide-svelte/icons/list-plus';
 	import SearchIcon from 'lucide-svelte/icons/search';
-	import ZoomInIcon from 'lucide-svelte/icons/zoom-in';
-	import ZoomOutIcon from 'lucide-svelte/icons/zoom-out';
+	// import ZoomInIcon from 'lucide-svelte/icons/zoom-in';
+	// import ZoomOutIcon from 'lucide-svelte/icons/zoom-out';
 	import { slide } from 'svelte/transition';
 	import Input from '$lib/components/Input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -27,8 +27,8 @@
 	const { isCompact = false }: Props = $props();
 
 	const { lots, background } = getAppManagerContext();
-	const minItemHeight = 2.5;
-	const maxItemHeight = 3;
+	// const minItemHeight = 40;
+	// const maxItemHeight = 48;
 	const slideBarStyle = 'absolute bottom-[100%] left-0 z-50 flex w-full border-t p-4 bg-card';
 
 	let isNewLotInputVisible = $state(false);
@@ -43,7 +43,6 @@
 	let searchInputRef: HTMLInputElement | null = $state(null);
 	let newLotTitleRef: HTMLInputElement | null = $state(null);
 
-	// PERFORMANCE PROBLEM
 	let searchTimeout: NodeJS.Timeout;
 	let newLotTimeout: NodeJS.Timeout;
 
@@ -74,7 +73,6 @@
 		clearTimeout(searchTimeout);
 		clearTimeout(newLotTimeout);
 	}
-	// PERFORMANCE PROBLEM
 
 	function clearNewLotInputs() {
 		lotTitle = '';
@@ -90,13 +88,13 @@
 		clearNewLotInputs();
 	}
 
-	function onZoomOut() {
-		lots.settings.itemHeightRem = Math.max(minItemHeight, lots.settings.itemHeightRem - 0.2);
-	}
+	// function onZoomOut() {
+	// 	lots.settings.itemHeight = Math.max(minItemHeight, lots.settings.itemHeight - remToPx(0.2));
+	// }
 
-	function onZoomIn() {
-		lots.settings.itemHeightRem = Math.min(maxItemHeight, lots.settings.itemHeightRem + 0.2);
-	}
+	// function onZoomIn() {
+	// 	lots.settings.itemHeight = Math.min(maxItemHeight, lots.settings.itemHeight + remToPx(0.2));
+	// }
 </script>
 
 <div
@@ -121,7 +119,7 @@
 	{#if !lots.sortedItems}
 		<div class="flex h-full flex-col space-y-1">
 			{#each { length: 17 } as _}
-				<Skeleton class="w-full" style="height: {lots.settings.itemHeightRem}rem;" />
+				<Skeleton class="w-full" style="height: {lots.settings.itemHeight}px;" />
 			{/each}
 		</div>
 	{:else}
@@ -133,10 +131,10 @@
 				</div>
 			{/each}
 		</ScrollArea> -->
-		<VirtualList items={filteredLots || lots.sortedItems} itemSize={lots.settings.itemHeightRem}>
+		<VirtualList items={filteredLots || lots.sortedItems}>
 			{#snippet children(lot)}
 				{@const percent = getPercentFromTotal(lot.value, lots.totalValue || 0)}
-				<Lot {...lot} {percent} itemHeight={lots.settings.itemHeightRem} />
+				<Lot {...lot} {percent} itemHeight={lots.settings.itemHeight} />
 			{/snippet}
 			{#snippet empty()}
 				<Penguin />
@@ -181,7 +179,7 @@
 
 				<Separator orientation="vertical" class="mx-2" />
 
-				<Tooltip>
+				<!-- <Tooltip>
 					<TooltipTrigger>
 						{#snippet child({ props })}
 							<Button
@@ -189,7 +187,7 @@
 								variant="ghost"
 								size="icon"
 								onclick={onZoomIn}
-								disabled={lots.settings.itemHeightRem >= maxItemHeight}
+								disabled={lots.settings.itemHeight >= maxItemHeight}
 							>
 								<ZoomInIcon />
 							</Button>
@@ -205,14 +203,14 @@
 								variant="ghost"
 								size="icon"
 								onclick={onZoomOut}
-								disabled={lots.settings.itemHeightRem <= minItemHeight}
+								disabled={lots.settings.itemHeight <= minItemHeight}
 							>
 								<ZoomOutIcon />
 							</Button>
 						{/snippet}
 					</TooltipTrigger>
 					<TooltipContent>Уменьшить</TooltipContent>
-				</Tooltip>
+				</Tooltip> -->
 
 				<LotLoader />
 				<ClearActionDialog />

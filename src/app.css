@@ -143,4 +143,16 @@
       appearance: textfield;
     }
   }
+
+  @media screen and (min-width: 1920px) {
+    html {
+      font-size: 100%;
+    }
+  }
+
+  @media screen and (min-width: 2560px) {
+    html {
+      font-size: 133%;
+    }
+  }
 }

@@ -4,6 +4,7 @@ import type { ILot } from "$lib/interfaces";
 import RandomColor from "$lib/misc/RandomColor";
 import { liveQuery } from "dexie";
 import storable from "./LocalStore.svelte";
+import { remToPx } from "$lib/utils";
 
 interface IAddedValueData {
   id: number;
@@ -15,7 +16,7 @@ class LotStore {
   private _randomColor = new RandomColor();
 
   private _settings = storable({
-    itemHeightRem: 2.5,
+    itemHeight: remToPx(2.5),
     isTotalValueHidden: false,
   }, 'lotListSettings');
 
