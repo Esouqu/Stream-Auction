@@ -105,7 +105,8 @@ export function formatNumberWithSuffix(number: number): string {
 	const suffix = suffixes[exp];
 	const num = number / 10 ** (exp * 3);
 
-	return num.toFixed(1) + suffix;
+	const formattedNumber = num.toFixed(1);
+	return (formattedNumber.endsWith('.0') ? num.toFixed(0) : formattedNumber) + suffix;
 }
 
 export function getPercentFromTotal(value: number, total: number, decimals: number = 1) {
