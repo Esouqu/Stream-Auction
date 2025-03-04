@@ -295,8 +295,7 @@
 <svelte:window {onresize} {onmousemove} {onmouseup} />
 
 <div
-	class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden p-4 data-[delayed=true]:animate-pulse"
-	data-delayed={wheel.isDelayed}
+	class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden p-4"
 	bind:this={containerRef}
 >
 	<div class="relative flex">

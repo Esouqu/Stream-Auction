@@ -83,7 +83,7 @@
 		</div>
 
 		<div
-			class="group flex w-full items-center justify-center font-[Geist] tabular-nums tracking-widest duration-500 ease-in-out data-[delayed=true]:animate-pulse data-[add=true]:text-primary data-[delayed=true]:text-[crimson]"
+			class="group flex w-full items-center justify-center font-[Geist] tabular-nums tracking-widest duration-500 ease-in-out data-[add=true]:text-primary data-[delayed=true]:text-[crimson]"
 			data-add={timer.isProcessingQueue && timer.beforeTimeUpdate.ms > 0}
 			data-subtract={timer.isProcessingQueue && timer.beforeTimeUpdate.ms < 0}
 			data-delayed={wheel.isDelayed}
@@ -115,7 +115,7 @@
 				value={paddedSeconds}
 			/>
 			<span
-				class="w-[2rem] self-end text-xl leading-8 text-muted-foreground duration-500 ease-in-out group-data-[delayed=true]:animate-pulse group-data-[add=true]:text-primary group-data-[delayed=true]:text-[crimson]"
+				class="w-[2rem] self-end text-xl leading-8 text-muted-foreground duration-500 ease-in-out group-data-[add=true]:text-primary group-data-[delayed=true]:text-[crimson]"
 			>
 				{paddedMs}
 			</span>

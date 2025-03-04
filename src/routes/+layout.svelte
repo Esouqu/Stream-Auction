@@ -60,7 +60,8 @@
 	<Background />
 	<Sidebar />
 
-	<main class="relative mx-auto flex w-full max-w-[1920px] p-4">
+	<!-- <main class="relative mx-auto flex w-full max-w-[1920px] p-4"> -->
+	<main class="relative flex w-full p-4">
 		{@render children()}
 		<div
 			class="relative m-auto flex h-full w-[29rem] min-w-[29rem] flex-col rounded-md border bg-card"
