@@ -72,6 +72,17 @@ export function getNoun(num: number, words: string[]) {
 	}
 }
 
+export function formatDate(date: Date) {
+	const currentYear = new Date().getFullYear();
+	const dateYear = date.getFullYear();
+
+	return date.toLocaleDateString('ru-RU', {
+		day: 'numeric',
+		month: 'long',
+		year: dateYear === currentYear ? undefined : 'numeric',
+	});
+}
+
 export function formatTime(ms: number) {
 	const hours = Math.floor(ms / 3600000);
 	const min = Math.floor((ms % 3600000) / 60000);

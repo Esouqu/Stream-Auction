@@ -56,7 +56,7 @@
 </script>
 
 <TooltipProvider disableHoverableContent delayDuration={100}>
-	<!-- <UpdateDialog /> -->
+	<UpdateDialog />
 	<Background />
 	<Sidebar />
 

@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { fade, fly, scale } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import ArrowIcon from 'lucide-svelte/icons/arrow-right';
 	import type { ILot } from '$lib/interfaces';
 	import Color from 'color';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
-	import { sineInOut } from 'svelte/easing';
 
 	interface Props {
 		winner: (ILot & { startAngle: number; endAngle: number }) | null;
@@ -61,15 +60,14 @@
 		{:else if !wheel.isFinished}
 			<p
 				class="col-start-1 row-start-1 line-clamp-5 overflow-hidden overflow-ellipsis break-words px-8 text-center"
-				in:scale|global
+				in:scale
 			>
 				{winner?.title}
 			</p>
 		{:else}
-			<div class="z-20 col-start-1 row-start-1 w-full" transition:scale|global>
+			<div class="z-20 col-start-1 row-start-1 w-full" in:scale>
 				<p
 					class="line-clamp-5 overflow-hidden overflow-ellipsis break-normal px-8 text-center text-2xl"
-					data-enlarged={wheel.isFinished}
 				>
 					{winner?.title}
 				</p>

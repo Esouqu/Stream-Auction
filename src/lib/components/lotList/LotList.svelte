@@ -19,8 +19,6 @@
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import Penguin from '../Penguin.svelte';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-	import ScrollArea from '../ui/scroll-area/scroll-area.svelte';
-	import { flip } from 'svelte/animate';
 
 	interface Props {
 		isCompact: boolean;
@@ -183,7 +181,7 @@
 
 				<Separator orientation="vertical" class="mx-2" />
 
-				<!-- <Tooltip>
+				<Tooltip>
 					<TooltipTrigger>
 						{#snippet child({ props })}
 							<Button
@@ -214,7 +212,7 @@
 						{/snippet}
 					</TooltipTrigger>
 					<TooltipContent>Уменьшить</TooltipContent>
-				</Tooltip> -->
+				</Tooltip>
 
 				<LotLoader />
 				<ClearActionDialog />

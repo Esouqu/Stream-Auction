@@ -50,7 +50,7 @@
 </script>
 
 <div
-	class="relative flex min-w-[29rem] flex-col rounded-md border bg-card"
+	class="relative flex w-full flex-col rounded-md border bg-card"
 	style="--tw-bg-opacity: {background.floatDimness}; --tw-border-opacity: {background.floatDimness};"
 >
 	{#if $editor}

@@ -13,7 +13,7 @@ export enum TIMER_STATE {
 
 class TimerStore {
   private _settings = storable({
-    baseTime: 60000,
+    baseTime: 600000,
   }, 'timerSettings');
 
   private _time = new Tween(this.baseTime, { duration: 500 });
