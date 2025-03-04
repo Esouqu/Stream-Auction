@@ -28,13 +28,13 @@ export class AppManager {
 	readonly background = new BackgroundStore();
 
 	private _settings = storable({
-		// wheel
+		// donation
 		isSpinExtendEnabled: false,
 		spinStopPrice: 9999,
 		spinStopDelaySec: 30,
 		spinExtendBasePrice: 50,
-		spinExtendPriceGain: 25,
-		spinExtendSec: 10,
+		spinExtendPriceGain: 50,
+		spinExtendSec: 30,
 		// timer
 		isAutoAddTimeEnabled: false,
 		newLeaderBonusSec: 60,

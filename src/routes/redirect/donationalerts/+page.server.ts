@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   const redirectUrl = dev ? 'http://localhost:5173/redirect/donationalerts' : 'https://stream-auction.vercel.app/redirect/donationalerts';
   const tokenUrl = 'https://www.donationalerts.com/oauth/token';
 
-  if (!code) throw redirect(300, '/integrations');
+  if (!code) throw redirect(300, '/');
 
   const tokenData = await fetch(tokenUrl, {
     method: 'POST',
