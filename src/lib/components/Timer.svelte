@@ -1,121 +1,158 @@
 <script lang="ts">
-	import { TIMER_STATE, WHEEL_STATE } from '$lib/constants';
-	import timer from '$lib/stores/timer';
-	import wheel from '$lib/stores/wheel';
-	import Button from './Button.svelte';
-	import actionManager from '$lib/stores/actionManager';
-	import settings from '$lib/stores/settings';
-	import startIcon from '$lib/assets/play_icon.svg';
-	import pauseIcon from '$lib/assets/pause_icon.svg';
-	import resetIcon from '$lib/assets/replay_icon.svg';
-	import upArrowIcon from '$lib/assets/arrow_up_icon.svg';
-	import downArrowIcon from '$lib/assets/arrow_down_icon.svg';
+	import { Button } from './ui/button';
+	import PlayIcon from 'lucide-svelte/icons/play';
+	import PauseIcon from 'lucide-svelte/icons/pause';
+	import ResetIcon from 'lucide-svelte/icons/timer-reset';
+	import PlusIcon from 'lucide-svelte/icons/plus';
+	import MinusIcon from 'lucide-svelte/icons/minus';
+	import Input from './Input.svelte';
+	import { getAppManagerContext } from '$lib/context/appManagerContext';
+	import { slide } from 'svelte/transition';
 
-	export let timeToAdd: number = 60000;
+	const inputStyle =
+		'h-[2.75rem] leading-none border-none p-0 text-center tabular-nums hover:bg-muted read-only:hover:bg-transparent read-only:focus-visible:ring-transparent md:w-[3.75rem] md:text-4xl disabled:opacity-100 disabled:cursor-default';
+	const { timer, wheel, background } = getAppManagerContext();
+	const { hours, minutes, seconds, ms } = $derived(timer.formattedTime);
+	const paddedHours = $derived(timeToString(hours));
+	const paddedMinutes = $derived(timeToString(minutes));
+	const paddedSeconds = $derived(timeToString(seconds));
+	const paddedMs = $derived(timeToString(ms));
 
-	$: wheelState = wheel.state;
-	$: timerState = timer.state;
-	$: timerKeyConfig = settings.timerKeyConfig;
-	$: formattedTime = timer.formattedTime;
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (!$timerKeyConfig.isEnabled || $wheelState !== WHEEL_STATE.IDLE) return;
-
-		if (e.code === $timerKeyConfig.add) timer.add(timeToAdd);
-		if (e.code === $timerKeyConfig.subtract) timer.subtract(timeToAdd);
-		if (e.code === $timerKeyConfig.reset) timer.reset();
-		if (e.code === $timerKeyConfig.startOrPause) {
-			if ($timerState === TIMER_STATE.RUNNING) timer.pause();
-			else timer.start();
+	function setSeconds(value: number) {
+		if (seconds !== value) {
+			timer.setSeconds(Math.min(60, Math.max(0, value)));
+			timer.setMilliseconds(0);
 		}
+	}
+
+	function setMinutes(value: number) {
+		if (minutes !== value) {
+			timer.setMinutes(Math.min(60, Math.max(0, value)));
+		}
+	}
+
+	function setHours(value: number) {
+		if (hours !== value) {
+			timer.setHours(Math.min(60, Math.max(0, value)));
+		}
+	}
+
+	function timeToString(num: number) {
+		return String(num).padStart(2, '0');
 	}
 </script>
 
-<svelte:document on:keydown={(e) => handleKeydown(e)} />
-
-<div class="timer">
-	<p class="timer__time" class:delayed={$wheelState === WHEEL_STATE.DELAYED}>
-		{$formattedTime.min}:{$formattedTime.sec}:{$formattedTime.ms}
-	</p>
-	<div class="timer-buttons-wrapper">
-		{#if $wheelState === WHEEL_STATE.SPINNING}
-			<h3>Происходит кручение колеса...</h3>
-		{:else if $wheelState === WHEEL_STATE.DELAYED}
-			<h3>Задержка...</h3>
-		{:else}
-			{#if $timerState !== TIMER_STATE.RUNNING}
+<div
+	class=" relative flex w-full flex-col items-center border-b bg-secondary p-4"
+	style="--tw-bg-opacity: {background.floatDimness}; --tw-border-opacity: {background.floatDimness};"
+>
+	<div
+		class="transition-color relative flex w-full items-center justify-between text-4xl font-medium"
+	>
+		<div class="flex">
+			<Button
+				variant="ghost"
+				size="icon"
+				class="active:scale-90"
+				onclick={() => timer.reset()}
+				disabled={timer.target === timer.baseTime || wheel.isActive}
+			>
+				<ResetIcon />
+			</Button>
+			{#if !timer.isActive}
 				<Button
-					icon={startIcon}
-					color="transparent"
-					iconSize="40px"
-					on:click={() => actionManager.startAuction()}
-				/>
-			{:else if $timerState === TIMER_STATE.RUNNING}
+					variant="ghost"
+					size="icon"
+					class="active:scale-90"
+					onclick={() => timer.start()}
+					disabled={timer.target === 0 || wheel.isActive}
+				>
+					<PlayIcon />
+				</Button>
+			{:else}
 				<Button
-					icon={pauseIcon}
-					iconSize="40px"
-					color="transparent"
-					on:click={() => actionManager.pauseAuction()}
-				/>
+					variant="ghost"
+					size="icon"
+					class="active:scale-90"
+					disabled={timer.isProcessingQueue || wheel.isActive}
+					onclick={() => timer.pause()}
+				>
+					<PauseIcon />
+				</Button>
 			{/if}
-			<Button icon={resetIcon} color="transparent" iconSize="40px" on:click={() => timer.reset()} />
-			<Button
-				icon={upArrowIcon}
-				color="transparent"
-				iconSize="40px"
-				on:click={() => timer.add(timeToAdd)}
+		</div>
+
+		<div
+			class="group flex w-full items-center justify-center font-[Geist] tabular-nums tracking-widest duration-500 ease-in-out data-[delayed=true]:animate-pulse data-[add=true]:text-primary data-[delayed=true]:text-[crimson]"
+			data-add={timer.isProcessingQueue && timer.beforeTimeUpdate.ms > 0}
+			data-subtract={timer.isProcessingQueue && timer.beforeTimeUpdate.ms < 0}
+			data-delayed={wheel.isDelayed}
+		>
+			<Input
+				id="timer-hours"
+				type="number"
+				class={inputStyle}
+				disabled={timer.isRunning}
+				onConfirmation={(v) => setHours(Number(v))}
+				value={paddedHours}
 			/>
-			<Button
-				icon={downArrowIcon}
-				color="transparent"
-				iconSize="40px"
-				on:click={() => timer.subtract(timeToAdd)}
+			:
+			<Input
+				id="timer-minutes"
+				type="number"
+				class={inputStyle}
+				disabled={timer.isRunning}
+				onConfirmation={(v) => setMinutes(Number(v))}
+				value={paddedMinutes}
 			/>
-		{/if}
+			:
+			<Input
+				id="timer-seconds"
+				type="number"
+				class={inputStyle}
+				disabled={timer.isRunning}
+				onConfirmation={(v) => setSeconds(Number(v))}
+				value={paddedSeconds}
+			/>
+			<span
+				class="w-[2rem] self-end text-xl leading-8 text-muted-foreground duration-500 ease-in-out group-data-[delayed=true]:animate-pulse group-data-[add=true]:text-primary group-data-[delayed=true]:text-[crimson]"
+			>
+				{paddedMs}
+			</span>
+		</div>
+
+		<div class="flex">
+			<Button
+				variant="ghost"
+				size="icon"
+				disabled={wheel.isActive}
+				class="active:scale-90"
+				onclick={() => timer.subtract()}
+			>
+				<MinusIcon />
+			</Button>
+			<Button
+				variant="ghost"
+				size="icon"
+				class="active:scale-90"
+				disabled={wheel.isActive}
+				onclick={() => timer.add()}
+			>
+				<PlusIcon />
+			</Button>
+		</div>
 	</div>
+
+	{#if wheel.isActive}
+		<div
+			class="mt-2 flex h-4 w-full items-center justify-center text-sm font-medium text-muted-foreground"
+			transition:slide
+		>
+			{#if wheel.isSpinning || wheel.isPreparing}
+				<div class="flex items-center">Крутим колесо...</div>
+			{:else if wheel.isDelayed}
+				<div class="flex items-center">Задержка...</div>
+			{/if}
+		</div>
+	{/if}
 </div>
-
-<style lang="scss">
-	.timer {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-
-		&-buttons-wrapper {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 10px;
-			width: 100%;
-			height: 50px;
-		}
-
-		&__time {
-			margin: 0;
-			font-size: 80px;
-			font-weight: 600;
-			font-variant-numeric: tabular-nums;
-			letter-spacing: 6px;
-			transition: color 0.3s;
-			user-select: none;
-
-			@media (max-width: 1366px) {
-				font-size: 60px;
-			}
-
-			&.delayed {
-				animation: blink 0.5s infinite alternate ease-in;
-			}
-		}
-	}
-
-	@keyframes blink {
-		0% {
-			color: inherit;
-		}
-		100% {
-			color: var(--error);
-		}
-	}
-</style>

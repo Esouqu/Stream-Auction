@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'DIGI';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./lib/assets/fonts/DS-DIGIB.woff2') format('woff2');
+}
+
+@layer base {
+  :root {
+    --background: 240 8% 5%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 10% 9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 0 0% 98%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
+  }
+
+  .theme-red {
+    --primary: 0 84.24% 60.2%;
+    --primary-foreground: 0 0% 98%;
+  }
+
+  .theme-orange {
+    --primary: 24.58 94.98% 53.14%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-white {
+    --primary: 0 0% 98%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-yellow {
+    --primary: 45.4 93.39% 47.45%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-lime {
+    --primary: 83.74 80.53% 44.31%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-green {
+    --primary: 142.09 70.56% 45.29%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-emerald {
+    --primary: 160.12 84.08% 39.41%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-teal {
+    --primary: 173.41 80.39% 40%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-cyan {
+    --primary: 188.74 94.5% 42.75%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-sky {
+    --primary: 198.63 88.66% 48.43%;
+    --primary-foreground: 222.2 84% 4.9%;
+  }
+
+  .theme-blue {
+    --primary: 217.22 91.22% 59.8%;
+    --primary-foreground: 0 0% 98%;
+  }
+
+  .theme-indigo {
+    --primary: 238.73 83.53% 66.67%;
+    --primary-foreground: 0 0% 98%;
+  }
+
+  .theme-violet {
+    --primary: 258.31 89.53% 66.27%;
+    --primary-foreground: 0 0% 98%;
+  }
+
+  .theme-purple {
+    --primary: 270.74 91.01% 65.1%;
+    --primary-foreground: 0 0% 98%;
+  }
+
+  .theme-fuchsia {
+    --primary: 292.19 84.08% 60.59%;
+    --primary-foreground: 0 0% 98%;
+  }
+
+  .theme-pink {
+    --primary: 330.37 81.19% 60.39%;
+    --primary-foreground: 0 0% 98%;
+  }
+
+
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground h-[100vh] flex overflow-hidden relative;
+
+    &.grabbing {
+      user-select: none;
+      cursor: grabbing;
+    }
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  @-moz-document url-prefix() {
+    input[type="number"] {
+      appearance: textfield;
+    }
+  }
+
+  @media (prefers-reduced-motion) {
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+  }
+}

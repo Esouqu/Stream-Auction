@@ -1,16 +1,25 @@
-.DS_Store
 node_modules
-/build
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
 /.svelte-kit
-/package
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
 .env
 .env.*
 !.env.example
+!.env.test
+
+# Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-todo.txt
-/src/routes/bomber
-/src/routes/api/twitch
-/src/routes/api/donatepay
-/src/lib/donatePayApi.ts
-/src/lib/stores/donatePay.ts
+
+src/lib/components/dev

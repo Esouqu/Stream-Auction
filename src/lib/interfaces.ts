@@ -1,34 +1,42 @@
-export interface IRoute {
+import type { SOCKET_STATE } from "$lib/stores/DonationAlertsSocket.svelte";
+export type DonationSource = 'DonationAlerts' | 'DonatePay';
+
+export interface ISocketConnectionData {
   id: number;
-  title: string;
-  icon: string;
-  url: string;
+  socketToken?: string;
 }
 
-export interface ICountdownTimerState {
-  isRunning: boolean;
-  timeRemaining: number;
+export interface IDonationSocket {
+  id: DonationSource;
+  color: string;
+  state: SOCKET_STATE;
+  isOpen: boolean;
+  isConnecting: boolean;
+  isClosed: boolean;
+  socket?: WebSocket;
+  onDonation?: ((donation: IDonationSocketData) => void);
+  connect: () => void;
+  disconnect: () => void;
 }
-
-export interface IPreset {
-  title: string;
-  text: string;
-}
-
 export interface ILot {
   id: number;
   title: string;
   value: number;
-  percent: string;
-  color: string;
-  contrastColor: string;
+  color: {
+    r: number;
+    g: number;
+    b: number;
+  };
+  isDarkColor: boolean;
   donators: string[];
-  url?: string;
 }
 
-export interface IPieItem extends ILot {
-  startAngle: number;
-  endAngle: number;
+export interface IDonationSocketData {
+  username: string;
+  amount: number;
+  currency: string;
+  message: string;
+  source: DonationSource;
 }
 
 export interface IAuthTokenData {
@@ -38,19 +46,14 @@ export interface IAuthTokenData {
   refresh_token: string;
 }
 
-export interface IDonationAlertsRefreshToken extends Omit<IAuthTokenData, 'refresh_token'> {
-  refresh_token?: string;
-}
-
-export interface IDonationAlertsUserData {
-  id: number;
-  code: string;
-  name: string;
-  is_active: number;
-  avatar: string;
-  email: string | null;
-  language: string;
-  socket_connection_token: string
+export interface ITwitchValidation {
+  client_id: string;
+  login: string;
+  scopes: string[];
+  user_id: number;
+  expires_in: number;
+  status?: number;
+  message?: string;
 }
 
 export interface IDonatePayUserData {
@@ -61,36 +64,15 @@ export interface IDonatePayUserData {
   cashout_sum: number;
 }
 
-export interface IDonationDataFull {
-  id: number | string;
-  type: 'Twitch' | 'Donation Alerts';
-  isInstant: boolean;
-  username: string;
-  amount: number;
-  amount_in_user_currency: number;
-  currency: string;
-  message: string;
-  created_at: string;
-  mostSimilarLot: ILot | null;
-  name: string,
-  message_type: string,
-  paying_system: string,
-  is_shown: boolean,
-  recipient_name: string,
-  recipient: string,
-  shown_at: string,
-  reason: string,
-}
-
-export interface IDonationData {
-  id: number | string;
-  type: 'Twitch' | 'Donation Alerts';
-  username: string;
-  amount: number;
-  amount_in_user_currency: number;
-  currency: string;
-  message: string;
-  created_at: string;
+export interface IDonationAlertsUserData {
+  id: number;
+  code: string;
+  name: string;
+  is_active: number;
+  avatar: string;
+  email: string | null;
+  language: string;
+  socket_connection_token: string;
 }
 
 export interface ITwitchUserData {
@@ -104,53 +86,5 @@ export interface ITwitchUserData {
   offline_image_url: string;
   view_count: number;
   email: string;
-  created_at: Date
-}
-
-export interface ITwitchRedeemedReward {
-  timestamp: Date;
-  redemption: {
-    id: string;
-    user: {
-      id: number;
-      login: string;
-      display_name: string
-    };
-    channel_id: number;
-    redeemed_at: Date;
-    reward: {
-      id: string;
-      channel_id: number;
-      title: string;
-      prompt: string;
-      cost: number;
-      is_user_input_required: boolean;
-      is_sub_only: boolean;
-      image: {
-        url_1x: string;
-        url_2x: string;
-        url_4x: string
-      };
-      default_image: {
-        url_1x: string;
-        url_2x: string;
-        url_4x: string;
-      };
-      background_color: string;
-      is_enabled: boolean;
-      is_paused: boolean;
-      is_in_stock: boolean;
-      max_per_stream: { is_enabled: boolean; max_per_stream: number };
-      should_redemptions_skip_request_queue: boolean
-    };
-    user_input: string;
-    status: 'FULFILLED' | 'UNFULFILLED'
-  }
-}
-
-export interface IProcessedDonationData extends IDonationData {
-  // isInstant indicates that donation will be showed as notification
-  isInstant: boolean;
-  lot?: ILot;
-  mostSimilarLot?: ILot;
+  created_at: Date;
 }

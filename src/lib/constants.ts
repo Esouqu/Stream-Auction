@@ -1,80 +1,51 @@
-import type { IRoute } from "./interfaces";
-import pieIcon from '$lib/assets/pie_chart_icon.svg';
-import listIcon from '$lib/assets/list_icon.svg';
-import settingsIcon from '$lib/assets/settings_icon.svg';
+import Color from "color";
 
-export enum DONATION_EVENT {
-  EXTEND = 'extend',
-  STOP = 'stop',
-}
-
-export enum WHEEL_STATE {
-  IDLE = 'idle',
-  SPINNING = 'spinning',
-  STOPPED = 'stopped',
-  DELAYED = 'delayed',
-}
-
-export enum ACTION_MANAGER_STATE {
-  IDLE = 'idle',
-  AUCTIONING = 'auctioning',
-  SPINNING_WHEEL = 'spinning wheel',
-  DELAYING_SPIN_STOP = 'delaying spin stop',
-}
-
-export enum TIMER_STATE {
-  IDLE = 'idle',
-  PAUSED = 'paused',
-  RUNNING = 'running',
-  STOPPED = 'stopped',
-  INCREASING = 'increasing',
-  DECREASING = 'decreasing'
-}
-
-export enum CENTRIFUGE_STATE {
-  DISCONNECTED = 0,
-  CONNECTING = 1,
-  CONNECTED = 2,
-  CLOSED = 3,
-}
-
-export enum SOCKET_STATE {
-  CONNECTING = 0,
-  OPEN = 1,
-  CLOSING = 2,
-  CLOSED = 3,
-}
-
-export enum NAVIGATION_ROUTES {
-  LOTS = '/',
-  WHEEL = '/wheel',
-  SETTINGS = '/settings',
-}
-
-export const routes: IRoute[] = [
-  { id: 0, title: 'Аукцион', icon: listIcon, url: NAVIGATION_ROUTES.LOTS },
-  { id: 1, title: 'Колесо', icon: pieIcon, url: NAVIGATION_ROUTES.WHEEL },
-  { id: 2, title: 'Настройки', icon: settingsIcon, url: NAVIGATION_ROUTES.SETTINGS },
+export const degreesToRadians = Math.PI / 180;
+export const radiansToDegrees = 180 / Math.PI;
+export const colors: Color[] = [
+  Color('#ef4444'), // red
+  Color('#f97316'), // orange
+  Color('#f59e0b'), // amber
+  Color('#eab308'), // yellow
+  Color('#84cc16'), // lime
+  Color('#22c55e'), // green
+  Color('#10b981'), // emerald
+  Color('#14b8a6'), // teal
+  Color('#06b6d4'), // cyan
+  Color('#0ea5e9'), // sky
+  Color('#3b82f6'), // blue
+  Color('#6366f1'), // indigo
+  Color('#8b5cf6'), // violet
+  Color('#a855f7'), // purple
+  Color('#d946ef'), // fuchsia
+  Color('#ec4899'), // pink
+  // Color('#f43f5e'),
 ];
 
-export const radiansToDegrees = 180 / Math.PI;
-export const degreesToRadians = Math.PI / 180;
+export const themes = [
+  { theme: 'theme-white', color: Color('white') },
+  { theme: 'theme-red', color: colors[0] },
+  { theme: 'theme-orange', color: colors[1] },
+  { theme: 'theme-yellow', color: colors[3] },
+  { theme: 'theme-lime', color: colors[4] },
+  { theme: 'theme-green', color: colors[5] },
+  { theme: 'theme-emerald', color: colors[6] },
+  { theme: 'theme-teal', color: colors[7] },
+  { theme: 'theme-cyan', color: colors[8] },
+  { theme: 'theme-sky', color: colors[9] },
+  { theme: 'theme-blue', color: colors[10] },
+  { theme: 'theme-indigo', color: colors[11] },
+  { theme: 'theme-violet', color: colors[12] },
+  { theme: 'theme-purple', color: colors[13] },
+  { theme: 'theme-fuchsia', color: colors[14] },
+  { theme: 'theme-pink', color: colors[15] },
+];
 
-export const colors = [
-  '#f44336',
-  '#e91e63',
-  '#9c27b0',
-  '#673ab7',
-  '#3f51b5',
-  '#2196f3',
-  '#03a9f4',
-  '#00bcd4',
-  '#009688',
-  '#4caf50',
-  '#8bc34a',
-  '#cddc39',
-  '#ffeb3b',
-  '#ffc107',
-  '#ff9800',
-  '#ff5722',
+export const patterns = [
+  null,
+  'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern4-1ebz6SrCw4YRKgnnBJlXeH8otyvYj4.png',
+  'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern2-bfr6Ttl1bIbY5kw1HPQBIQHOU9Mrk9.png',
+  'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern3-Q16PlIdpKAdJsblTsmHV1PNvPBz8YP.jpg',
+  // 'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern1-sapVQisWvjlVCqek9okbLPEM4oNtU3.png',
+  'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern5-uXZwvagY0f8JbfVStCN3Nhkw3mjON8.png',
 ];
