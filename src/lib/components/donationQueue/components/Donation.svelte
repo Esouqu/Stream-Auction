@@ -5,7 +5,6 @@
 	import XIcon from 'lucide-svelte/icons/x';
 	import DonationAlertsIcon from '../../icons/DonationAlertsIcon.svelte';
 	import { Button } from '../../ui/button';
-	import DonationSplitDialog from './DonationSplitDialog.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import DonatePayIcon from '../../icons/DonatePayIcon.svelte';
 
@@ -93,8 +92,6 @@
 					<Button variant="ghost" size="icon" class="w-full" onclick={addNewLot}>
 						<PlusIcon />
 					</Button>
-
-					<!-- <DonationSplitDialog {id} {username} {message} {amount} {currency} {isInstant} /> -->
 
 					<Button variant="ghost" size="icon" class="w-full" onclick={removeDonation}>
 						<XIcon />

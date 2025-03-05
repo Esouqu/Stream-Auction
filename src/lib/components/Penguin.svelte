@@ -58,8 +58,8 @@
 </script>
 
 <div
-	class="h-16 w-16 scale-[2.5] overflow-hidden"
+	class="h-[64px] w-[64px] scale-[2.5] overflow-hidden"
 	class:scale-x-[-2.5]={scaleX < 0}
-	style="background-image: url({penguinSpritesheet}); background-position: -192px 0px; transform: scale3d(${scaleX},2, 2);"
+	style="background-image: url({penguinSpritesheet}); background-position: -192px 0px;"
 	bind:this={penguinRef}
 ></div>

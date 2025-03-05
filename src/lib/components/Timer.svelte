@@ -10,7 +10,7 @@
 	import { slide } from 'svelte/transition';
 
 	const inputStyle =
-		'h-[2.75rem] leading-none border-none p-0 text-center tabular-nums hover:bg-muted read-only:hover:bg-transparent read-only:focus-visible:ring-transparent md:w-[3.75rem] md:text-4xl disabled:opacity-100 disabled:cursor-default';
+		'h-[3.25rem] leading-none border-none p-0 text-center tabular-nums hover:bg-muted read-only:hover:bg-transparent read-only:focus-visible:ring-transparent md:w-[4.75rem] md:text-5xl disabled:opacity-100 disabled:cursor-default';
 	const { timer, wheel, background } = getAppManagerContext();
 	const { hours, minutes, seconds, ms } = $derived(timer.formattedTime);
 	const paddedHours = $derived(timeToString(hours));
@@ -47,41 +47,8 @@
 	style="--tw-bg-opacity: {background.floatDimness}; --tw-border-opacity: {background.floatDimness};"
 >
 	<div
-		class="transition-color relative flex w-full items-center justify-between text-4xl font-medium"
+		class="transition-color relative flex w-fit flex-col items-center justify-between gap-2 text-5xl font-medium"
 	>
-		<div class="flex">
-			<Button
-				variant="ghost"
-				size="icon"
-				class="active:scale-90"
-				onclick={() => timer.reset()}
-				disabled={timer.target === timer.baseTime || wheel.isActive}
-			>
-				<ResetIcon />
-			</Button>
-			{#if !timer.isActive}
-				<Button
-					variant="ghost"
-					size="icon"
-					class="active:scale-90"
-					onclick={() => timer.start()}
-					disabled={timer.target === 0 || wheel.isActive}
-				>
-					<PlayIcon />
-				</Button>
-			{:else}
-				<Button
-					variant="ghost"
-					size="icon"
-					class="active:scale-90"
-					disabled={timer.isProcessingQueue || wheel.isActive}
-					onclick={() => timer.pause()}
-				>
-					<PauseIcon />
-				</Button>
-			{/if}
-		</div>
-
 		<div
 			class="group flex w-full items-center justify-center font-[Geist] tabular-nums tracking-widest duration-500 ease-in-out data-[add=true]:text-primary data-[delayed=true]:text-[crimson]"
 			data-add={timer.isProcessingQueue && timer.beforeTimeUpdate.ms > 0}
@@ -121,38 +88,68 @@
 			</span>
 		</div>
 
-		<div class="flex">
-			<Button
-				variant="ghost"
-				size="icon"
-				disabled={wheel.isActive}
-				class="active:scale-90"
-				onclick={() => timer.subtract()}
+		{#if wheel.isActive}
+			<div
+				class="mt-2 flex h-4 w-full items-center justify-center text-sm font-medium text-muted-foreground"
+				transition:slide
 			>
-				<MinusIcon />
-			</Button>
-			<Button
-				variant="ghost"
-				size="icon"
-				class="active:scale-90"
-				disabled={wheel.isActive}
-				onclick={() => timer.add()}
-			>
-				<PlusIcon />
-			</Button>
-		</div>
+				{#if wheel.isSpinning || wheel.isPreparing}
+					<div class="flex items-center">Крутим колесо...</div>
+				{:else if wheel.isDelayed}
+					<div class="flex items-center">Задержка...</div>
+				{/if}
+			</div>
+		{:else}
+			<div class="flex w-full">
+				<Button
+					variant="ghost"
+					size="icon"
+					class="w-full active:scale-90"
+					onclick={() => timer.reset()}
+					disabled={timer.target === timer.baseTime || wheel.isActive}
+				>
+					<ResetIcon />
+				</Button>
+				{#if !timer.isActive}
+					<Button
+						variant="ghost"
+						size="icon"
+						class="w-full active:scale-90"
+						onclick={() => timer.start()}
+						disabled={timer.target === 0 || wheel.isActive}
+					>
+						<PlayIcon />
+					</Button>
+				{:else}
+					<Button
+						variant="ghost"
+						size="icon"
+						class="w-full active:scale-90"
+						disabled={timer.isProcessingQueue || wheel.isActive}
+						onclick={() => timer.pause()}
+					>
+						<PauseIcon />
+					</Button>
+				{/if}
+				<Button
+					variant="ghost"
+					size="icon"
+					disabled={wheel.isActive}
+					class="w-full active:scale-90"
+					onclick={() => timer.subtract()}
+				>
+					<MinusIcon />
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon"
+					class="w-full active:scale-90"
+					disabled={wheel.isActive}
+					onclick={() => timer.add()}
+				>
+					<PlusIcon />
+				</Button>
+			</div>
+		{/if}
 	</div>
-
-	{#if wheel.isActive}
-		<div
-			class="mt-2 flex h-4 w-full items-center justify-center text-sm font-medium text-muted-foreground"
-			transition:slide
-		>
-			{#if wheel.isSpinning || wheel.isPreparing}
-				<div class="flex items-center">Крутим колесо...</div>
-			{:else if wheel.isDelayed}
-				<div class="flex items-center">Задержка...</div>
-			{/if}
-		</div>
-	{/if}
 </div>

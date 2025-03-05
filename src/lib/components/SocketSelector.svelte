@@ -3,7 +3,7 @@
 	import type { IDonationSocket } from '$lib/interfaces';
 	import { Toggle } from './ui/toggle';
 	import Spinner from './Spinner.svelte';
-	import XIcon from 'lucide-svelte/icons/circle-x';
+	import XIcon from 'lucide-svelte/icons/circle-dashed';
 	import CheckIcon from 'lucide-svelte/icons/circle-check';
 
 	const app = getAppManagerContext();

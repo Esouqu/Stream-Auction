@@ -63,11 +63,13 @@ class DonatePayCentrifuge implements IDonationSocket {
 
       this._centrifuge.subscribe(this._roomId, (message) => {
         const { data } = message as DonatePayDonationMessage;
+        const username = data.notification.vars.name ?? 'Аноним';
+        const amount = Math.round(data.notification.vars.sum);
 
         this.onDonation?.({
-          username: data.notification.vars.name,
-          amount: data.notification.vars.sum,
-          currency: data.notification.vars.currency,
+          username,
+          amount,
+          currency: 'RUB',
           message: data.notification.vars.comment,
           source: 'DonatePay'
         });

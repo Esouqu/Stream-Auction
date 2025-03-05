@@ -82,11 +82,13 @@ class DonationAlertsSocket implements IDonationSocket {
 
       if (!message.result.type && message.result.channel === this._roomId) {
         const donation: DonationAlertsDonationMessage = message.result.data.data;
+        const username = donation.username ?? 'Аноним';
+        const roundedAmount = Math.round(donation.amount_in_user_currency);
 
         this.onDonation?.({
-          username: donation.username,
-          amount: donation.amount_in_user_currency,
-          currency: donation.currency,
+          username,
+          amount: roundedAmount,
+          currency: 'RUB',
           message: donation.message,
           source: 'DonationAlerts'
         });
