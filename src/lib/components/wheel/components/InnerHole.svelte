@@ -15,7 +15,6 @@
 
 	const app = getAppManagerContext();
 	const { wheel, lots } = app;
-	const textColor = $derived(winner?.isDarkColor ? 'white' : 'black');
 	const backgroundColor = $derived(winner && Color(winner.color).hex());
 	const holeSize = $derived(wheel.isFinished ? '95%' : `${Math.round(size)}px`);
 </script>
@@ -63,7 +62,7 @@
 			</div>
 		{:else if !wheel.isFinished}
 			<p
-				class="col-start-1 row-start-1 line-clamp-5 overflow-hidden overflow-ellipsis break-words px-8 text-center text-lg"
+				class="col-start-1 row-start-1 line-clamp-5 overflow-hidden overflow-ellipsis break-words px-8 text-center text-xl"
 				in:scale
 			>
 				{winner?.title}
