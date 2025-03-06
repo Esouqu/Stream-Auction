@@ -129,7 +129,7 @@
 		ctx.stroke();
 	}
 
-	function drawText({ title, startAngle, endAngle, isDarkColor }: ILotWithAngle, progress: number) {
+	function drawText({ title, startAngle, endAngle }: ILotWithAngle, progress: number) {
 		if (!ctx) return;
 
 		const midAngle = (startAngle + endAngle) / 2;
@@ -138,15 +138,18 @@
 		const textX = radius + radius * textOffsetFromCenter * cosMidAngle;
 		const textY = radius + radius * textOffsetFromCenter * sinMidAngle;
 
+		ctx.fillStyle = 'white';
+		ctx.strokeStyle = 'black';
+		ctx.lineWidth = 4;
+
 		if (progress < 1) {
 			ctx.globalAlpha = progress;
 		}
 
-		ctx.fillStyle = isDarkColor ? 'white' : 'black';
-
 		ctx.save();
 		ctx.translate(textX, textY);
 		ctx.rotate(midAngle * degreesToRadians);
+		ctx.strokeText(getShortenedText(title, fontStyle, maxSliceTextWidth), 0, 0);
 		ctx.fillText(getShortenedText(title, fontStyle, maxSliceTextWidth), 0, 0);
 		ctx.restore();
 	}
@@ -188,7 +191,9 @@
 			const angleDiff = endAngle - startAngle;
 
 			drawBody(lot, centerX, centerY, progress);
-			if (angleDiff >= textMinAngleCap) drawText(lot, progress);
+			if (angleDiff >= textMinAngleCap) {
+				drawText(lot, progress);
+			}
 		}
 
 		ctx.globalAlpha = 1;

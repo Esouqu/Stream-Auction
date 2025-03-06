@@ -50,7 +50,7 @@
 		class="transition-color relative flex w-fit flex-col items-center justify-between gap-2 text-5xl font-medium"
 	>
 		<div
-			class="group flex w-full items-center justify-center font-[Geist] tabular-nums tracking-widest duration-500 ease-in-out data-[add=true]:text-primary data-[delayed=true]:text-[crimson]"
+			class="data-[delayed=true]:animate-timer-delay group flex w-full items-center justify-center font-[Geist] tabular-nums tracking-widest duration-500 ease-in-out data-[add=true]:text-primary"
 			data-add={timer.isProcessingQueue && timer.beforeTimeUpdate.ms > 0}
 			data-subtract={timer.isProcessingQueue && timer.beforeTimeUpdate.ms < 0}
 			data-delayed={wheel.isDelayed}
@@ -82,7 +82,7 @@
 				value={paddedSeconds}
 			/>
 			<span
-				class="w-[2rem] self-end text-xl leading-8 text-muted-foreground duration-500 ease-in-out group-data-[add=true]:text-primary group-data-[delayed=true]:text-[crimson]"
+				class="group-data-[delayed=true]:animate-timer-delay w-[2rem] self-end text-xl leading-8 text-muted-foreground duration-500 ease-in-out group-data-[add=true]:text-primary group-data-[delayed=true]:text-[crimson]"
 			>
 				{paddedMs}
 			</span>
@@ -90,8 +90,7 @@
 
 		{#if wheel.isActive}
 			<div
-				class="mt-2 flex h-4 w-full items-center justify-center text-sm font-medium text-muted-foreground"
-				transition:slide
+				class="flex h-10 w-full items-center justify-center text-sm font-medium text-muted-foreground"
 			>
 				{#if wheel.isSpinning || wheel.isPreparing}
 					<div class="flex items-center">Крутим колесо...</div>

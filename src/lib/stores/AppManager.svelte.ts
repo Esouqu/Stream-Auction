@@ -1,4 +1,4 @@
-import type { IDonationSocket, IDonationSocketData } from "$lib/interfaces";
+import type { IDonationSocket, IDonationSocketData, ILot } from "$lib/interfaces";
 import { untrack } from "svelte";
 import DonationStore, { type IDonation } from "./DonationStore.svelte";
 import LotStore from "./LotStore.svelte";
@@ -262,10 +262,16 @@ export class AppManager {
 		return 0;
 	}
 
-	private _activateEvent(donation: IDonationSocketData) {
+	private _activateEvent(donation: IDonationSocketData, lot?: ILot) {
+		// Spin Stop Event
 		if (donation.amount === this.settings.spinStopPrice) {
 			this.wheel.stop();
-		} else if (donation.amount >= this._spinExtendPrice) {
+			this._addDonation(donation);
+			return;
+		}
+
+		// Spin Extend Event
+		if (donation.amount >= this._spinExtendPrice) {
 			if (this.wheel.isSpinning) {
 				this.extendSpin();
 			} else {
@@ -273,12 +279,30 @@ export class AppManager {
 				this.wheel.spin();
 			}
 
+			if (lot) {
+				this._addDonationToLot(donation, lot);
+			} else {
+				this._addDonation(donation);
+			}
+
 			this._previousSpinExtendPrice = this._spinExtendPrice;
 			this._spinExtendPrice += this.settings.spinExtendPriceGain;
 			this._addSpinMultiplier();
 			this._dingAudio?.load();
 			this._dingAudio?.play();
+			return;
 		}
+
+		if (lot && this.wheel.isSpinning) {
+			this._addDonationToLot(donation, lot);
+		} else {
+			this._addDonation(donation);
+		}
+	}
+
+	private _addDonationToLot(donation: IDonationSocketData, lot: ILot) {
+		this.lots.addValue(lot.id, donation.amount, donation.username);
+		this._addDonation({ ...donation, message: lot.title }, true);
 	}
 
 	private _addDonation(donation: IDonationSocketData, isInstant = false) {
@@ -296,15 +320,12 @@ export class AppManager {
 	public onDonation(donation: IDonationSocketData) {
 		const lot = this.lots.getLotFromString(donation.message);
 
-		if (lot) {
-			this.lots.addValue(lot.id, donation.amount, donation.username);
-			this._addDonation({ ...donation, message: lot.title }, true);
+		if (this.settings.isSpinExtendEnabled && this.wheel.isActive) {
+			this._activateEvent(donation, lot);
+		} else if (lot) {
+			this._addDonationToLot(donation, lot);
 		} else {
 			this._addDonation(donation);
-		}
-
-		if (this.settings.isSpinExtendEnabled && (this.wheel.isSpinning || this.wheel.isDelayed)) {
-			this._activateEvent(donation);
 		}
 
 		if (this.background.settings.isFlameEnabled) {

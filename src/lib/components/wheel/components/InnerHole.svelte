@@ -21,7 +21,7 @@
 </script>
 
 <div
-	class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[0.25rem] bg-background shadow-[0_0_1rem_transparent] transition-all duration-500 data-[enlarged=true]:h-[60%] data-[enlarged=true]:w-[60%] data-[glow=true]:shadow-white"
+	class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[0.2rem] bg-background shadow-[0_0_1rem_transparent] transition-all duration-500 data-[enlarged=true]:h-[60%] data-[enlarged=true]:w-[60%] data-[glow=true]:shadow-white"
 	data-glow={app.spinExtends > 0}
 	data-enlarged={wheel.isFinished}
 	style="height: {holeSize}; width: {holeSize};"
@@ -29,14 +29,18 @@
 >
 	<div
 		class="relative grid h-full w-full items-center justify-center text-center text-base font-semibold transition-colors duration-300"
-		style="color: {textColor}; background-color: {app.spinExtends > 0
+		style="color: white;   text-shadow: 
+    -0.125rem -0.125rem 0 black,
+    -0.125rem  0   0 black,
+    -0.125rem  0.125rem 0 black,
+     0   -0.125rem 0 black,
+     0    0.125rem 0 black,
+     0.125rem -0.125rem 0 black,
+     0.125rem  0   0 black,
+     0.125rem  0.125rem 0 black; background-color: {app.spinExtends > 0
 			? 'hsl(var(--muted))'
 			: backgroundColor};"
 	>
-		<div
-			class="absolute h-full w-full bg-[length:17rem_17rem] bg-center opacity-10"
-			style="background-image: url({patternImage || ''});"
-		></div>
 		{#if app.spinExtends > 0}
 			<div
 				class="relative col-start-1 row-start-1 flex h-full w-full flex-col items-center justify-center gap-2 text-center text-base font-semibold text-foreground transition-colors duration-300"
@@ -59,7 +63,7 @@
 			</div>
 		{:else if !wheel.isFinished}
 			<p
-				class="col-start-1 row-start-1 line-clamp-5 overflow-hidden overflow-ellipsis break-words px-8 text-center"
+				class="col-start-1 row-start-1 line-clamp-5 overflow-hidden overflow-ellipsis break-words px-8 text-center text-lg"
 				in:scale
 			>
 				{winner?.title}
@@ -80,5 +84,9 @@
 				</p>
 			</div>
 		{/if}
+		<div
+			class="pointer-events-none absolute h-full w-full bg-[length:17rem_17rem] bg-center opacity-10"
+			style="background-image: url({patternImage || ''});"
+		></div>
 	</div>
 </div>

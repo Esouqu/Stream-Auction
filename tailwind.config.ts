@@ -85,6 +85,10 @@ const config: Config = {
 				sans: [...fontFamily.sans]
 			},
 			keyframes: {
+				"timer-delay": {
+					from: { color: "hsl(var(--foreground))" },
+					to: { color: "crimson" },
+				},
 				"accordion-down": {
 					from: { height: "0" },
 					to: { height: "var(--bits-accordion-content-height)" },
@@ -102,6 +106,7 @@ const config: Config = {
 				"accordion-down": "accordion-down 0.2s ease-out",
 				"accordion-up": "accordion-up 0.2s ease-out",
 				"caret-blink": "caret-blink 1.25s ease-out infinite",
+				"timer-delay": "timer-delay 1s ease-in-out infinite alternate",
 			},
 		},
 	},
