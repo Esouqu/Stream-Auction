@@ -97,4 +97,5 @@ export interface ILiveHubUserData {
     display_name: string;
     icon_url: string;
     is_muted: boolean;
+    token: string;
 }

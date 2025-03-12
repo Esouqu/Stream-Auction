@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({url, cookies}) => {
     cookies.set(LIVEHUB_TOKEN_COOKIE, tokenData.access_token, {
         path: '/',
         secure: !dev,
-        expires: new Date(Date.now() + tokenData.expires_in)
+        expires: new Date(Date.now() + tokenData.expires_in * 1000)
     });
 
     cookies.set(LIVEHUB_REFRESH_TOKEN_COOKIE, tokenData.refresh_token, {

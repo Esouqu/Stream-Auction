@@ -4,7 +4,7 @@ export interface IDonation {
   amount: number;
   currency: string;
   message: string;
-  source: 'DonationAlerts' | 'DonatePay';
+  source: 'DonationAlerts' | 'DonatePay' | 'LiveHub';
   isInstant: boolean;
 }
 

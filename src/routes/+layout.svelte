@@ -23,6 +23,7 @@
 	import DonationQueue from '$lib/components/donationQueue/DonationQueue.svelte';
 	import donationAlertsApi from '$lib/api/donationalertsApi.svelte';
 	import liveHubApi from "$lib/api/liveHubApi.svelte";
+	import LiveHubSocket from "$lib/stores/LiveHubSocket.svelte";
 
 	const { children } = $props();
 
@@ -56,7 +57,9 @@
 
 		const liveHubUser = await liveHubApi.getUser();
 		if (liveHubUser) {
+			const liveHubSocket = new LiveHubSocket(liveHubUser.token);
 			liveHubApi.setUser(liveHubUser);
+			appManager.addSocket(liveHubSocket);
 		}
 	}
 </script>
