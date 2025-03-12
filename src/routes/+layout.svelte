@@ -22,6 +22,7 @@
 	import donatePayApi from '$lib/api/donatePayApi.svelte';
 	import DonationQueue from '$lib/components/donationQueue/DonationQueue.svelte';
 	import donationAlertsApi from '$lib/api/donationalertsApi.svelte';
+	import liveHubApi from "$lib/api/liveHubApi.svelte";
 
 	const { children } = $props();
 
@@ -36,13 +37,13 @@
 	});
 
 	async function addSockets() {
-		const user = await donationAlertsApi.getUser();
-		if (user) {
+		const donationAlertsUser = await donationAlertsApi.getUser();
+		if (donationAlertsUser) {
 			const donationAlertsSocket = new DonationAlertsSocket({
-				id: user.id,
-				socketToken: user.socket_connection_token
+				id: donationAlertsUser.id,
+				socketToken: donationAlertsUser.socket_connection_token
 			});
-			donationAlertsApi.setUser(user);
+			donationAlertsApi.setUser(donationAlertsUser);
 			appManager.addSocket(donationAlertsSocket);
 		}
 
@@ -51,6 +52,11 @@
 				id: donatePayApi.user.id
 			});
 			appManager.addSocket(donatePaySocket);
+		}
+
+		const liveHubUser = await liveHubApi.getUser();
+		if (liveHubUser) {
+			liveHubApi.setUser(liveHubUser);
 		}
 	}
 </script>

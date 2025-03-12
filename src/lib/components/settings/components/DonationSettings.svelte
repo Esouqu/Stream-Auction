@@ -7,6 +7,7 @@
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import DonatePayIntegration from '$lib/components/DonatePayIntegration.svelte';
 	import DonationAlertsIntegration from '$lib/components/DonationAlertsIntegration.svelte';
+	import LiveHubIntegration from '$lib/components/LiveHubIntegration.svelte';
 
 	const app = getAppManagerContext();
 </script>
@@ -19,6 +20,9 @@
 		<div class="flex gap-4">
 			<DonationAlertsIntegration />
 			<DonatePayIntegration />
+		</div>
+		<div class="flex gap-4">
+			<LiveHubIntegration />
 		</div>
 		<SettingCard isExtended={app.settings.isSpinExtendEnabled}>
 			{#snippet header()}
