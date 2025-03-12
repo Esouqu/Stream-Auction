@@ -11,10 +11,10 @@
     function onLogout() {
         liveHubApi.logout();
 
-        // if (app.donationAlertsSocket) {
-        //     app.donationAlertsSocket.disconnect();
-        //     app.removeSocket(app.donationAlertsSocket.id);
-        // }
+        if (app.liveHubSocket) {
+            app.liveHubSocket.disconnect();
+            app.removeSocket(app.liveHubSocket.id);
+        }
     }
 
     function onAuth() {

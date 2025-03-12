@@ -343,6 +343,7 @@ export class AppManager {
 	get previousSpinExtendPrice() { return this._previousSpinExtendPrice; }
 	get donatePaySocket() { return this._donationSockets.get('DonatePay'); }
 	get donationAlertsSocket() { return this._donationSockets.get('DonationAlerts'); }
+	get liveHubSocket() { return this._donationSockets.get('LiveHub'); }
 	get donationSockets() { return Array.from(this._donationSockets.values()); }
 }
 
