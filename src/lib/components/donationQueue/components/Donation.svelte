@@ -7,6 +7,7 @@
 	import { Button } from '../../ui/button';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import DonatePayIcon from '../../icons/DonatePayIcon.svelte';
+	import LiveHubDonateIcon from "$lib/components/icons/LiveHubDonateIcon.svelte";
 
 	interface Props extends IDonation {
 		isInteractive: boolean;
@@ -68,6 +69,10 @@
 	{:else if source === 'DonatePay'}
 		<div class="flex h-full items-center bg-gradient-to-b from-[#5db180] to-[#44AB4F] px-2">
 			<DonatePayIcon />
+		</div>
+	{:else if source === 'LiveHub'}
+		<div class="flex h-full items-center bg-black px-2">
+			<LiveHubDonateIcon />
 		</div>
 	{/if}
 
