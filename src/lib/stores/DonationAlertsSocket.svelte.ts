@@ -1,11 +1,4 @@
-import type { IDonationSocket, IDonationSocketData, ISocketConnectionData } from '../interfaces';
-
-export enum SOCKET_STATE {
-  NOT_EXISTS,
-  OPEN,
-  CLOSED,
-  CONNECTING,
-}
+import { SOCKET_STATE, type IDonationSocket, type IDonationSocketData, type ISocketConnectionData } from '../interfaces';
 
 interface DonationAlertsDonationMessage {
   id: number;

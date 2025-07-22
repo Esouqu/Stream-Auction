@@ -1,5 +1,10 @@
-import type { SOCKET_STATE } from "$lib/stores/DonationAlertsSocket.svelte";
 export type DonationSource = 'DonationAlerts' | 'DonatePay';
+
+export enum SOCKET_STATE {
+  OPEN,
+  CLOSED,
+  CONNECTING,
+}
 
 export interface ISocketConnectionData {
   id: number;

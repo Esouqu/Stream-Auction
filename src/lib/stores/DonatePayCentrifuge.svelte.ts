@@ -1,6 +1,5 @@
 import Centrifuge from "centrifuge";
-import { SOCKET_STATE } from "./DonationAlertsSocket.svelte";
-import type { IDonationSocket, IDonationSocketData, ISocketConnectionData } from "$lib/interfaces";
+import { SOCKET_STATE, type IDonationSocket, type IDonationSocketData, type ISocketConnectionData } from "$lib/interfaces";
 import donatePayApi from "$lib/api/donatePayApi.svelte";
 
 interface DonatePayDonationMessage {
@@ -26,7 +25,7 @@ class DonatePayCentrifuge implements IDonationSocket {
   readonly color = 'bg-green-500/50';
   private _state: SOCKET_STATE = $state(SOCKET_STATE.CLOSED);
   private _centrifuge: Centrifuge | undefined;
-  private _CENTRIFUGO_URL = 'wss://centrifugo.donatepay.ru:43002/connection/websocket';
+  private _CENTRIFUGO_URL = 'wss://centrifugo.donatepay.ru:443/connection/websocket';
   private _TOKEN_ENDPOINT = 'https://donatepay.ru/api/v2/socket/token';
   private _roomId: string;
 

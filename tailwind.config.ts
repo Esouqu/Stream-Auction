@@ -89,6 +89,17 @@ const config: Config = {
 					from: { color: "hsl(var(--foreground))" },
 					to: { color: "crimson" },
 				},
+				"seal": {
+					"0%": {
+						transform: "scale(0)"
+					},
+					"50%": {
+						transform: "scale(1.2)"
+					},
+					"100%": {
+						transform: 'scale(1)'
+					}
+				},
 				"accordion-down": {
 					from: { height: "0" },
 					to: { height: "var(--bits-accordion-content-height)" },
@@ -107,6 +118,7 @@ const config: Config = {
 				"accordion-up": "accordion-up 0.2s ease-out",
 				"caret-blink": "caret-blink 1.25s ease-out infinite",
 				"timer-delay": "timer-delay 1s ease-in-out infinite alternate",
+				"seal": "seal 0.5s 0.5s ease-in-out forwards",
 			},
 		},
 	},

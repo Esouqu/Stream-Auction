@@ -6,8 +6,6 @@
 	import VirtualList from './components/VirtualList.svelte';
 	import PlusIcon from 'lucide-svelte/icons/list-plus';
 	import SearchIcon from 'lucide-svelte/icons/search';
-	// import ZoomInIcon from 'lucide-svelte/icons/zoom-in';
-	// import ZoomOutIcon from 'lucide-svelte/icons/zoom-out';
 	import { slide } from 'svelte/transition';
 	import Input from '$lib/components/Input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -17,7 +15,6 @@
 	import ClearActionDialog from './components/ClearActionDialog.svelte';
 	import LotLoader from './components/LotLoader.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
-	import Penguin from '../Penguin.svelte';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 	interface Props {
@@ -27,8 +24,6 @@
 	const { isCompact = false }: Props = $props();
 
 	const { lots, background } = getAppManagerContext();
-	// const minItemHeight = 40;
-	// const maxItemHeight = 48;
 	const slideBarStyle = 'absolute bottom-[100%] left-0 z-50 flex w-full border-t p-4 bg-card';
 
 	let isNewLotInputVisible = $state(false);
@@ -87,14 +82,6 @@
 
 		clearNewLotInputs();
 	}
-
-	// function onZoomOut() {
-	// 	lots.settings.itemHeight = Math.max(minItemHeight, lots.settings.itemHeight - remToPx(0.2));
-	// }
-
-	// function onZoomIn() {
-	// 	lots.settings.itemHeight = Math.min(maxItemHeight, lots.settings.itemHeight + remToPx(0.2));
-	// }
 </script>
 
 <div
@@ -137,7 +124,7 @@
 				<Lot {...lot} {percent} itemHeight={lots.settings.itemHeight} />
 			{/snippet}
 			{#snippet empty()}
-				<Penguin />
+				<div class="text-muted-foreground">Список пуст</div>
 			{/snippet}
 		</VirtualList>
 	{/if}
@@ -179,39 +166,6 @@
 
 				<Separator orientation="vertical" class="mx-2" />
 
-				<!-- <Tooltip>
-					<TooltipTrigger>
-						{#snippet child({ props })}
-							<Button
-								{...props}
-								variant="ghost"
-								size="icon"
-								onclick={onZoomIn}
-								disabled={lots.settings.itemHeight >= maxItemHeight}
-							>
-								<ZoomInIcon />
-							</Button>
-						{/snippet}
-					</TooltipTrigger>
-					<TooltipContent>Увеличить</TooltipContent>
-				</Tooltip>
-				<Tooltip>
-					<TooltipTrigger>
-						{#snippet child({ props })}
-							<Button
-								{...props}
-								variant="ghost"
-								size="icon"
-								onclick={onZoomOut}
-								disabled={lots.settings.itemHeight <= minItemHeight}
-							>
-								<ZoomOutIcon />
-							</Button>
-						{/snippet}
-					</TooltipTrigger>
-					<TooltipContent>Уменьшить</TooltipContent>
-				</Tooltip> -->
-
 				<LotLoader />
 				<ClearActionDialog />
 			</div>
@@ -230,13 +184,13 @@
 			</div>
 		{:else if isNewLotInputVisible}
 			<div class={slideBarStyle} transition:slide={{ duration: 200 }}>
-				<div class="grid grid-cols-8 gap-4">
+				<div class="flex w-full justify-center gap-4">
 					<div class="col-span-3 flex flex-col gap-2">
 						<Input
 							id="new-lot-title"
 							type="text"
 							placeholder="Название *"
-							onConfirmation={addNewLot}
+							onenter={addNewLot}
 							bind:value={lotTitle}
 							bind:ref={newLotTitleRef}
 						/>
@@ -246,17 +200,8 @@
 							id="new-lot-value"
 							type="number"
 							placeholder="Сумма *"
-							onConfirmation={addNewLot}
+							onenter={addNewLot}
 							bind:value={lotValue}
-						/>
-					</div>
-					<div class="col-span-2 flex flex-col gap-2">
-						<Input
-							id="new-lot-donator"
-							type="text"
-							placeholder="Никнейм"
-							onConfirmation={addNewLot}
-							bind:value={lotDonator}
 						/>
 					</div>
 					<Button onclick={addNewLot} disabled={!isValid}>Добавить</Button>

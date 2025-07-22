@@ -8,6 +8,7 @@
 		class?: string;
 		value?: string | number | null;
 		ref?: HTMLElement | null | undefined;
+		onenter?: () => void;
 		onConfirmation?: ((value: number | string | null) => void) | null;
 	}
 
@@ -17,12 +18,14 @@
 		class: className,
 		value = $bindable(type === 'number' ? null : ''),
 		ref = $bindable(null),
+		onenter,
 		onConfirmation,
 		...restProps
 	}: Props = $props();
 
 	function onkeydown(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
+			onenter?.();
 			ref?.blur();
 		}
 	}
