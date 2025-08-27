@@ -7,7 +7,7 @@ A donation-integrated auction system with a wheel of fortune to randomly select 
 - **Auction List** - Manage your list of lots/items
 - **Wheel of Fortune** - Random selection with visual spin animation
 - **Donation Integration** - Supports DonationAlerts & DonatePay
-- **Auto-Add Items** - Donation messages become auction lots
+- **Auto-Add Items By ID** - Donation messages become auction lots
 - **Re-spin Mechanic** - Donations can trigger re-spin
 
 ## 🎯 How It Works
