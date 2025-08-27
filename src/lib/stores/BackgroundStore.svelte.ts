@@ -16,7 +16,7 @@ class BackgroundStore {
   private _settings = storable<BackgroundSettings>({
     url: null,
     dimness: 70,
-    blur: 12,
+    blur: 0,
     isFlameEnabled: false,
     flameSizeTickSec: 15,
     flameSize1Price: 150,
