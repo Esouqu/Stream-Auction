@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   cookies.set(DONATEPAY_KEY_COOKIE, body.access_token, {
     path: '/',
     secure: !dev,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // year
   });
 
   return new Response('OK', { status: 200 });

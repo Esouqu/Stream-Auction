@@ -1,11 +1,7 @@
 <script lang="ts">
 	import '../app.css';
-	import {
-		Tooltip,
-		TooltipContent,
-		TooltipProvider,
-		TooltipTrigger
-	} from '$lib/components/ui/tooltip';
+
+	import { TooltipProvider } from '$lib/components/ui/tooltip';
 	import { onMount } from 'svelte';
 	import { updateLocalStorageVersion } from '$lib/utils';
 	import Timer from '$lib/components/Timer.svelte';
@@ -14,88 +10,76 @@
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import Background from '$lib/components/Background.svelte';
 	import SocketSelector from '$lib/components/SocketSelector.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import TrashIcon from 'lucide-svelte/icons/trash-2';
 	import UpdateDialog from '$lib/components/UpdateDialog.svelte';
 	import DonationAlertsSocket from '$lib/stores/DonationAlertsSocket.svelte';
 	import DonatePayCentrifuge from '$lib/stores/DonatePayCentrifuge.svelte';
 	import donatePayApi from '$lib/api/donatePayApi.svelte';
 	import DonationQueue from '$lib/components/donationQueue/DonationQueue.svelte';
 	import donationAlertsApi from '$lib/api/donationalertsApi.svelte';
+	import Sonner from '$lib/components/ui/sonner/sonner.svelte';
+	import LotList from '$lib/components/lotList/LotList.svelte';
+	import SpinExtendInfo from '$lib/components/SpinExtendInfo.svelte';
+	import { page } from '$app/stores';
+	import { MediaQuery } from 'svelte/reactivity';
 
 	const { children } = $props();
+
+	const isWheelPage = $derived($page.route.id === '/wheel');
 
 	setAppManagerContext(appManager);
 
 	onMount(async () => {
 		updateLocalStorageVersion(1);
-
-		appManager.setTheme(appManager.settings.theme);
-
 		addSockets();
 	});
 
 	async function addSockets() {
 		const user = await donationAlertsApi.getUser();
+
 		if (user) {
 			const donationAlertsSocket = new DonationAlertsSocket({
 				id: user.id,
 				socketToken: user.socket_connection_token
 			});
+
 			donationAlertsApi.setUser(user);
 			appManager.addSocket(donationAlertsSocket);
 		}
 
 		if (donatePayApi.user?.id) {
-			const donatePaySocket = new DonatePayCentrifuge({
-				id: donatePayApi.user.id
-			});
+			const donatePaySocket = new DonatePayCentrifuge({ id: donatePayApi.user.id });
+
 			appManager.addSocket(donatePaySocket);
 		}
 	}
+
+	const large = new MediaQuery('(min-width: 1536px)');
 </script>
 
+<!-- <div class="flex h-full max-h-[1080px] w-full max-w-[1920px]"> -->
 <TooltipProvider disableHoverableContent delayDuration={100}>
 	<UpdateDialog />
-	<Background />
 	<Sidebar />
 
-	<!-- <main class="relative mx-auto flex w-full max-w-[1920px] p-4"> -->
-	<main class="relative flex w-full p-4">
+	<main class="relative flex w-full overflow-hidden rounded-xl border p-4">
+		<Sonner richColors position="bottom-center" />
+		<Background />
+
 		{@render children()}
-		<div
-			class="relative m-auto flex h-full w-[29rem] min-w-[29rem] flex-col rounded-md border bg-card"
-			style="--tw-bg-opacity: {appManager.background.floatDimness}; --tw-border-opacity: {appManager
-				.background.floatDimness};"
-		>
+
+		<div class="relative flex h-full w-[26rem] shrink-0 flex-col gap-4">
 			<Timer />
-
-			<DonationQueue />
-
-			<div
-				class="grid grid-cols-[1fr_auto] items-center gap-2 border-t bg-secondary px-4 py-2"
-				style="--tw-bg-opacity: {appManager.background
-					.floatDimness}; --tw-border-opacity: {appManager.background.floatDimness};"
-			>
+			<SpinExtendInfo />
+			{#if isWheelPage && !large.current}
+				<div class="h-full overflow-hidden">
+					<LotList compact />
+				</div>
+			{/if}
+			<div class="flex h-full flex-col overflow-hidden rounded-2xl bg-card/40">
+				<DonationQueue />
 				<SocketSelector />
-				<Tooltip>
-					<TooltipTrigger>
-						{#snippet child({ props })}
-							<Button
-								{...props}
-								variant="ghost"
-								size="icon"
-								class="hover:bg-destructive hover:text-destructive-foreground"
-								disabled={appManager.donations.items.length === 0}
-								onclick={() => appManager.donations.clear()}
-							>
-								<TrashIcon />
-							</Button>
-						{/snippet}
-					</TooltipTrigger>
-					<TooltipContent>Очистить</TooltipContent>
-				</Tooltip>
 			</div>
 		</div>
 	</main>
 </TooltipProvider>
+<!-- </div> -->

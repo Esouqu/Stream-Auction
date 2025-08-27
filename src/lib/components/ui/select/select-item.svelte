@@ -1,12 +1,7 @@
 <script lang="ts">
-	import Check from 'lucide-svelte/icons/check';
-	import { Select as SelectPrimitive, type WithoutChild } from 'bits-ui';
-	import { cn } from '$lib/utils.js';
-	import Spinner from '$lib/components/Spinner.svelte';
-
-	interface Props {
-		loading?: boolean;
-	}
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import { Select as SelectPrimitive } from 'bits-ui';
+	import { cn, type WithoutChild } from '$lib/utils.js';
 
 	let {
 		ref = $bindable(null),
@@ -14,26 +9,24 @@
 		value,
 		label,
 		children: childrenProp,
-		loading,
 		...restProps
-	}: WithoutChild<SelectPrimitive.ItemProps> & Props = $props();
+	}: WithoutChild<SelectPrimitive.ItemProps> = $props();
 </script>
 
 <SelectPrimitive.Item
 	bind:ref
 	{value}
+	data-slot="select-item"
 	class={cn(
-		'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-primary data-[highlighted]:text-primary-foreground data-[disabled]:opacity-50',
+		"relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
 		className
 	)}
 	{...restProps}
 >
 	{#snippet children({ selected, highlighted })}
-		<span class="absolute left-2 flex size-3.5 items-center justify-center">
-			{#if loading}
-				<Spinner />
-			{:else if selected}
-				<Check class="size-4" />
+		<span class="absolute right-3 flex items-center justify-center">
+			{#if selected}
+				<CheckIcon class="stroke-3" />
 			{/if}
 		</span>
 		{#if childrenProp}

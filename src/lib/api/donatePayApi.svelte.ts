@@ -6,6 +6,12 @@ interface DonatePayUser {
   username: string;
 }
 
+interface TokenResponse {
+  token?: string;
+  apiKey?: string;
+  error?: string;
+}
+
 class DonatePayApi {
   private _user = storable<DonatePayUser | null>(null, 'donatePayUser');
 
@@ -21,11 +27,14 @@ class DonatePayApi {
     fetch('/api/donatepay/key', { method: 'DELETE' });
   }
 
-  public async getToken() {
+  public async getToken(): Promise<TokenResponse> {
     const response = await fetch('/api/donatepay/token');
 
     if (response.ok) {
       return await response.json() as { token: string, apiKey: string };
+    } else {
+      const error = await response.text();
+      return { error };
     }
   };
 

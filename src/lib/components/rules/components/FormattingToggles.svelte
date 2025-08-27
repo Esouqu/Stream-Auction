@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Editor } from 'svelte-tiptap';
-	import BoldIcon from 'lucide-svelte/icons/bold';
-	import ItalicIcon from 'lucide-svelte/icons/italic';
-	import UnderlineIcon from 'lucide-svelte/icons/underline';
-	import HighlighterIcon from 'lucide-svelte/icons/highlighter';
+	import BoldIcon from '@lucide/svelte/icons/bold';
+	import ItalicIcon from '@lucide/svelte/icons/italic';
+	import UnderlineIcon from '@lucide/svelte/icons/underline';
+	import HighlighterIcon from '@lucide/svelte/icons/highlighter';
 	import MenuButton from './MenuButton.svelte';
 	import ColorPicker from './ColorPicker.svelte';
 	import Color from 'color';

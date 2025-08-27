@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import type { ILot } from '$lib/interfaces';
-	import { remToPx } from '$lib/utils';
 	import { flip } from 'svelte/animate';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 
@@ -18,8 +17,7 @@
 	let { items, scrollElement = $bindable(null), empty, children }: Props = $props();
 
 	let scrollTop = $state(0);
-	let itemHeight = $state(remToPx(2.5));
-	// let itemHeight = $derived.by(() => remToPx(itemSize));
+	let itemHeight = $state(40);
 	let itemsBufferHeight = $derived(itemsBuffer * itemHeight);
 	let minHeight = $state(0);
 	let visibleItems: (ILot & { position: number })[] = $state([]);
@@ -51,14 +49,7 @@
 		}
 	});
 
-	// $effect(() => {
-	// 	if (scrollElement) {
-	// 		minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedItems.length);
-	// 	}
-	// });
-
 	function onresize() {
-		itemHeight = remToPx(2.5);
 		if (scrollElement) {
 			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedItems.length);
 		}
@@ -73,7 +64,7 @@
 
 <svelte:window {onresize} />
 
-<ScrollArea class="relative flex h-full" bind:ref={scrollElement} {onscroll}>
+<ScrollArea class="relative flex h-full overflow-hidden" bind:ref={scrollElement} {onscroll}>
 	<div
 		class="grid grid-flow-row transition-[height] [&_div:last-child]:border-0"
 		style="grid-auto-rows: {itemHeight}px; height: {minHeight}px;"
@@ -82,7 +73,7 @@
 			<div
 				class="flex border-b"
 				style="grid-row: {item.position};"
-				animate:flip={{ duration: 300 }}
+				animate:flip={{ duration: 400 }}
 			>
 				{@render children(item)}
 			</div>

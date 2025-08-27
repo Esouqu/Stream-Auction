@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TrashcanIcon from 'lucide-svelte/icons/trash-2';
+	import TrashcanIcon from '@lucide/svelte/icons/trash-2';
 	import {
 		AlertDialog,
 		AlertDialogAction,
@@ -29,10 +29,7 @@
 
 <AlertDialog bind:open={isAlertOpened}>
 	<AlertDialogTrigger
-		class={cn(
-			buttonVariants({ variant: 'ghost', size: 'icon' }),
-			'hover:bg-destructive hover:text-destructive-foreground'
-		)}
+		class={cn(buttonVariants({ variant: 'ghost', size: 'icon' }))}
 		disabled={lots.isEmpty}
 	>
 		<TrashcanIcon />
@@ -45,9 +42,9 @@
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel>Отмена</AlertDialogCancel>
-			<AlertDialogAction class={buttonVariants({ variant: 'destructive' })} onclick={onAlertAction}
-				>Удалить</AlertDialogAction
-			>
+			<AlertDialogAction class={buttonVariants({ variant: 'destructive' })} onclick={onAlertAction}>
+				Удалить
+			</AlertDialogAction>
 		</AlertDialogFooter>
 	</AlertDialogContent>
 </AlertDialog>

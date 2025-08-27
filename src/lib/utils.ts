@@ -1,10 +1,17 @@
-import { browser } from "$app/environment";
-import { type ClassValue, clsx } from "clsx";
+import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { browser } from "$app/environment";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, "children"> : T;
+export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
+export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
 export function randomFromRange(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -84,13 +91,13 @@ export function formatDate(date: Date) {
 }
 
 export function formatTime(ms: number) {
-	const hours = Math.floor(ms / 3600000);
-	const min = Math.floor((ms % 3600000) / 60000);
+	// const hours = Math.floor(ms / 3600000);
+	const min = Math.floor(ms / 60000);
 	const sec = Math.floor((ms % 60000) / 1000);
 	const remainingMs = Math.floor((ms % 1000) / 10);
 
 	return {
-		hours: hours,
+		// hours: hours,
 		minutes: min,
 		seconds: sec,
 		ms: remainingMs

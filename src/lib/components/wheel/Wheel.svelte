@@ -5,9 +5,10 @@
 	import { onMount, tick, untrack } from 'svelte';
 	import Pointer from './components/Pointer.svelte';
 	import Outline from './components/Outline.svelte';
-	import InnerHole from './components/InnerHole.svelte';
+	import Core from './components/Core.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import type { ILot } from '$lib/interfaces';
+	import gsap from 'gsap';
 
 	interface ILotWithAngle extends ILot {
 		startAngle: number;
@@ -19,6 +20,8 @@
 	}
 
 	const { patternImage }: Props = $props();
+
+	const strokeColor = '#27272a';
 
 	const textMinAngleCap = 5;
 	const app = getAppManagerContext();
@@ -37,8 +40,8 @@
 	let radius = $derived(Math.floor(Math.min(resizeHeight, resizeWidth) / 2.25));
 	let holeSize = $derived(radius / 1.5);
 	let textOffsetFromCenter = $derived(Math.min(1, Math.max(0, (radius * 0.38) / radius)));
-	let textSize = $derived((radius / 100) * 4.5);
-	let fontStyle = $derived(`700 ${textSize}px sans-serif`);
+	let textSize = $derived((radius / 100) * 5);
+	let fontStyle = $derived(`700 ${textSize}px Geist`);
 	let maxSliceTextWidth = $derived(radius / 2);
 	let lineWidth = $derived(lotsWithAngles.length > 300 ? 1 : 3);
 
@@ -108,7 +111,7 @@
 	function drawStroke(centerX: number, centerY: number, progress: number) {
 		if (!ctx) return;
 
-		ctx.strokeStyle = '#27272a';
+		ctx.strokeStyle = strokeColor;
 		ctx.lineWidth = lineWidth;
 
 		ctx.beginPath();
@@ -138,7 +141,7 @@
 		const textX = radius + radius * textOffsetFromCenter * cosMidAngle;
 		const textY = radius + radius * textOffsetFromCenter * sinMidAngle;
 
-		ctx.fillStyle = 'white';
+		ctx.fillStyle = 'white'; // white
 		ctx.strokeStyle = 'black';
 		ctx.lineWidth = 4;
 
@@ -174,7 +177,7 @@
 			ctx.fill();
 		}
 
-		ctx.fillStyle = `rgb(${color.r} ${color.g} ${color.b} / 90%)`;
+		ctx.fillStyle = `rgb(${color.r} ${color.g} ${color.b} / ${pattern ? '90%' : '100%'})`;
 		ctx.fill();
 	}
 
@@ -295,22 +298,57 @@
 		document.body.classList.add('grabbing');
 		draggingStartAngle = Math.atan2(e.clientY - wheelY, e.clientX - wheelX);
 	}
+
+	// function onwheel(e: WheelEvent) {
+	// 	e.preventDefault();
+
+	// 	if (!winner) return;
+
+	// 	const direction = e.deltaY > 0 ? 1 : -1;
+	// 	const idx = lotsWithAngles.findIndex((item) => item.id === winner.id);
+	// 	let next = lotsWithAngles[(idx + direction) % lotsWithAngles.length];
+
+	// 	if (!next) {
+	// 		if (direction === 1) {
+	// 			next = lotsWithAngles[0];
+	// 		} else {
+	// 			next = lotsWithAngles[lotsWithAngles.length - 1];
+	// 		}
+	// 	}
+
+	// 	console.log(next.title);
+
+	// 	const nextAngle = (next.startAngle + next.endAngle) / 2;
+	// 	let rotation = wheel.rotation;
+
+	// 	if (direction === -1) {
+	// 		rotation = wheel.rotation - ((wheel.rotation + nextAngle) % 360) + 360;
+	// 	} else {
+	// 		rotation = wheel.rotation - ((wheel.rotation + nextAngle) % 360) - 360;
+	// 	}
+
+	// 	gsap.to(wheel, {
+	// 		rotation: rotation,
+	// 		duration: 0.2,
+	// 		ease: 'power1.out'
+	// 	});
+	// }
 </script>
 
 <svelte:window {onresize} {onmousemove} {onmouseup} />
 
 <div
-	class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden p-4"
+	class="relative flex h-full w-full flex-col items-center justify-center p-4"
 	bind:this={containerRef}
 >
 	<div class="relative flex">
 		{#if radius > 0}
-			<InnerHole {winner} size={holeSize} {patternImage} />
-			<Outline color={Color(winner?.color).hex()} />
+			<Core {strokeColor} {winner} size={holeSize} {patternImage} />
+			<Outline {strokeColor} color={Color(winner?.color).hex()} />
 			<Pointer trigger={winner?.id} />
 		{/if}
 		<div
-			class="cursor-grab select-none data-[inactive=true]:pointer-events-none data-[grabbing=true]:cursor-grabbing"
+			class="cursor-grab select-none data-[grabbing=true]:cursor-grabbing data-[inactive=true]:pointer-events-none"
 			data-grabbing={isDragging}
 			data-inactive={wheel.isSpinning || wheel.isDelayed}
 			style="transform: rotate({wheel.rotation}deg);"

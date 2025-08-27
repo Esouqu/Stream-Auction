@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import UploadIcon from 'lucide-svelte/icons/upload';
-	import DownloadIcon from 'lucide-svelte/icons/download';
+	import UploadIcon from '@lucide/svelte/icons/upload';
+	import DownloadIcon from '@lucide/svelte/icons/download';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
+	import { Input } from '$lib/components/ui/input';
 
 	const { lots } = getAppManagerContext();
 	const fileName = 'лоты.csv';
@@ -50,33 +50,32 @@
 	}
 </script>
 
-<div class="flex">
-	<Input
-		type="file"
-		id="fileElem"
-		accept=".csv"
-		style="display: none;"
-		onchange={handleFileInput}
-		bind:ref={fileImportRef}
-	/>
-	<Tooltip>
-		<TooltipTrigger>
-			{#snippet child({ props })}
-				<Button {...props} variant="ghost" size="icon" onclick={() => fileImportRef?.click()}>
-					<UploadIcon />
-				</Button>
-			{/snippet}
-		</TooltipTrigger>
-		<TooltipContent>Загрузить</TooltipContent>
-	</Tooltip>
-	<Tooltip>
-		<TooltipTrigger>
-			{#snippet child({ props })}
-				<Button {...props} variant="ghost" size="icon" onclick={() => downloadLotsAsCSV()}>
-					<DownloadIcon />
-				</Button>
-			{/snippet}
-		</TooltipTrigger>
-		<TooltipContent>Сохранить</TooltipContent>
-	</Tooltip>
-</div>
+<Input
+	type="file"
+	id="fileElem"
+	accept=".csv"
+	class="hidden"
+	onchange={handleFileInput}
+	bind:ref={fileImportRef}
+/>
+
+<Tooltip>
+	<TooltipTrigger>
+		{#snippet child({ props })}
+			<Button {...props} variant="ghost" size="icon" onclick={() => fileImportRef?.click()}>
+				<UploadIcon />
+			</Button>
+		{/snippet}
+	</TooltipTrigger>
+	<TooltipContent>Загрузить</TooltipContent>
+</Tooltip>
+<Tooltip>
+	<TooltipTrigger>
+		{#snippet child({ props })}
+			<Button {...props} variant="ghost" size="icon" onclick={downloadLotsAsCSV}>
+				<DownloadIcon />
+			</Button>
+		{/snippet}
+	</TooltipTrigger>
+	<TooltipContent>Сохранить</TooltipContent>
+</Tooltip>

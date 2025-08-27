@@ -1,10 +1,7 @@
 <script lang="ts">
-	interface Props {
-		size?: string;
-		color?: string;
-	}
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	const { size = '1.5rem', color = 'currentColor' }: Props = $props();
+	const { ...props }: HTMLAttributes<SVGSVGElement> = $props();
 </script>
 
 <svg
@@ -14,12 +11,13 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	x="0px"
 	y="0px"
-	width={size}
-	height={size}
-	fill={color}
+	width="24"
+	height="24"
+	fill="currentColor"
 	viewBox="0 0 2400 2800"
 	style="enable-background:new 0 0 2400 2800;"
 	xml:space="preserve"
+	{...props}
 >
 	<g id="Layer_1-2">
 		<path

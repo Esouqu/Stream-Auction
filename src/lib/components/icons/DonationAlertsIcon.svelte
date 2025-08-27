@@ -1,24 +1,25 @@
 <script lang="ts">
-	interface Props {
-		class?: string;
-		size?: string;
-		color?: string;
-	}
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	const { class: className, size = '1.5rem', color = 'currentColor' }: Props = $props();
+	const { ...props }: HTMLAttributes<SVGSVGElement> = $props();
 </script>
 
 <svg
-	class={className}
-	width={size}
-	height={size}
+	width="24"
+	height="24"
 	viewBox="0 0 69 80"
 	version="1.1"
 	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
+	{...props}
 >
 	<g id="Dashboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-		<g id="Brand" transform="translate(-536.000000, -275.000000)" fill={color} fill-rule="nonzero">
+		<g
+			id="Brand"
+			transform="translate(-536.000000, -275.000000)"
+			fill="currentColor"
+			fill-rule="nonzero"
+		>
 			<g id="Logos" transform="translate(390.000000, 120.000000)">
 				<g id="1" transform="translate(0.000000, 120.000000)">
 					<g id="DA_Alert" transform="translate(146.000000, 35.000000)">

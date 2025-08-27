@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { type IDonation } from '$lib/stores/DonationStore.svelte';
 	import { fly } from 'svelte/transition';
-	import PlusIcon from 'lucide-svelte/icons/list-plus';
-	import XIcon from 'lucide-svelte/icons/x';
+	import PlusIcon from '@lucide/svelte/icons/list-plus';
+	import XIcon from '@lucide/svelte/icons/x';
 	import DonationAlertsIcon from '../../icons/DonationAlertsIcon.svelte';
 	import { Button } from '../../ui/button';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
@@ -51,7 +51,7 @@
 </script>
 
 <div
-	class="relative grid w-full select-none grid-cols-[auto_1fr_auto] overflow-hidden rounded-md border data-[interactive=false]:select-auto data-[dragged=true]:opacity-30 data-[dragged=true]:grayscale data-[dragged=true]:transition-none"
+	class="relative grid w-full grid-cols-[auto_1fr_auto] overflow-hidden rounded-lg select-none data-[dragged=true]:opacity-30 data-[dragged=true]:grayscale data-[dragged=true]:transition-none data-[interactive=false]:select-auto"
 	data-dragged={isDragged}
 	data-interactive={isInteractive}
 	draggable={!isInstant && isInteractive}
@@ -71,7 +71,7 @@
 		</div>
 	{/if}
 
-	<div class="relative z-20 flex w-full flex-col overflow-hidden bg-card text-sm">
+	<div class="relative z-20 flex w-full flex-col overflow-hidden bg-card">
 		{#if isInstant}
 			<div class="flex w-full justify-between gap-4 p-4">
 				<div>{message}</div>
@@ -89,11 +89,11 @@
 			</div>
 			{#if isInteractive}
 				<div class="flex w-full">
-					<Button variant="ghost" size="icon" class="w-full" onclick={addNewLot}>
+					<Button variant="ghost" size="icon" class="w-full shrink" onclick={addNewLot}>
 						<PlusIcon />
 					</Button>
 
-					<Button variant="ghost" size="icon" class="w-full" onclick={removeDonation}>
+					<Button variant="ghost" size="icon" class="w-full shrink" onclick={removeDonation}>
 						<XIcon />
 					</Button>
 				</div>

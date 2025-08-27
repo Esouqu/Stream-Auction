@@ -21,12 +21,12 @@
 			Авторизоваться
 		</Button>
 	{:else}
-		<Card class="flex w-full justify-between">
-			<CardHeader class="p-4">
+		<Card class="flex w-full flex-row justify-between">
+			<CardHeader class="grow gap-0">
 				<CardTitle>{title}</CardTitle>
-				<CardDescription class="text-xs">Пользователь: {username}</CardDescription>
+				<CardDescription class="text-sm">{username}</CardDescription>
 			</CardHeader>
-			<CardContent class="p-4">
+			<CardContent class="flex items-center">
 				<Button variant="ghost" onclick={onLogout}>Выйти</Button>
 			</CardContent>
 		</Card>

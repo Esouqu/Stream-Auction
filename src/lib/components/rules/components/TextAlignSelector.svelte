@@ -1,11 +1,11 @@
 <script lang="ts">
-	import AlignLeftIcon from 'lucide-svelte/icons/align-left';
-	import AlignRightIcon from 'lucide-svelte/icons/align-right';
-	import AlignCenterIcon from 'lucide-svelte/icons/align-center';
-	import AlignJustifyIcon from 'lucide-svelte/icons/align-justify';
+	import AlignLeftIcon from '@lucide/svelte/icons/align-left';
+	import AlignRightIcon from '@lucide/svelte/icons/align-right';
+	import AlignCenterIcon from '@lucide/svelte/icons/align-center';
+	import AlignJustifyIcon from '@lucide/svelte/icons/align-justify';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import Select, { type ISelectItem } from '$lib/components/Select.svelte';
 	import type { Editor } from 'svelte-tiptap';
-	import ChevronDownIcon from 'lucide-svelte/icons/chevron-down';
 
 	interface Props {
 		editor: Editor;

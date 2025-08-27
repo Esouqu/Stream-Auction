@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Input from '$lib/components/Input.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import PlusIcon from 'lucide-svelte/icons/plus';
-	import XIcon from 'lucide-svelte/icons/x';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import XIcon from '@lucide/svelte/icons/x';
 	import { onMount, untrack } from 'svelte';
 	import type { Editor } from 'svelte-tiptap';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
@@ -50,16 +50,13 @@
 	}
 </script>
 
-<div
-	class="relative flex items-center border-t bg-secondary px-4 py-2"
-	style="--tw-bg-opacity: {background.floatDimness}; --tw-border-opacity: {background.floatDimness};"
->
+<div class="relative flex items-center p-4">
 	<div class="flex w-full rounded-md border">
 		<Input
 			id="preset-name"
 			type="text"
 			placeholder="Название"
-			class="rounded-br-none rounded-tr-none border-transparent hover:bg-muted focus-visible:bg-transparent"
+			class="rounded-tr-none rounded-br-none border-transparent"
 			bind:ref={nameInputRef}
 			bind:value={rulePresets.items[rulePresets.current].label}
 		/>
@@ -75,8 +72,8 @@
 					'rounded-l-none rounded-r-md border-none bg-transparent'
 				)}
 			/>
-			<SelectContent align="end">
-				{#each rulePresets.items as { id, label }, idx}
+			<SelectContent class="w-[384px]" align="end">
+				{#each rulePresets.items as { label }, idx}
 					<div class="flex">
 						<SelectItem value={String(idx)} {label} />
 						<Button
@@ -89,8 +86,14 @@
 						</Button>
 					</div>
 				{/each}
-				<Button variant="ghost" size="icon" class="mt-1 w-full" onclick={createPreset}>
+				<Button
+					variant="ghost"
+					size="icon"
+					class="mt-1 w-full text-muted-foreground"
+					onclick={createPreset}
+				>
 					<PlusIcon />
+					Новый пресет
 				</Button>
 			</SelectContent>
 		</Select>

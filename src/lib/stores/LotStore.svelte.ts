@@ -127,6 +127,24 @@ class LotStore {
     dispatchEvent(new CustomEvent('__newLot', { detail: item }));
   }
 
+  public async randomizeColors() {
+    if (!this._items) return;
+
+    const update = this._items.map((item) => {
+      const color = this._randomColor.get();
+      const { r, g, b } = color.object();
+
+      return {
+        key: item.id,
+        changes: {
+          color: { r, g, b },
+        }
+      };
+    });
+
+    db.lots.bulkUpdate(update);
+  }
+
   private _addToNewLotsArray(lot: ILot) {
     this._newelyAddedLots.push(lot);
 
@@ -136,7 +154,7 @@ class LotStore {
       if (index > -1) {
         this._newelyAddedLots.splice(index, 1);
       }
-    }, 7000);
+    }, 5000);
   }
 
   private _addToAddedValuesArray(data: IAddedValueData) {

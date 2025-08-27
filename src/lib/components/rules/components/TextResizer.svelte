@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Input from '$lib/components/Input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import PlusIcon from 'lucide-svelte/icons/plus';
-	import MinusIcon from 'lucide-svelte/icons/minus';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import MinusIcon from '@lucide/svelte/icons/minus';
 	import type { Editor } from 'svelte-tiptap';
 
 	interface Props {
@@ -26,7 +26,7 @@
 		const textStyle = editor.getAttributes('textStyle').fontSize;
 		const parsedValue = parseInt(textStyle, 10); // might be NaN
 
-		return parsedValue || 14;
+		return parsedValue || 16;
 	}
 </script>
 
@@ -42,7 +42,7 @@
 	<Input
 		id="editor-menu-text-size"
 		type="number"
-		class="w-[3.25rem] bg-transparent text-center hover:bg-white/10"
+		class="w-[56px] bg-transparent text-center hover:bg-white/10"
 		value={fontSize}
 		onConfirmation={(value) => setFontSize(value as number)}
 	/>

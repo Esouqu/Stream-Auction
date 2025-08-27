@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SpinnerIcon from 'lucide-svelte/icons/loader-circle';
+	import SpinnerIcon from '@lucide/svelte/icons/loader-circle';
 	import { cn } from '$lib/utils';
 
 	interface Props {

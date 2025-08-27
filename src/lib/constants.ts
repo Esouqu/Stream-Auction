@@ -3,42 +3,23 @@ import Color from "color";
 export const degreesToRadians = Math.PI / 180;
 export const radiansToDegrees = 180 / Math.PI;
 export const colors: Color[] = [
-  Color('#ef4444'), // red
-  Color('#f97316'), // orange
-  Color('#f59e0b'), // amber
-  Color('#eab308'), // yellow
-  Color('#84cc16'), // lime
-  Color('#22c55e'), // green
-  Color('#10b981'), // emerald
-  Color('#14b8a6'), // teal
-  Color('#06b6d4'), // cyan
-  Color('#0ea5e9'), // sky
-  Color('#3b82f6'), // blue
-  Color('#6366f1'), // indigo
-  Color('#8b5cf6'), // violet
-  Color('#a855f7'), // purple
-  Color('#d946ef'), // fuchsia
-  Color('#ec4899'), // pink
+  Color('#fb2c36'), // red
+  Color('#ff6900'), // orange
+  Color('#fe9a00'), // amber
+  Color('#f0b100'), // yellow
+  Color('#7ccf00'), // lime
+  Color('#00c951'), // green
+  Color('#00bc7d'), // emerald
+  Color('#00bba7'), // teal
+  Color('#00b8db'), // cyan
+  Color('#00a6f4'), // sky
+  Color('#2b7fff'), // blue
+  Color('#615fff'), // indigo
+  Color('#8e51ff'), // violet
+  Color('#ad46ff'), // purple
+  Color('#e12afb'), // fuchsia
+  Color('#f6339a'), // pink
   // Color('#f43f5e'),
-];
-
-export const themes = [
-  { theme: 'theme-white', color: Color('white') },
-  { theme: 'theme-red', color: colors[0] },
-  { theme: 'theme-orange', color: colors[1] },
-  { theme: 'theme-yellow', color: colors[3] },
-  { theme: 'theme-lime', color: colors[4] },
-  { theme: 'theme-green', color: colors[5] },
-  { theme: 'theme-emerald', color: colors[6] },
-  { theme: 'theme-teal', color: colors[7] },
-  { theme: 'theme-cyan', color: colors[8] },
-  { theme: 'theme-sky', color: colors[9] },
-  { theme: 'theme-blue', color: colors[10] },
-  { theme: 'theme-indigo', color: colors[11] },
-  { theme: 'theme-violet', color: colors[12] },
-  { theme: 'theme-purple', color: colors[13] },
-  { theme: 'theme-fuchsia', color: colors[14] },
-  { theme: 'theme-pink', color: colors[15] },
 ];
 
 export const patterns = [

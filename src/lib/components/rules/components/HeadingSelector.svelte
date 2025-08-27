@@ -1,11 +1,11 @@
 <script lang="ts">
-	import ListOrderedIcon from 'lucide-svelte/icons/list-ordered';
-	import ListIcon from 'lucide-svelte/icons/list';
+	import ListOrderedIcon from '@lucide/svelte/icons/list-ordered';
+	import ListIcon from '@lucide/svelte/icons/list';
+	import HeadingIcon from '@lucide/svelte/icons/heading';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import Select, { type ISelectItem } from '$lib/components/Select.svelte';
-	import HeadingIcon from 'lucide-svelte/icons/heading';
 	import type { Editor } from 'svelte-tiptap';
 	import MenuButton from './MenuButton.svelte';
-	import ChevronDownIcon from 'lucide-svelte/icons/chevron-down';
 
 	type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
