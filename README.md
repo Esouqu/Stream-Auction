@@ -1,38 +1,26 @@
-# sv
+# Auction Wheel
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A donation-integrated auction system with a wheel of fortune to randomly select items.
 
-## Creating a project
+## ✨ Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Auction List** - Manage your list of lots/items
+- **Wheel of Fortune** - Random selection with visual spin animation
+- **Donation Integration** - Supports DonationAlerts & DonatePay
+- **Auto-Add Items** - Donation messages become auction lots
+- **Re-spin Mechanic** - Donations can trigger re-spin
 
-```bash
-# create a new project in the current directory
-npx sv create
+## 🎯 How It Works
 
-# create a new project in my-app
-npx sv create my-app
-```
+1. **Donors** send donations with messages via DonationAlerts or DonatePay
+2. **Add Messages** to your auction list
+3. **Spin the wheel** to randomly pick the winner
+4. **Special donations** can trigger immediate re-spins!
 
-## Developing
+## ⚙️ Setup
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+1. Connect your DonationAlerts/DonatePay
+2. Configure donation settings
+3. Set your countdown timer duration
+4. Add initial items to your auction list
+5. Start spinning!
