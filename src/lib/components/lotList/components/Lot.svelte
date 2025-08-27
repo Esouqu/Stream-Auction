@@ -208,6 +208,7 @@
 			placeholder="Сумма"
 			onConfirmation={setValue}
 			suffix={percent}
+			suffixSize="sm"
 			{value}
 		/>
 	</div>

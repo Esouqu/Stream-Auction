@@ -6,6 +6,7 @@
 		id: string;
 		type: 'file' | Exclude<HTMLInputTypeAttribute, 'file'>;
 		suffix?: string;
+		suffixSize?: 'sm' | 'default';
 		class?: string;
 		style?: string;
 		value?: string | number | null;
@@ -18,6 +19,7 @@
 		id,
 		type,
 		suffix,
+		suffixSize = 'default',
 		class: className,
 		style,
 		value = $bindable(type === 'number' ? null : ''),
@@ -55,7 +57,8 @@
 			{placeholder}
 		/>
 		<span
-			class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground"
+			class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground data-[suffix-size=sm]:right-2 data-[suffix-size=sm]:text-sm"
+			data-suffix-size={suffixSize}
 		>
 			{suffix}
 		</span>
