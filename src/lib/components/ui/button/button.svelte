@@ -11,7 +11,7 @@
 					'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary active:outline-primary',
 				destructive:
 					'bg-destructive text-foreground hover:bg-destructive/90 active:bg-destructive active:outline-destructive',
-				outline: 'bg-background hover:bg-accent hover:text-accent-foreground border',
+				outline: 'bg-elevation-2 hover:bg-accent hover:text-accent-foreground border',
 				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				ghost: 'hover:bg-accent/70 hover:text-foreground active:bg-accent active:outline-accent',
 				link: 'text-primary underline-offset-4 hover:underline',
@@ -20,7 +20,7 @@
 			size: {
 				default: 'h-10 px-4 py-2 has-[>svg]:px-3',
 				sm: 'h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5',
-				lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+				lg: 'h-12 rounded-md px-6 has-[>svg]:px-4',
 				icon: 'size-10',
 				sidebar: "[&_svg:not([class*='size-'])]:!size-8 py-1 px-5"
 			}

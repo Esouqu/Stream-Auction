@@ -26,7 +26,7 @@
 	}
 </script>
 
-<Dialog open={haveSeenUpdates} {onOpenChange}>
+<Dialog open={!haveSeenUpdates} {onOpenChange}>
 	<DialogTrigger class="absolute" />
 	<DialogContent class="w-[600px] gap-0">
 		<DialogHeader>
