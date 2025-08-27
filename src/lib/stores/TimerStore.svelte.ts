@@ -26,6 +26,7 @@ class TimerStore {
   private _animationStartTime = 0;
   private _animationPausedTime = 0;
   private _defaultAdjustmentMs = 60000;
+  private _maxTime = 60 * 60 * 1000;
   private _queue: number[] = [];
 
   public async start(ms?: number) {
@@ -53,7 +54,9 @@ class TimerStore {
   }
 
   public add(ms = this._defaultAdjustmentMs) {
-    this._adjustTime(ms);
+    const newTime = this._time.target + ms;
+
+    if (newTime <= this._maxTime) this._adjustTime(ms);
   }
 
   public async reset() {
@@ -67,8 +70,8 @@ class TimerStore {
   }
 
   public async setTime(ms: number) {
-    this._currentTime = ms;
-    await this._time.set(ms);
+    this._currentTime = Math.min(ms, this._maxTime);
+    await this._time.set(this._currentTime);
   }
 
   public async setSeconds(seconds: number) {
@@ -79,17 +82,17 @@ class TimerStore {
   }
 
   public async setMinutes(minutes: number) {
-    const hours = Math.floor(this._time.target / 3600000);
+    // const hours = Math.floor(this._time.target / 3600000);
     const seconds = this._time.target % 60000;
-    await this.setTime((hours * 3600000) + (minutes * 60000) + seconds);
+    await this.setTime((minutes * 60000) + seconds);
     this._saveBaseTime();
   }
 
-  public async setHours(hours: number) {
-    const currentMinutesAndSeconds = this._time.target % 3600000;
-    await this.setTime((hours * 3600000) + currentMinutesAndSeconds);
-    this._saveBaseTime();
-  }
+  // public async setHours(hours: number) {
+  //   const currentMinutesAndSeconds = this._time.target % 3600000;
+  //   await this.setTime((hours * 3600000) + currentMinutesAndSeconds);
+  //   this._saveBaseTime();
+  // }
 
   public async setMilliseconds(milliseconds: number) {
     const currentHoursMinutesAndSeconds = this._time.target - (this._time.target % 1000);

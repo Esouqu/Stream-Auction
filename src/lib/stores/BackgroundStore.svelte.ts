@@ -3,6 +3,7 @@ import storable from "./LocalStore.svelte";
 interface BackgroundSettings {
   url: string | null;
   dimness: number;
+  blur: number;
   isFlameEnabled: boolean;
   flameSizeTickSec: number;
   flameSize1Price: number;
@@ -15,6 +16,7 @@ class BackgroundStore {
   private _settings = storable<BackgroundSettings>({
     url: null,
     dimness: 70,
+    blur: 0,
     isFlameEnabled: false,
     flameSizeTickSec: 15,
     flameSize1Price: 150,
@@ -76,6 +78,7 @@ class BackgroundStore {
   get settings() { return this._settings.value; }
   get url() { return this.settings.url; }
   get dimness() { return this.settings.dimness; }
+  get blur() { return this.settings.blur; }
   get currentFlameSize() { return this._currentFlameSize; }
 }
 

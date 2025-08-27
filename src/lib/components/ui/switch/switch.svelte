@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Switch as SwitchPrimitive, type WithoutChildrenOrChild } from "bits-ui";
-	import { cn } from "$lib/utils.js";
+	import { Switch as SwitchPrimitive } from 'bits-ui';
+	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
 
 	let {
 		ref = $bindable(null),
@@ -13,15 +13,17 @@
 <SwitchPrimitive.Root
 	bind:ref
 	bind:checked
+	data-slot="switch"
 	class={cn(
-		"focus-visible:ring-ring focus-visible:ring-offset-background data-[state=checked]:bg-primary data-[state=unchecked]:bg-input peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+		'peer inline-flex h-[1.5rem] w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent shadow-xs transition-all outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-accent data-[state=unchecked]:bg-input',
 		className
 	)}
 	{...restProps}
 >
 	<SwitchPrimitive.Thumb
+		data-slot="switch-thumb"
 		class={cn(
-			"bg-background pointer-events-none block size-5 rounded-full shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+			'pointer-events-none block size-5 rounded-full bg-foreground ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-1px)] data-[state=unchecked]:translate-x-[3px]'
 		)}
 	/>
 </SwitchPrimitive.Root>

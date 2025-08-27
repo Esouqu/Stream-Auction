@@ -3,7 +3,7 @@
 	import Rules from '$lib/components/rules/Rules.svelte';
 </script>
 
-<!-- 
+<!--
 <ResizablePaneGroup class="mr-4 w-full" direction="horizontal" autoSaveId="lotListAndRules">
 	<ResizablePane class="flex w-full" defaultSize={35}>
 		<Rules />
@@ -15,10 +15,10 @@
 </ResizablePaneGroup> -->
 
 <div class="flex w-full">
-	<div class="flex h-full min-w-[29rem]">
+	<div class="hidden h-full w-full max-w-[26rem] 2xl:flex">
 		<Rules />
 	</div>
 	<div class="mx-4 flex w-full">
-		<LotList isCompact={false} />
+		<LotList />
 	</div>
 </div>

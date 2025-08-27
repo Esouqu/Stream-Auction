@@ -40,8 +40,6 @@ export class AppManager {
 		newLeaderBonusSec: 60,
 		newLotBonusSec: 30,
 		newDonationBonusSec: 60,
-		// interface
-		theme: 'theme-white',
 	}, 'appSettings');
 	private _previousSpinExtendPrice = $state(this.settings.spinExtendBasePrice);
 	private _spinExtendPrice = $state(this.settings.spinExtendBasePrice);
@@ -53,6 +51,7 @@ export class AppManager {
 
 	private _celebrationAudios: HTMLAudioElement[] = [];
 	private _dingAudio: HTMLAudioElement | undefined;
+	private _IsInstantDonationCooldown = false;
 
 	constructor() {
 		if (browser) {
@@ -96,11 +95,11 @@ export class AppManager {
 
 	private _loadAudio() {
 		this._dingAudio = new Audio('https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/sounds/ding-7jemxPSHTFunK7cggRmYI5ikvecUaf.mp3');
-		this._dingAudio.volume = 0.05;
+		this._dingAudio.volume = 0.1;
 
 		for (const sound of sounds) {
 			const audio = new Audio(sound);
-			audio.volume = 0.05;
+			audio.volume = 0.1;
 
 			this._celebrationAudios.push(audio);
 		}
@@ -122,15 +121,6 @@ export class AppManager {
 		if (this.timer.isActive && !this.wheel.isActive && this.settings.isAutoAddTimeEnabled) {
 			this.timer.add(this.settings.newLotBonusSec * 1000);
 		}
-	}
-
-	public setTheme(theme: string) {
-		document.body.classList.forEach((cls) => {
-			if (cls.startsWith('theme-')) document.body.classList.remove(cls);
-		});
-
-		this.settings.theme = theme;
-		document.body.classList.add(theme);
 	}
 
 	public splitDonationAndAddLots(id: string, donations: Omit<IDonation, 'id' | 'isInstant'>[]) {
@@ -205,9 +195,16 @@ export class AppManager {
 				this._spinExtendPrice = this.settings.spinExtendBasePrice;
 				this._fireConfetti();
 
+				this._IsInstantDonationCooldown = true;
+
+				setTimeout(() => {
+					this._IsInstantDonationCooldown = false;
+				}, 10000);
+
 				setTimeout(() => {
 					this._playAudio();
-				}, 50)
+				}, 50);
+
 				break;
 		}
 	}
@@ -322,7 +319,7 @@ export class AppManager {
 
 		if (this.settings.isSpinExtendEnabled && this.wheel.isActive) {
 			this._activateEvent(donation, lot);
-		} else if (lot) {
+		} else if (lot && !this._IsInstantDonationCooldown) {
 			this._addDonationToLot(donation, lot);
 		} else {
 			this._addDonation(donation);

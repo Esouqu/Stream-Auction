@@ -3,8 +3,8 @@
 	import type { IDonationSocket } from '$lib/interfaces';
 	import { Toggle } from './ui/toggle';
 	import Spinner from './Spinner.svelte';
-	import XIcon from 'lucide-svelte/icons/circle-dashed';
-	import CheckIcon from 'lucide-svelte/icons/circle-check';
+	import DashedCircleIcon from '@lucide/svelte/icons/circle-dashed';
+	import CheckIcon from '@lucide/svelte/icons/circle-check';
 
 	const app = getAppManagerContext();
 
@@ -14,20 +14,19 @@
 	}
 </script>
 
-<div>
+<div class="flex justify-center gap-2 p-4">
 	{#each app.donationSockets as socket}
 		<Toggle
-			class="group data-[state=off]:text-muted-foreground data-[state=on]:text-foreground"
 			onclick={() => toggleConnection(socket)}
 			disabled={socket.isConnecting}
-			pressed={socket.isOpen}
+			bind:pressed={socket.isOpen}
 		>
 			{#if socket.isConnecting}
 				<Spinner />
 			{:else if socket.isOpen}
 				<CheckIcon class="text-green-500" />
 			{:else}
-				<XIcon class="text-muted-foreground" />
+				<DashedCircleIcon />
 			{/if}
 			{socket.id}
 		</Toggle>

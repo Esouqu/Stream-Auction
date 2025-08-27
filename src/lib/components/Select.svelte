@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-	import CheckIcon from 'lucide-svelte/icons/check';
+	import CheckIcon from '@lucide/svelte/icons/check';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover';
 	import { cn } from '$lib/utils';

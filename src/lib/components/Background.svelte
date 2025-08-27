@@ -7,7 +7,7 @@
 	const { background } = app;
 </script>
 
-<div class="absolute left-0 top-0 z-[-1] h-full w-full">
+<div class="absolute top-0 left-0 z-[-1] h-full w-full bg-elevation-1">
 	{#if background.url}
 		{#if background.type === 'video'}
 			<video class=" h-[inherit] w-full object-cover" controls={false} autoplay muted loop>
@@ -27,7 +27,7 @@
 	{/if}
 
 	<div
-		class="absolute left-0 top-0 h-full w-full bg-background"
-		style="--tw-bg-opacity: {background.floatDimness};"
+		class="absolute top-0 left-0 h-full w-full"
+		style="backdrop-filter: blur({background.blur}px); background-color: color-mix(in oklab, var(--elevation-1) {background.dimness}%, transparent);"
 	></div>
 </div>

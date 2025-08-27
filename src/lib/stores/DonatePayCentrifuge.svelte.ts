@@ -1,6 +1,7 @@
 import Centrifuge from "centrifuge";
 import { SOCKET_STATE, type IDonationSocket, type IDonationSocketData, type ISocketConnectionData } from "$lib/interfaces";
 import donatePayApi from "$lib/api/donatePayApi.svelte";
+import { toast } from "svelte-sonner";
 
 interface DonatePayDonationMessage {
   data: {
@@ -45,10 +46,8 @@ class DonatePayCentrifuge implements IDonationSocket {
 
       const data = await donatePayApi.getToken();
 
-      if (!data?.apiKey) {
-        this._state = SOCKET_STATE.CLOSED;
-        return;
-      }
+      if (!data.apiKey || !data.token)
+        throw new Error('Не удалось установить соединение.\nПопробуйте обновить DonatePay API ключ.');
 
       this._centrifuge = new Centrifuge(this._CENTRIFUGO_URL, {
         subscribeEndpoint: this._TOKEN_ENDPOINT,
@@ -88,8 +87,10 @@ class DonatePayCentrifuge implements IDonationSocket {
 
       this._centrifuge.connect();
     } catch (error) {
+      const err = error as { message: string };
+
       this._state = SOCKET_STATE.CLOSED;
-      console.error('Error starting Centrifuge:', error);
+      toast.error(err.message);
     }
   };
 

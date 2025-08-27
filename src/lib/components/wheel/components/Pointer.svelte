@@ -1,5 +1,6 @@
 <script lang="ts">
 	import gsap from 'gsap';
+	import { fade, fly, scale } from 'svelte/transition';
 
 	interface Props {
 		trigger?: number;
@@ -27,9 +28,10 @@
 </script>
 
 <svg
-	class="pointer-events-auto absolute left-0 right-0 top-[-2rem] z-20 mx-auto h-[3.5rem] drop-shadow-[0_2px_2px_black]"
+	class="pointer-events-auto absolute top-[-2.5rem] right-0 left-0 z-20 mx-auto h-[4rem] drop-shadow-[0_2px_2px_black]"
 	viewBox="0 10 20 60"
 	bind:this={ref}
+	in:fade
 >
 	<path d="M 3 20 Q 10 0 17 20 Q 10 100 3 20" fill="white" />
 </svg>

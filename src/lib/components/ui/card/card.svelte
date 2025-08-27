@@ -1,7 +1,6 @@
 <script lang="ts">
-	import type { WithElementRef } from "bits-ui";
-	import type { HTMLAttributes } from "svelte/elements";
-	import { cn } from "$lib/utils.js";
+	import type { HTMLAttributes } from 'svelte/elements';
+	import { cn, type WithElementRef } from '$lib/utils.js';
 
 	let {
 		ref = $bindable(null),
@@ -13,7 +12,11 @@
 
 <div
 	bind:this={ref}
-	class={cn("bg-card text-card-foreground rounded-xl border shadow", className)}
+	data-slot="card"
+	class={cn(
+		'flex flex-col gap-4 rounded-xl bg-card py-4 text-card-foreground shadow-sm',
+		className
+	)}
 	{...restProps}
 >
 	{@render children?.()}

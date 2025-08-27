@@ -1,22 +1,23 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import RefreshCwIcon from 'lucide-svelte/icons/refresh-cw';
-	import RefreshCwOffIcon from 'lucide-svelte/icons/refresh-cw-off';
-	import DicesIcon from 'lucide-svelte/icons/dices';
+	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
+	import RefreshCwOffIcon from '@lucide/svelte/icons/refresh-cw-off';
+	import DicesIcon from '@lucide/svelte/icons/dices';
 	import Input from '$lib/components/Input.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
-	import { Badge } from '$lib/components/ui/badge';
 	import { randomFromRange } from '$lib/utils';
 	import { Tween } from 'svelte/motion';
+	import TrendingUpIcon from '@lucide/svelte/icons/trending-up';
+	import PaletteIcon from '@lucide/svelte/icons/palette';
 
 	const app = getAppManagerContext();
-	const { wheel, background } = app;
+	const { wheel, lots } = app;
 	const minDuration = 1;
 	const maxDuration = 999;
 
 	let duration = new Tween(wheel.spinDuration, { duration: 300 });
-	let isActionsDisabled = $derived(wheel.isPreparing || wheel.isDelayed || wheel.isSpinning);
+	let isWheelActive = $derived(wheel.isPreparing || wheel.isDelayed || wheel.isSpinning);
 
 	function startSpin() {
 		wheel.spinDuration = duration.target;
@@ -43,80 +44,62 @@
 	}
 </script>
 
-<div
-	class="relative flex items-center justify-center rounded-lg border bg-secondary px-4 py-2"
-	style="--tw-bg-opacity: {background.floatDimness}; --tw-border-opacity: {background.floatDimness};"
->
-	{#if app.settings.isSpinExtendEnabled && app.donationSockets.length > 0}
-		<div class="flex w-full items-center gap-2">
-			<Badge class="text-sm">
-				Вклин — {app.spinExtendPrice} RUB (⇧{app.settings.spinExtendPriceGain} RUB)
-			</Badge>
-			<Badge class="text-sm">
-				Стоп Колесо — {app.settings.spinStopPrice} RUB
-			</Badge>
+<div class="relative mx-auto flex w-fit items-center justify-between gap-4">
+	<!-- {#if app.settings.isSpinExtendEnabled && app.donationSockets.length > 0}
+		<div
+			class="flex h-full w-fit shrink-0 flex-col items-center justify-center rounded-xl bg-card/40 px-4 font-semibold"
+		>
+			<div>Вклин</div>
+			<div class="flex gap-1">
+				{app.spinExtendPrice} RUB (<TrendingUpIcon class="size-5" />{app.settings
+					.spinExtendPriceGain} RUB )
+			</div>
 		</div>
-	{/if}
-	<div class="flex gap-1">
-		{#if !isActionsDisabled}
+		<div
+			class="flex h-full w-fit shrink-0 flex-col items-center justify-center rounded-xl bg-card/40 px-4 font-semibold"
+		>
+			<div>Стоп Колесо</div>
+			<div>{app.settings.spinStopPrice} RUB</div>
+		</div>
+	{/if} -->
+
+	<div class="flex gap-2 rounded-xl bg-card/40 p-4">
+		<Button
+			variant={isWheelActive ? 'destructive' : 'default'}
+			onclick={() => (isWheelActive ? app.stopSpinManually() : startSpin())}
+		>
+			{#if !isWheelActive}
+				<RefreshCwIcon />
+				Крутить
+			{:else}
+				<RefreshCwOffIcon />
+				Остановить
+			{/if}
+		</Button>
+		<Tooltip>
+			<TooltipTrigger>
+				<Input
+					id="wheel-spin"
+					type="number"
+					class="w-[6rem]"
+					suffix="сек."
+					disabled={isWheelActive}
+					onConfirmation={setDuration}
+					value={Math.round(duration.current)}
+				/>
+			</TooltipTrigger>
+			<TooltipContent>Длительность</TooltipContent>
+		</Tooltip>
+
+		<div class="flex">
 			<Tooltip>
 				<TooltipTrigger>
 					{#snippet child({ props })}
 						<Button
 							{...props}
-							variant="default"
-							size="icon"
-							onclick={startSpin}
-							class="active:scale-90"
-							disabled={isActionsDisabled}
-						>
-							<RefreshCwIcon />
-						</Button>
-					{/snippet}
-				</TooltipTrigger>
-				<TooltipContent>Крутить</TooltipContent>
-			</Tooltip>
-		{:else}
-			<Tooltip>
-				<TooltipTrigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							class="hover:bg-destructive hover:text-destructive-foreground active:scale-90"
 							variant="ghost"
 							size="icon"
-							onclick={() => app.stopSpinManually()}
-						>
-							<RefreshCwOffIcon />
-						</Button>
-					{/snippet}
-				</TooltipTrigger>
-				<TooltipContent>Остановить</TooltipContent>
-			</Tooltip>
-		{/if}
-		<div class="flex overflow-hidden rounded">
-			<Tooltip>
-				<TooltipTrigger>
-					<Input
-						id="wheel-spin"
-						type="number"
-						class="w-[3.25rem] rounded-none border-transparent text-center hover:bg-primary/10 focus-visible:bg-background"
-						disabled={isActionsDisabled}
-						onConfirmation={setDuration}
-						value={Math.round(duration.current)}
-					/>
-				</TooltipTrigger>
-				<TooltipContent>Длительность</TooltipContent>
-			</Tooltip>
-			<Tooltip>
-				<TooltipTrigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							class="rounded-none active:scale-90"
-							variant="ghost"
-							size="icon"
-							disabled={isActionsDisabled}
+							disabled={isWheelActive}
 							onclick={setRandomDuration}
 						>
 							<DicesIcon />
@@ -124,8 +107,24 @@
 					{/snippet}
 				</TooltipTrigger>
 				<TooltipContent>
-					Случайное число ({wheel.settings.durationRange[0]}-{wheel.settings.durationRange[1]})
+					Случайное число от {wheel.settings.durationRange[0]} до {wheel.settings.durationRange[1]}
 				</TooltipContent>
+			</Tooltip>
+			<Tooltip>
+				<TooltipTrigger>
+					{#snippet child({ props })}
+						<Button
+							{...props}
+							variant="ghost"
+							size="icon"
+							disabled={isWheelActive}
+							onclick={() => lots.randomizeColors()}
+						>
+							<PaletteIcon />
+						</Button>
+					{/snippet}
+				</TooltipTrigger>
+				<TooltipContent>Сгенерировать новые цвета</TooltipContent>
 			</Tooltip>
 		</div>
 	</div>

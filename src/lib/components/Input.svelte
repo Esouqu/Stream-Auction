@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { Input } from './ui/input';
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
 
 	interface Props extends HTMLInputAttributes {
 		id: string;
+		type: 'file' | Exclude<HTMLInputTypeAttribute, 'file'>;
 		suffix?: string;
 		class?: string;
+		style?: string;
 		value?: string | number | null;
 		ref?: HTMLElement | null | undefined;
 		onenter?: () => void;
@@ -13,14 +15,17 @@
 	}
 
 	let {
+		id,
 		type,
 		suffix,
 		class: className,
+		style,
 		value = $bindable(type === 'number' ? null : ''),
 		ref = $bindable(null),
+		disabled,
+		placeholder,
 		onenter,
-		onConfirmation,
-		...restProps
+		onConfirmation
 	}: Props = $props();
 
 	function onkeydown(e: KeyboardEvent) {
@@ -36,14 +41,36 @@
 </script>
 
 {#if suffix}
-	<div class="relative h-fit w-full">
-		<Input bind:ref class={className} {type} bind:value {onkeydown} {onblur} {...restProps} />
+	<div class="relative h-fit w-fit">
+		<Input
+			{id}
+			bind:ref
+			class={className}
+			bind:value
+			{onkeydown}
+			{onblur}
+			{style}
+			{type}
+			{disabled}
+			{placeholder}
+		/>
 		<span
-			class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+			class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground"
 		>
 			{suffix}
 		</span>
 	</div>
 {:else}
-	<Input bind:ref class={className} {type} bind:value {onkeydown} {onblur} {...restProps} />
+	<Input
+		{id}
+		bind:ref
+		class={className}
+		bind:value
+		{onkeydown}
+		{onblur}
+		{style}
+		{type}
+		{disabled}
+		{placeholder}
+	/>
 {/if}

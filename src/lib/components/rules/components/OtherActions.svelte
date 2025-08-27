@@ -1,6 +1,6 @@
 <script lang="ts">
-	import SeparatorIcon from 'lucide-svelte/icons/separator-horizontal';
-	import RemoveFormattingIcon from 'lucide-svelte/icons/remove-formatting';
+	import SeparatorIcon from '@lucide/svelte/icons/separator-horizontal';
+	import RemoveFormattingIcon from '@lucide/svelte/icons/remove-formatting';
 	import type { Editor } from 'svelte-tiptap';
 	import MenuButton from './MenuButton.svelte';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';

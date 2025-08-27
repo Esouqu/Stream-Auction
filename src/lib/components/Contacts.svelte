@@ -2,14 +2,8 @@
 	import { Button } from './ui/button';
 	import GithubIcon from './icons/GithubIcon.svelte';
 	import TelegramIcon from './icons/TelegramIcon.svelte';
-	import HandHeartIcon from 'lucide-svelte/icons/hand-heart';
+	import HandHeartIcon from '@lucide/svelte/icons/hand-heart';
 	import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-
-	interface Props {
-		class?: string;
-	}
-
-	const { class: className }: Props = $props();
 
 	const contacts = [
 		{ href: 'https://www.donationalerts.com/r/esouqu', title: 'Поддержать', Icon: HandHeartIcon },
@@ -18,24 +12,17 @@
 	];
 </script>
 
-<div class="flex flex-col {className}">
+<div class="flex flex-col gap-3">
 	{#each contacts as { title, href, Icon }}
-		<Tooltip>
+		<Tooltip delayDuration={500}>
 			<TooltipTrigger>
 				{#snippet child({ props })}
-					<Button
-						{...props}
-						variant="link"
-						size="icon"
-						{href}
-						target="_blank"
-						class="text-accent hover:text-primary"
-					>
-						<Icon size="1.5rem" />
+					<Button {...props} {href} target="_blank" variant="icon" size="sidebar">
+						<Icon class="size-6" />
 					</Button>
 				{/snippet}
 			</TooltipTrigger>
-			<TooltipContent side="right" sideOffset={12}>{title}</TooltipContent>
+			<TooltipContent side="right" sideOffset={0}>{title}</TooltipContent>
 		</Tooltip>
 	{/each}
 </div>
