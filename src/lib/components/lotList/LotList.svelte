@@ -94,7 +94,7 @@
 	{#if !lots.sortedItems}
 		<div class="flex h-full flex-col space-y-1">
 			{#each { length: 17 } as _}
-				<Skeleton class="w-full" style="height: {lots.settings.itemHeight}px;" />
+				<Skeleton class="h-10 w-full" />
 			{/each}
 		</div>
 	{:else}

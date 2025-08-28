@@ -176,7 +176,13 @@
 
 	<div class="relative flex">
 		{#if isDonatorsShown}
-			<div class="flex items-center pl-3">{donators.join(', ')}</div>
+			<div class="flex items-center pl-3">
+				{#if donators.length > 0}
+					{donators.join(', ')}
+				{:else}
+					<div class="text-muted-foreground">Донатеры не указаны</div>
+				{/if}
+			</div>
 		{:else}
 			<Input
 				id="lot-title-{id}"
