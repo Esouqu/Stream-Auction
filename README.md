@@ -15,7 +15,7 @@ A donation-integrated auction system with a wheel of fortune to randomly select 
 1. **Donors** send donations with messages via DonationAlerts or DonatePay
 2. **Add Messages** to your auction list
 3. **Spin the wheel** to randomly pick the winner
-4. **Special donations** can trigger immediate re-spins!
+4. **Donations** can trigger immediate re-spins!
 
 ## ⚙️ Setup
 
