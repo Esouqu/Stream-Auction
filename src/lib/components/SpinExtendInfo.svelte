@@ -5,6 +5,9 @@
 
 	const app = getAppManagerContext();
 
+	const extendPrice = $derived(app.spinExtendPrice.toLocaleString('ru-RU'));
+	const extendPriceGain = $derived(app.settings.spinExtendPriceGain);
+	const spinStopPrice = $derived(app.settings.spinStopPrice.toLocaleString('ru-RU'));
 	const currentRouteId = $derived($page.route.id);
 	const isShown = $derived(
 		app.settings.isSpinExtendEnabled &&
@@ -15,20 +18,19 @@
 
 {#if isShown}
 	<div class="flex gap-2">
-		<div
-			class="flex w-full flex-col items-center justify-center rounded-xl bg-card/40 p-2 font-semibold"
-		>
+		<div class="flex w-full flex-col justify-center rounded-xl bg-card/40 p-4">
 			<div>Вклин</div>
-			<div class="flex gap-1">
-				{app.spinExtendPrice} RUB (<TrendingUpIcon class="size-5" />{app.settings
-					.spinExtendPriceGain} )
+			<div class="flex justify-between gap-1 text-xl font-bold">
+				<div>{extendPrice} RUB</div>
+				<div class="inline-flex items-center gap-1 text-base font-medium text-green-400">
+					<TrendingUpIcon class="inline size-4.5" />
+					{extendPriceGain}
+				</div>
 			</div>
 		</div>
-		<div
-			class="flex w-full flex-col items-center justify-center rounded-xl bg-card/40 p-2 font-semibold"
-		>
+		<div class="flex w-full flex-col justify-center rounded-xl bg-card/40 p-4">
 			<div>Стоп Колесо</div>
-			<div>{app.settings.spinStopPrice} RUB</div>
+			<div class="text-xl font-bold">{spinStopPrice} RUB</div>
 		</div>
 	</div>
 {/if}
