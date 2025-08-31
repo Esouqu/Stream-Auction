@@ -93,7 +93,7 @@
 					onclick={createPreset}
 				>
 					<PlusIcon />
-					Новый пресет
+					Новые правила
 				</Button>
 			</SelectContent>
 		</Select>

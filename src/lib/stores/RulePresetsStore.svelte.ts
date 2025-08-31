@@ -9,7 +9,7 @@ interface IPreset {
 
 const initialRules: IPreset = {
   "id": "example",
-  "label": "Пресет 1",
+  "label": "Правила 1",
   "content": {
     "type": "doc",
     "content": [
@@ -78,7 +78,7 @@ class RulePresets {
   }
 
   public create() {
-    const label = `Пресет ${this._items.value.length + 1}`;
+    const label = `Правила ${this._items.value.length + 1}`;
     const newPreset = { id: crypto.randomUUID(), label, content: { type: 'doc', content: [] } };
 
     this._items.value.push(newPreset);
