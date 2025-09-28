@@ -25,7 +25,6 @@
 	data-glow={app.spinExtends > 0}
 	data-enlarged={wheel.isFinished}
 	style="height: {holeSize}; width: {holeSize}; border-color: {strokeColor};"
-	in:scale
 >
 	<div
 		class="relative grid h-full w-full items-center justify-center text-center text-base font-semibold transition-colors duration-300"

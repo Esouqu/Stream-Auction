@@ -12,7 +12,7 @@
 		style="background-image: url('{logoPng}');"
 	></div>
 	<img
-		class="w-full object-contain p-12 brightness-90 backdrop-blur-lg backdrop-saturate-[3]"
+		class="w-full object-contain p-12 backdrop-blur-lg backdrop-saturate-[3]"
 		src={logoPng}
 		alt="logo"
 	/>

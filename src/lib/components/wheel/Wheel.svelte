@@ -8,7 +8,8 @@
 	import Core from './components/Core.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import type { ILot } from '$lib/interfaces';
-	import gsap from 'gsap';
+	import { scale } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
 	interface ILotWithAngle extends ILot {
 		startAngle: number;
@@ -20,12 +21,11 @@
 	}
 
 	const { patternImage }: Props = $props();
-
-	const strokeColor = '#27272a';
-
-	const textMinAngleCap = 5;
 	const app = getAppManagerContext();
 	const { wheel, lots } = app;
+
+	const strokeColor = '#27272a';
+	const textMinAngleCap = 5;
 
 	let containerRef: HTMLDivElement | undefined = $state();
 	let canvasContainerRef: HTMLDivElement | undefined = $state();
@@ -51,11 +51,9 @@
 	let wheelY: number;
 	let draggingStartAngle: number;
 	let pattern: CanvasPattern | undefined = $state();
-	let isAnimating = false;
 
 	onMount(() => {
 		onresize();
-		animatePieChart();
 
 		return () => {
 			if (patternImage) {
@@ -84,11 +82,9 @@
 		resizeWidth;
 		pattern;
 
-		if (!isAnimating) {
-			untrack(() => {
-				drawPieChart(1);
-			});
-		}
+		untrack(() => {
+			drawPieChart();
+		});
 	});
 
 	async function loadPattern() {
@@ -108,7 +104,7 @@
 		});
 	}
 
-	function drawStroke(centerX: number, centerY: number, progress: number) {
+	function drawStroke(centerX: number, centerY: number) {
 		if (!ctx) return;
 
 		ctx.strokeStyle = strokeColor;
@@ -122,7 +118,7 @@
 			ctx.arc(
 				centerX,
 				centerY,
-				Math.min(radius * progress, radius),
+				radius,
 				startAngle * degreesToRadians,
 				endAngle * degreesToRadians,
 				false
@@ -132,7 +128,7 @@
 		ctx.stroke();
 	}
 
-	function drawText({ title, startAngle, endAngle }: ILotWithAngle, progress: number) {
+	function drawText({ title, startAngle, endAngle }: ILotWithAngle) {
 		if (!ctx) return;
 
 		const midAngle = (startAngle + endAngle) / 2;
@@ -145,10 +141,6 @@
 		ctx.strokeStyle = 'black';
 		ctx.lineWidth = 4;
 
-		if (progress < 1) {
-			ctx.globalAlpha = progress;
-		}
-
 		ctx.save();
 		ctx.translate(textX, textY);
 		ctx.rotate(midAngle * degreesToRadians);
@@ -157,20 +149,14 @@
 		ctx.restore();
 	}
 
-	function drawBody(lot: ILotWithAngle, centerX: number, centerY: number, progress: number) {
+	function drawBody(lot: ILotWithAngle, centerX: number, centerY: number) {
 		if (!ctx) return;
 
 		const { startAngle, endAngle, color } = lot;
 
 		ctx.beginPath();
 		ctx.moveTo(centerX, centerY);
-		ctx.arc(
-			centerX,
-			centerY,
-			Math.min(radius * progress, radius),
-			startAngle * degreesToRadians,
-			endAngle * degreesToRadians
-		);
+		ctx.arc(centerX, centerY, radius, startAngle * degreesToRadians, endAngle * degreesToRadians);
 
 		if (pattern) {
 			ctx.fillStyle = pattern;
@@ -181,7 +167,7 @@
 		ctx.fill();
 	}
 
-	function drawPieChart(progress: number) {
+	function drawPieChart() {
 		if (!ctx || !canvasRef) return;
 
 		const centerX = canvasRef.width / 2;
@@ -193,36 +179,15 @@
 			const { startAngle, endAngle } = lot;
 			const angleDiff = endAngle - startAngle;
 
-			drawBody(lot, centerX, centerY, progress);
+			drawBody(lot, centerX, centerY);
 			if (angleDiff >= textMinAngleCap) {
-				drawText(lot, progress);
+				drawText(lot);
 			}
 		}
 
 		ctx.globalAlpha = 1;
 
-		drawStroke(centerX, centerY, progress);
-	}
-
-	async function animatePieChart() {
-		if (!ctx || !canvasRef) return;
-
-		await tick();
-
-		const start = performance.now();
-		isAnimating = true;
-		const draw = (progress: number) => {
-			drawPieChart(progress);
-
-			if (progress < 1) {
-				const timeElapsed = performance.now() - start;
-				const progress = timeElapsed / 500;
-				requestAnimationFrame(() => draw(progress));
-			} else {
-				isAnimating = false;
-			}
-		};
-		draw(0);
+		drawStroke(centerX, centerY);
 	}
 
 	function getWinner() {
@@ -340,6 +305,7 @@
 <div
 	class="relative flex h-full w-full flex-col items-center justify-center p-4"
 	bind:this={containerRef}
+	in:scale={{ start: 0, opacity: 0, duration: 500, easing: quintOut }}
 >
 	<div class="relative flex">
 		{#if radius > 0}

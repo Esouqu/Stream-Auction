@@ -10,7 +10,7 @@
 	import { fade } from 'svelte/transition';
 
 	const inputStyle =
-		'h-[4rem] leading-none border-none p-0 text-center tabular-nums read-only:hover:bg-transparent read-only:focus-visible:ring-transparent w-[6rem] md:text-7xl disabled:opacity-100 disabled:cursor-default transition-none hover:bg-accent/40';
+		'h-[4rem] leading-none border-none p-0 text-center tabular-nums read-only:hover:bg-transparent read-only:focus-visible:ring-transparent w-[6.25rem] md:text-7xl disabled:opacity-100 disabled:cursor-default transition-none hover:bg-white/10';
 
 	const { timer, wheel } = getAppManagerContext();
 

@@ -18,7 +18,7 @@
 	<div class="hidden h-full w-full max-w-[26rem] 2xl:flex">
 		<Rules />
 	</div>
-	<div class="mx-4 flex w-full">
+	<div class="mr-4 flex w-full 2xl:mx-4">
 		<LotList />
 	</div>
 </div>

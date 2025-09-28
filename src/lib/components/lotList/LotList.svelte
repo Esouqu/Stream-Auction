@@ -5,7 +5,7 @@
 	import VirtualList from './components/VirtualList.svelte';
 	import PlusIcon from '@lucide/svelte/icons/list-plus';
 	import SearchIcon from '@lucide/svelte/icons/search';
-	import { slide } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import Input from '$lib/components/Input.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Toggle } from '$lib/components/ui/toggle';
@@ -23,7 +23,8 @@
 	const { compact = false }: Props = $props();
 
 	const { lots } = getAppManagerContext();
-	const slideBarStyle = 'absolute bottom-full left-0 z-50 flex w-full p-4 bg-elevation-2';
+	const slideBarStyle =
+		'absolute bottom-[calc(100%_+_0.5rem)] left-1/2 -translate-x-1/2 z-50 flex p-3 bg-elevation-2 rounded-lg shadow-md';
 
 	let isNewLotInputVisible = $state(false);
 	let isSearchVisible = $state(false);
@@ -140,39 +141,39 @@
 			</div>
 
 			{#if isSearchVisible}
-				<div class={slideBarStyle} transition:slide={{ duration: 200 }}>
+				<div class={slideBarStyle} transition:fly={{ y: 50, duration: 200 }}>
 					<Input
 						id="search"
 						type="text"
-						class="mx-auto w-1/3"
+						class="w-[248px]"
 						placeholder="Поиск"
 						bind:value={searchText}
 						bind:ref={searchInputRef}
 					/>
 				</div>
 			{:else if isNewLotInputVisible}
-				<div class={slideBarStyle} transition:slide={{ duration: 200 }}>
-					<div class="flex w-full justify-center gap-4">
-						<div class="col-span-3 flex flex-col gap-2">
-							<Input
-								id="new-lot-title"
-								type="text"
-								placeholder="Название"
-								onenter={addNewLot}
-								bind:value={lotTitle}
-								bind:ref={newLotTitleRef}
-							/>
-						</div>
-						<div class="col-span-2 flex flex-col gap-2">
-							<Input
-								id="new-lot-value"
-								type="number"
-								placeholder="Сумма"
-								onenter={addNewLot}
-								bind:value={lotValue}
-							/>
-						</div>
-						<Button onclick={addNewLot} disabled={!isValid}>Добавить</Button>
+				<div class={slideBarStyle} transition:fly={{ y: 50, duration: 200 }}>
+					<div class="flex flex-wrap justify-center gap-2 xl:w-max">
+						<Input
+							id="new-lot-title"
+							type="text"
+							placeholder="Название"
+							class="w-[248px]"
+							onenter={addNewLot}
+							bind:value={lotTitle}
+							bind:ref={newLotTitleRef}
+						/>
+						<Input
+							id="new-lot-value"
+							type="number"
+							placeholder="Сумма"
+							class="w-[248px] xl:w-32"
+							onenter={addNewLot}
+							bind:value={lotValue}
+						/>
+						<Button class="w-[248px] xl:w-auto" disabled={!isValid} onclick={addNewLot}>
+							Добавить
+						</Button>
 					</div>
 				</div>
 			{/if}

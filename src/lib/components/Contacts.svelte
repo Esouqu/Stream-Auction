@@ -17,7 +17,7 @@
 		<Tooltip delayDuration={500}>
 			<TooltipTrigger>
 				{#snippet child({ props })}
-					<Button {...props} {href} target="_blank" variant="icon" size="sidebar">
+					<Button {...props} {href} target="_blank" variant="icon" size="sidebar" draggable="false">
 						<Icon class="size-6" />
 					</Button>
 				{/snippet}

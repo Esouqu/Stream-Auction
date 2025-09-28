@@ -45,6 +45,7 @@
 								size="sidebar"
 								class="grid data-[active=true]:text-foreground"
 								data-active={item.url === currentRouteId}
+								draggable="false"
 							>
 								{#if item.url === currentRouteId}
 									<div class="col-1 row-1" transition:fade={{ duration: 200 }}>
