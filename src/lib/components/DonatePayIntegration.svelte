@@ -2,6 +2,7 @@
 	import donatePayApi from '$lib/api/donatePayApi.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import DonatePayCentrifuge from '$lib/stores/DonatePayCentrifuge.svelte';
+	import { cn } from '$lib/utils';
 	import DonatePayIcon from './icons/DonatePayIcon.svelte';
 	import Input from './Input.svelte';
 	import Integration from './Integration.svelte';
@@ -74,8 +75,8 @@
 				</div>
 			{/snippet}
 		</DialogTrigger>
-		<DialogContent>
-			<DialogHeader>
+		<DialogContent class="w-[512px] p-4">
+			<DialogHeader class="p-0 text-start">
 				<DialogTitle>DonatePay API ключ</DialogTitle>
 				<DialogDescription>
 					Перейдите на страницу <Button
@@ -86,19 +87,21 @@
 					>, затем скопируйте значение поля "Ваш API ключ" и вставьте его в поле ниже.
 				</DialogDescription>
 			</DialogHeader>
-			<div class="flex flex-col items-start gap-2">
-				<span class={badgeVariants({ variant: 'destructive' })}>
-					Никому не показывайте свой API ключ
-				</span>
-				<Input
-					id="donatepay-api-key"
-					type="password"
-					placeholder="Введите API ключ"
-					maxlength={60}
-					oninput={() => (error = '')}
-					bind:value={apiKey}
-				/>
-				<div class="flex items-center gap-4 self-end">
+			<div class="space-y-4">
+				<div class="space-y-2">
+					<span class={cn(badgeVariants({ variant: 'destructive' }), 'text-sm')}>
+						Никому не показывайте свой API ключ
+					</span>
+					<Input
+						id="donatepay-api-key"
+						type="password"
+						placeholder="Введите API ключ"
+						maxlength={60}
+						oninput={() => (error = '')}
+						bind:value={apiKey}
+					/>
+				</div>
+				<div class="flex items-center gap-4 justify-self-end">
 					{#if error}
 						<p class="text-destructive">{error}</p>
 					{/if}
