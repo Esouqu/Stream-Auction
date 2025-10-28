@@ -56,21 +56,18 @@
 
 		<BubbleMenu
 			editor={$editor}
-			class="z-50 grid grid-cols-[auto_1fr_auto] grid-rows-2 items-center rounded border bg-popover shadow-md"
+			class="z-50 grid grid-cols-[auto_1fr_auto] grid-rows-2 items-center rounded-lg border bg-popover shadow-md"
 			updateDelay={300}
 			tippyOptions={{ moveTransition: 'transform 0.3s ease-in-out', maxWidth: 'fit-content' }}
 		>
-			<HeadingSelector editor={$editor} class="flex gap-0.5 border-b p-1 pr-2" />
-			<TextAlignSelector
-				editor={$editor}
-				class="flex gap-0.5 border-r border-b border-l p-1 px-2"
-			/>
-			<TextResizer editor={$editor} class="flex gap-0.5 border-b p-1 pl-2" />
+			<HeadingSelector editor={$editor} class="flex border-b p-1 pr-2" />
+			<TextAlignSelector editor={$editor} class="flex border-r border-b border-l p-1 px-2" />
+			<TextResizer editor={$editor} class="flex border-b p-1 pl-2" />
 			<FormattingToggles
 				editor={$editor}
-				class="col-span-2 flex gap-0.5 justify-self-end border-r p-1 pr-2"
+				class="col-span-2 flex justify-self-end border-r p-1 pr-2"
 			/>
-			<OtherActions editor={$editor} class="flex gap-0.5 p-1 pl-2" />
+			<OtherActions editor={$editor} class="flex p-1 pl-2" />
 		</BubbleMenu>
 	{:else}
 		<div class="flex flex-col space-y-2 p-4">

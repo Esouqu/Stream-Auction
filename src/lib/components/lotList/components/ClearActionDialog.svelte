@@ -29,7 +29,7 @@
 
 <AlertDialog bind:open={isAlertOpened}>
 	<AlertDialogTrigger
-		class={cn(buttonVariants({ variant: 'ghost', size: 'icon' }))}
+		class={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'rounded-full')}
 		disabled={lots.isEmpty}
 	>
 		<TrashcanIcon />

@@ -9,6 +9,7 @@
 	import DonationSettings from './components/DonationSettings.svelte';
 	import InterfaceSettings from './components/InterfaceSettings.svelte';
 	import TimerSettings from './components/TimerSettings.svelte';
+	import { fly } from 'svelte/transition';
 
 	const tabs = [
 		{ title: 'Донат', value: 'donation', component: DonationSettings },
@@ -19,6 +20,7 @@
 	];
 
 	let currentTabId = $state(0);
+	let direction = $state(1);
 
 	let itemsSizes: (HTMLElement | null)[] = $state(new Array(tabs.length).fill(null));
 	let prevWidthSum = $derived(
@@ -34,6 +36,7 @@
 	}
 
 	function setValue(v: string) {
+		direction = currentTabId < parseInt(v) ? 1 : -1;
 		currentTabId = parseInt(v);
 	}
 </script>
@@ -67,13 +70,21 @@
 			</TabsList>
 
 			<ScrollArea class="h-full w-full gap-0 overflow-hidden px-6">
-				{#each tabs as tab, idx}
-					{#if currentTabId === idx}
-						<TabsContent class="py-4" value={idx.toString()}>
-							<tab.component />
-						</TabsContent>
-					{/if}
-				{/each}
+				<div class="grid">
+					{#each tabs as tab, idx}
+						{#if currentTabId === idx}
+							<div
+								class="col-start-1 row-start-1"
+								in:fly={{ x: 300 * direction, duration: 300 }}
+								out:fly={{ x: -300 * direction, duration: 300 }}
+							>
+								<TabsContent class="py-4" value={idx.toString()}>
+									<tab.component />
+								</TabsContent>
+							</div>
+						{/if}
+					{/each}
+				</div>
 			</ScrollArea>
 		</Tabs>
 	</DialogContent>

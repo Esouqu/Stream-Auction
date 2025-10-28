@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import Fire from './Fire.svelte';
 
@@ -22,7 +22,7 @@
 		{/if}
 	{/if}
 
-	{#if $page.route.id === '/'}
+	{#if page.route.id === '/'}
 		<Fire amount={background.currentFlameSize} />
 	{/if}
 

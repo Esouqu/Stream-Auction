@@ -2,9 +2,9 @@
 	import Settings from './settings/Settings.svelte';
 	import Logo from './Logo.svelte';
 	import { Button } from './ui/button';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-	import Contacts from './Contacts.svelte';
+	import Links from './Links.svelte';
 	import ListIcon from './icons/ListIcon.svelte';
 	import ListFillIcon from './icons/ListFillIcon.svelte';
 	import PieIcon from './icons/PieIcon.svelte';
@@ -26,7 +26,7 @@
 		}
 	];
 
-	const currentRouteId = $derived($page.route.id);
+	const currentRouteId = $derived(page.route.id);
 </script>
 
 <div class="flex w-[86px] shrink-0 flex-col items-center justify-between gap-4 pt-20 pb-8">
@@ -63,7 +63,7 @@
 				</Tooltip>
 			{/each}
 		</div>
-		<Contacts />
+		<Links />
 	</div>
 	<Settings />
 </div>

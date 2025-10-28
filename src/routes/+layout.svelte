@@ -19,12 +19,12 @@
 	import Sonner from '$lib/components/ui/sonner/sonner.svelte';
 	import LotList from '$lib/components/lotList/LotList.svelte';
 	import SpinExtendInfo from '$lib/components/SpinExtendInfo.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { MediaQuery } from 'svelte/reactivity';
 
 	const { children } = $props();
 
-	const isWheelPage = $derived($page.route.id === '/wheel');
+	const isWheelPage = $derived(page.route.id === '/wheel');
 
 	setAppManagerContext(appManager);
 
@@ -67,7 +67,7 @@
 
 		{@render children()}
 
-		<div class="relative flex h-full w-[26rem] shrink-0 flex-col gap-4">
+		<div class="relative flex h-full w-[26rem] shrink-0 flex-col space-y-4">
 			<Timer />
 			<SpinExtendInfo />
 			{#if isWheelPage && !large.current}
@@ -75,9 +75,11 @@
 					<LotList compact />
 				</div>
 			{/if}
-			<div class="flex h-full flex-col overflow-hidden rounded-2xl bg-card/40">
+			<div class="relative flex h-full flex-col overflow-hidden rounded-2xl bg-card/40">
 				<DonationQueue />
-				<SocketSelector />
+				<div class="absolute bottom-0 left-1/2 z-50 -translate-x-1/2 p-4">
+					<SocketSelector />
+				</div>
 			</div>
 		</div>
 	</main>

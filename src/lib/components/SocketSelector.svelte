@@ -5,6 +5,8 @@
 	import Spinner from './Spinner.svelte';
 	import DashedCircleIcon from '@lucide/svelte/icons/circle-dashed';
 	import CheckIcon from '@lucide/svelte/icons/circle-check';
+	import { fly } from 'svelte/transition';
+	import BlurPanel from './BlurPanel.svelte';
 
 	const app = getAppManagerContext();
 
@@ -12,23 +14,32 @@
 		if (socket.isClosed) socket.connect();
 		else if (socket.isOpen) socket.disconnect();
 	}
+
+	function isSocketOpen(socket: IDonationSocket) {
+		return socket.isOpen;
+	}
 </script>
 
-<div class="flex justify-center gap-2 p-4">
-	{#each app.donationSockets as socket}
-		<Toggle
-			onclick={() => toggleConnection(socket)}
-			disabled={socket.isConnecting}
-			bind:pressed={socket.isOpen}
-		>
-			{#if socket.isConnecting}
-				<Spinner />
-			{:else if socket.isOpen}
-				<CheckIcon class="text-green-500" />
-			{:else}
-				<DashedCircleIcon />
-			{/if}
-			{socket.id}
-		</Toggle>
-	{/each}
-</div>
+{#if app.donationSockets.length > 0}
+	<div in:fly={{ y: 200, duration: 500 }}>
+		<BlurPanel class="flex">
+			{#each app.donationSockets as socket}
+				<Toggle
+					class="rounded-full"
+					variant="ghost"
+					disabled={socket.isConnecting}
+					bind:pressed={() => isSocketOpen(socket), () => toggleConnection(socket)}
+				>
+					{#if socket.isConnecting}
+						<Spinner />
+					{:else if socket.isOpen}
+						<CheckIcon class="text-green-500" />
+					{:else}
+						<DashedCircleIcon />
+					{/if}
+					{socket.id}
+				</Toggle>
+			{/each}
+		</BlurPanel>
+	</div>
+{/if}

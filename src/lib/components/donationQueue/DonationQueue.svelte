@@ -8,10 +8,10 @@
 </script>
 
 <ScrollArea class="h-full overflow-hidden" type="scroll">
-	<div class="flex h-full flex-col gap-4 p-4">
-		{#each donations.items as item (item.id)}
+	<div class="space-y-2 p-4">
+		{#each donations.items as donation (donation.id)}
 			<div class="w-full" animate:flip={{ duration: 200 }}>
-				<Donation {...item} isInteractive />
+				<Donation {donation} />
 			</div>
 		{/each}
 	</div>

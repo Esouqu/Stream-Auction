@@ -28,11 +28,6 @@
 
 <div class={className}>
 	{#each buttons as { Icon, tooltip, onclick }}
-		<Tooltip>
-			<TooltipTrigger>
-				<MenuButton {Icon} {onclick} />
-			</TooltipTrigger>
-			<TooltipContent>{tooltip}</TooltipContent>
-		</Tooltip>
+		<MenuButton {Icon} {onclick} {tooltip} />
 	{/each}
 </div>

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Button } from './ui/button';
 	import TelegramIcon from './icons/TelegramIcon.svelte';
-	import HandHeartIcon from '@lucide/svelte/icons/hand-heart';
+	import Donut from '@lucide/svelte/icons/donut';
 	import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 	import GithubIcon from '@lucide/svelte/icons/github';
 
 	const contacts = [
-		{ href: 'https://www.donationalerts.com/r/esouqu', title: 'Поддержать', Icon: HandHeartIcon },
+		{ href: 'https://dalink.to/esouqu', title: 'Поддержать', Icon: Donut },
 		{ href: 'https://t.me/esouqu', title: 'Написать', Icon: TelegramIcon },
 		{ href: 'https://github.com/Esouqu/Stream-Auction', title: 'Посмотреть', Icon: GithubIcon }
 	];

@@ -13,7 +13,6 @@
 
 	interface Props extends ILot {
 		percent: string;
-		itemHeight: number;
 		isDonatorsShown: boolean;
 	}
 
@@ -22,8 +21,7 @@
 
 	const app = getAppManagerContext();
 	const { lots } = app;
-	const sharedInputStyle =
-		'h-full border-transparent hover:bg-white/10 hover:border-transparent focus-visible:bg-background';
+	const sharedInputStyle = 'border-none hover:bg-primary/10 focus-visible:bg-background';
 	const actionItems: IDropdownItem[] = [
 		{
 			label: 'Прибавить',
@@ -43,21 +41,17 @@
 	let addedValue = new Tween(0, { delay: 0.5 });
 	let isDraggedOver = $state(false);
 	let isAddInputVisible = $state(false);
+	let isDirty = $state(false);
+	let shouldAnimateAddedValue = $state(false);
+	let isFresh = $derived.by(getIsFresh);
 
 	let additionalInputRef: HTMLInputElement | null = $state(null);
-	let shouldAnimateAddedValue = $state(false);
-	let isNewelyAddedLot = $state(false);
-	let isDirty = $state(false);
 
-	$effect(() => {
+	function getIsFresh() {
 		const data = lots.newelyAddedLots.find((item) => item.id === id);
 
-		if (data && !isDirty) {
-			isNewelyAddedLot = true;
-		} else {
-			isNewelyAddedLot = false;
-		}
-	});
+		return data && !isDirty;
+	}
 
 	$effect(() => {
 		const data = lots.addedValues.find((item) => item.id === id);
@@ -123,7 +117,6 @@
 
 	function ondragover(e: DragEvent) {
 		e.preventDefault();
-
 		if (isValidData(e)) isDraggedOver = true;
 	}
 
@@ -141,22 +134,14 @@
 	}
 </script>
 
-<div
-	class="relative grid w-full grid-cols-[3.5rem_1fr_8rem_auto] transition-colors"
-	style="background-color: rgb({color.r} {color.g} {color.b} / {isDraggedOver ? '50%' : '10%'});"
-	role="banner"
-	{ondragover}
-	{ondragleave}
-	{ondrop}
->
-	{#if isNewelyAddedLot}
+<div class="relative w-full">
+	{#if isFresh}
 		<div
-			class="absolute z-50 flex h-full w-full items-center justify-center gap-1 font-medium"
+			class="absolute top-0 left-0 flex size-full items-center justify-center gap-1 rounded-r-full font-medium"
 			style="background-color: rgb({color.r} {color.g} {color.b}); color: {isDarkColor
 				? 'white'
 				: 'black'}"
-			in:slide={{ axis: 'x', easing: expoOut }}
-			out:fade
+			transition:slide|global={{ axis: 'x', easing: expoOut }}
 			onmouseenter={() => (isDirty = true)}
 			onfocus={() => (isDirty = true)}
 			role="button"
@@ -170,74 +155,92 @@
 				{value}
 			</div>
 		</div>
-	{/if}
+	{:else}
+		<div
+			class="relative grid w-full grid-cols-[3.5rem_1fr_8rem_auto] outline-2 transition-colors duration-200"
+			style="outline-color: rgb({color.r} {color.g} {color.b} / {isDraggedOver
+				? '70%'
+				: '0%'}); background-color: rgb({color.r} {color.g} {color.b} / {isDraggedOver
+				? '15%'
+				: '0%'});"
+			role="banner"
+			{ondragover}
+			{ondragleave}
+			{ondrop}
+		>
+			<div
+				class="bg-opacity-50 sticky top-0 left-0 flex items-center justify-center rounded-r-full px-4 font-semibold"
+				style="background-color: rgb({color.r} {color.g} {color.b} / 15%);color: rgb({color.r} {color.g} {color.b} / 70%)"
+			>
+				{id}
+			</div>
 
-	<div class="bg-opacity-50 flex items-center px-4 font-medium">{id}</div>
-
-	<div class="relative flex">
-		{#if isDonatorsShown}
-			<div class="flex items-center pl-3">
-				{#if donators.length > 0}
-					{donators.join(', ')}
+			<div class="relative flex">
+				{#if isDonatorsShown}
+					<div class="flex items-center pl-3">
+						{#if donators.length > 0}
+							{donators.join(', ')}
+						{:else}
+							<div class="text-muted-foreground">Донатеры не указаны</div>
+						{/if}
+					</div>
 				{:else}
-					<div class="text-muted-foreground">Донатеры не указаны</div>
+					<Input
+						id="lot-title-{id}"
+						type="text"
+						class={cn(sharedInputStyle, 'text-ellipsis')}
+						placeholder="Название лота"
+						onConfirmation={setTitle}
+						value={title}
+					/>
 				{/if}
 			</div>
-		{:else}
-			<Input
-				id="lot-title-{id}"
-				type="text"
-				class={cn(sharedInputStyle, 'text-ellipsis')}
-				placeholder="Название лота"
-				onConfirmation={setTitle}
-				value={title}
-			/>
-		{/if}
-	</div>
 
-	<div class="relative">
-		{#if shouldAnimateAddedValue}
-			<div
-				class="absolute z-50 flex h-full w-full items-center justify-center rounded font-medium"
-				style="background-color: rgb({color.r} {color.g} {color.b}); color: {isDarkColor
-					? 'white'
-					: 'black'}"
-				transition:fade={{ duration: 300 }}
-			>
-				{addedValue.target > 0 ? '+' : ''}{Math.round(addedValue.current)}
-			</div>
-		{/if}
-		<Input
-			id="lot-value-{id}"
-			type="number"
-			class={cn(sharedInputStyle, 'pr-14 text-end tabular-nums')}
-			placeholder="Сумма"
-			onConfirmation={setValue}
-			suffix={percent}
-			suffixSize="sm"
-			{value}
-		/>
-	</div>
-
-	<div class="flex items-center pr-4">
-		{#if isAddInputVisible}
-			<div class="h-full" transition:slide={{ axis: 'x', duration: 200 }}>
+			<div class="relative">
+				{#if shouldAnimateAddedValue}
+					<div
+						class="absolute z-50 flex h-full w-full items-center justify-center rounded font-medium"
+						style="background-color: rgb({color.r} {color.g} {color.b}); color: {isDarkColor
+							? 'white'
+							: 'black'}"
+						transition:fade={{ duration: 300 }}
+					>
+						{addedValue.target > 0 ? '+' : ''}{Math.round(addedValue.current)}
+					</div>
+				{/if}
 				<Input
-					id="lot-add-value-{id}"
+					id="lot-value-{id}"
 					type="number"
-					class={cn(sharedInputStyle, 'w-24')}
+					class={cn(sharedInputStyle, 'pr-14 text-end tabular-nums')}
 					placeholder="Сумма"
-					bind:ref={additionalInputRef}
-					bind:value={valueToAdd}
-					onConfirmation={addValue}
+					onConfirmation={setValue}
+					suffix={percent}
+					suffixSize="sm"
+					{value}
 				/>
 			</div>
-		{/if}
 
-		<DropdownMenu items={actionItems} class={sharedInputStyle}>
-			{#snippet trigger()}
-				<EllipsisIcon />
-			{/snippet}
-		</DropdownMenu>
-	</div>
+			<div class="flex items-center pr-4">
+				{#if isAddInputVisible}
+					<div class="h-full" transition:slide={{ axis: 'x', duration: 200 }}>
+						<Input
+							id="lot-add-value-{id}"
+							type="number"
+							class={cn(sharedInputStyle, 'w-24')}
+							placeholder="Сумма"
+							bind:ref={additionalInputRef}
+							bind:value={valueToAdd}
+							onConfirmation={addValue}
+						/>
+					</div>
+				{/if}
+
+				<DropdownMenu items={actionItems} class={sharedInputStyle}>
+					{#snippet trigger()}
+						<EllipsisIcon />
+					{/snippet}
+				</DropdownMenu>
+			</div>
+		</div>
+	{/if}
 </div>

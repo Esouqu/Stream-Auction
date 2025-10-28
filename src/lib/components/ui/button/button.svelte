@@ -11,9 +11,12 @@
 					'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary active:outline-primary',
 				destructive:
 					'bg-destructive text-foreground hover:bg-destructive/90 active:bg-destructive active:outline-destructive',
-				outline: 'bg-elevation-2 hover:bg-accent hover:text-accent-foreground border',
+				outline: 'bg-elevation-2 hover:bg-primary/10 hover:text-accent-foreground border',
 				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-				ghost: 'hover:bg-accent/70 hover:text-foreground active:bg-accent active:outline-accent',
+				ghost:
+					'hover:bg-primary/10 hover:text-foreground active:bg-primary/30 active:outline-primary/30',
+				accent:
+					'bg-accent text-accent-foreground hover:bg-accent/90 active:bg-accent/80 active:outline-accent',
 				link: 'text-primary underline-offset-4 hover:underline',
 				icon: 'text-muted-foreground hover:text-foreground'
 			},

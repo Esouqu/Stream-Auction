@@ -8,8 +8,9 @@
 	import Core from './components/Core.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import type { ILot } from '$lib/interfaces';
-	import { scale } from 'svelte/transition';
+	import { fade, fly, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import WheelActionBar from './components/WheelActionBar.svelte';
 
 	interface ILotWithAngle extends ILot {
 		startAngle: number;
@@ -305,13 +306,22 @@
 <div
 	class="relative flex h-full w-full flex-col items-center justify-center p-4"
 	bind:this={containerRef}
-	in:scale={{ start: 0, opacity: 0, duration: 500, easing: quintOut }}
+	in:scale={{ start: 0, opacity: 0, duration: 500 }}
 >
 	<div class="relative flex">
 		{#if radius > 0}
+			<Pointer trigger={winner?.id} />
 			<Core {strokeColor} {winner} size={holeSize} {patternImage} />
 			<Outline {strokeColor} color={Color(winner?.color).hex()} />
-			<Pointer trigger={winner?.id} />
+			{#if !wheel.isActive}
+				<div
+					class="absolute bottom-[5rem] left-1/2 z-10 -translate-x-1/2"
+					in:fly|global={{ y: 250, duration: 500 }}
+					out:fade
+				>
+					<WheelActionBar />
+				</div>
+			{/if}
 		{/if}
 		<div
 			class="cursor-grab select-none data-[grabbing=true]:cursor-grabbing data-[inactive=true]:pointer-events-none"

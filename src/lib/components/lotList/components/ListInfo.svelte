@@ -1,20 +1,18 @@
 <script>
+	import SummaryIcon from '$lib/components/icons/SummaryIcon.svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
-	import InfoIcon from '@lucide/svelte/icons/info';
+	import { cn } from '$lib/utils';
 
 	const { lots } = getAppManagerContext();
 </script>
 
 <Tooltip>
 	<TooltipTrigger
-		class={[
-			buttonVariants({ size: 'icon', variant: 'ghost' }),
-			'!cursor-default text-muted-foreground hover:bg-transparent hover:text-foreground active:bg-transparent active:outline-transparent'
-		]}
+		class={cn(buttonVariants({ size: 'icon', variant: 'ghost' }), 'cursor-default rounded-full')}
 	>
-		<InfoIcon />
+		<SummaryIcon />
 	</TooltipTrigger>
 	<TooltipContent>
 		<div>Всего лотов — {lots.items?.length || 0}</div>

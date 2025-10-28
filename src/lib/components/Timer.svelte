@@ -8,6 +8,7 @@
 	import Input from './Input.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import { fade } from 'svelte/transition';
+	import BlurPanel from './BlurPanel.svelte';
 
 	const inputStyle =
 		'h-[4rem] leading-none border-none p-0 text-center tabular-nums read-only:hover:bg-transparent read-only:focus-visible:ring-transparent w-[6.25rem] md:text-7xl disabled:opacity-100 disabled:cursor-default transition-none hover:bg-white/10';
@@ -94,22 +95,22 @@
 			<Input id="timer-ms" type="number" class={inputStyle} disabled value={paddedMs} />
 		</div>
 
-		{#if wheel.isActive}
-			<div
-				class="flex h-10 w-full items-center justify-center text-base font-medium text-muted-foreground"
-			>
-				{#if wheel.isSpinning || wheel.isPreparing}
-					<div class="flex items-center">Кручение колеса...</div>
-				{:else if wheel.isDelayed}
-					<div class="flex items-center">Задержка...</div>
-				{/if}
-			</div>
-		{:else}
-			<div class="flex w-full">
+		<BlurPanel class="flex w-full">
+			{#if wheel.isActive}
+				<div
+					class="flex h-10 w-full items-center justify-center text-base font-medium text-muted-foreground"
+				>
+					{#if wheel.isSpinning || wheel.isPreparing}
+						<div class="flex items-center">Кручение колеса...</div>
+					{:else if wheel.isDelayed}
+						<div class="flex items-center">Задержка...</div>
+					{/if}
+				</div>
+			{:else}
 				<Button
 					variant="ghost"
 					size="icon"
-					class="w-full shrink"
+					class="w-full shrink rounded-full"
 					onclick={() => timer.reset()}
 					disabled={timer.target === timer.baseTime || wheel.isActive}
 				>
@@ -118,7 +119,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="w-full shrink"
+					class="w-full shrink rounded-full"
 					onclick={() => (timer.isActive ? timer.pause() : timer.start())}
 					disabled={timer.isActive
 						? timer.isProcessingQueue || wheel.isActive
@@ -134,7 +135,7 @@
 					variant="ghost"
 					size="icon"
 					disabled={wheel.isActive}
-					class="relative w-full shrink text-base"
+					class="relative w-full shrink rounded-full text-base"
 					onclick={onMinusClick}
 				>
 					<MinusIcon />
@@ -147,7 +148,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="relative w-full shrink text-base"
+					class="relative w-full shrink rounded-full text-base"
 					disabled={wheel.isActive}
 					onclick={onPlusClick}
 				>
@@ -158,7 +159,7 @@
 						</div>
 					{/if}
 				</Button>
-			</div>
-		{/if}
+			{/if}
+		</BlurPanel>
 	</div>
 </div>

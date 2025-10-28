@@ -8,8 +8,8 @@
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 	import { randomFromRange } from '$lib/utils';
 	import { Tween } from 'svelte/motion';
-	import TrendingUpIcon from '@lucide/svelte/icons/trending-up';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
+	import BlurPanel from '$lib/components/BlurPanel.svelte';
 
 	const app = getAppManagerContext();
 	const { wheel, lots } = app;
@@ -44,88 +44,68 @@
 	}
 </script>
 
-<div class="relative mx-auto flex w-fit items-center justify-between gap-4">
-	<!-- {#if app.settings.isSpinExtendEnabled && app.donationSockets.length > 0}
-		<div
-			class="flex h-full w-fit shrink-0 flex-col items-center justify-center rounded-xl bg-card/40 px-4 font-semibold"
-		>
-			<div>Вклин</div>
-			<div class="flex gap-1">
-				{app.spinExtendPrice} RUB (<TrendingUpIcon class="size-5" />{app.settings
-					.spinExtendPriceGain} RUB )
-			</div>
-		</div>
-		<div
-			class="flex h-full w-fit shrink-0 flex-col items-center justify-center rounded-xl bg-card/40 px-4 font-semibold"
-		>
-			<div>Стоп Колесо</div>
-			<div>{app.settings.spinStopPrice} RUB</div>
-		</div>
-	{/if} -->
+<!-- onclick={() => (isWheelActive ? app.stopSpinManually() : startSpin())} -->
+<BlurPanel class="flex gap-2">
+	<Button class="rounded-full" disabled={isWheelActive} onclick={startSpin}>
+		<!-- {#if !isWheelActive} -->
+		<RefreshCwIcon />
+		Крутить
+		<!-- {:else}
+			<RefreshCwOffIcon />
+			Остановить
+		{/if} -->
+	</Button>
+	<Tooltip>
+		<TooltipTrigger>
+			<Input
+				id="wheel-spin"
+				type="number"
+				class="w-[6rem] rounded-full"
+				suffix="сек."
+				disabled={isWheelActive}
+				onConfirmation={setDuration}
+				value={Math.round(duration.current)}
+			/>
+		</TooltipTrigger>
+		<TooltipContent>Длительность</TooltipContent>
+	</Tooltip>
 
-	<div class="flex gap-2 rounded-xl bg-card/40 p-4">
-		<Button
-			variant={isWheelActive ? 'destructive' : 'default'}
-			onclick={() => (isWheelActive ? app.stopSpinManually() : startSpin())}
-		>
-			{#if !isWheelActive}
-				<RefreshCwIcon />
-				Крутить
-			{:else}
-				<RefreshCwOffIcon />
-				Остановить
-			{/if}
-		</Button>
+	<div class="flex">
 		<Tooltip>
 			<TooltipTrigger>
-				<Input
-					id="wheel-spin"
-					type="number"
-					class="w-[6rem]"
-					suffix="сек."
-					disabled={isWheelActive}
-					onConfirmation={setDuration}
-					value={Math.round(duration.current)}
-				/>
+				{#snippet child({ props })}
+					<Button
+						{...props}
+						class="rounded-full"
+						variant="ghost"
+						size="icon"
+						disabled={isWheelActive}
+						onclick={setRandomDuration}
+					>
+						<DicesIcon />
+					</Button>
+				{/snippet}
 			</TooltipTrigger>
-			<TooltipContent>Длительность</TooltipContent>
+			<TooltipContent>
+				Случайное число от {wheel.settings.durationRange[0]} до {wheel.settings.durationRange[1]}
+			</TooltipContent>
 		</Tooltip>
-
-		<div class="flex">
-			<Tooltip>
-				<TooltipTrigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							variant="ghost"
-							size="icon"
-							disabled={isWheelActive}
-							onclick={setRandomDuration}
-						>
-							<DicesIcon />
-						</Button>
-					{/snippet}
-				</TooltipTrigger>
-				<TooltipContent>
-					Случайное число от {wheel.settings.durationRange[0]} до {wheel.settings.durationRange[1]}
-				</TooltipContent>
-			</Tooltip>
-			<Tooltip>
-				<TooltipTrigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							variant="ghost"
-							size="icon"
-							disabled={isWheelActive}
-							onclick={() => lots.randomizeColors()}
-						>
-							<PaletteIcon />
-						</Button>
-					{/snippet}
-				</TooltipTrigger>
-				<TooltipContent>Сгенерировать новые цвета</TooltipContent>
-			</Tooltip>
-		</div>
+		<Tooltip>
+			<TooltipTrigger>
+				{#snippet child({ props })}
+					<Button
+						{...props}
+						class="rounded-full"
+						variant="ghost"
+						size="icon"
+						disabled={isWheelActive}
+						onclick={() => lots.randomizeColors()}
+					>
+						<PaletteIcon />
+					</Button>
+				{/snippet}
+			</TooltipTrigger>
+			<TooltipContent>Сгенерировать новые цвета</TooltipContent>
+		</Tooltip>
 	</div>
-</div>
+</BlurPanel>

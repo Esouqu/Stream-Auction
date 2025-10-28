@@ -3,18 +3,14 @@
 	import { Skeleton } from '../ui/skeleton';
 	import Lot from './components/Lot.svelte';
 	import VirtualList from './components/VirtualList.svelte';
-	import PlusIcon from '@lucide/svelte/icons/list-plus';
-	import SearchIcon from '@lucide/svelte/icons/search';
-	import { fly } from 'svelte/transition';
-	import Input from '$lib/components/Input.svelte';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { Toggle } from '$lib/components/ui/toggle';
-	import ClearActionDialog from './components/ClearActionDialog.svelte';
-	import LotLoader from './components/LotLoader.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
+	import AddLotPopover from './components/AddLotPopover.svelte';
+	import Search from './components/Search.svelte';
+	import TitleViewButton from './components/TitleViewButton.svelte';
+	import ClearActionDialog from './components/ClearActionDialog.svelte';
 	import ListInfo from './components/ListInfo.svelte';
-	import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-	import RepeatIcon from '@lucide/svelte/icons/repeat-2';
+	import LotLoader from './components/LotLoader.svelte';
+	import BlurPanel from '../BlurPanel.svelte';
 
 	interface Props {
 		compact?: boolean;
@@ -23,73 +19,19 @@
 	const { compact = false }: Props = $props();
 
 	const { lots } = getAppManagerContext();
-	const slideBarStyle =
-		'absolute bottom-[calc(100%_+_0.5rem)] left-1/2 -translate-x-1/2 z-50 flex p-3 bg-elevation-2 rounded-lg shadow-md';
 
-	let isNewLotInputVisible = $state(false);
-	let isSearchVisible = $state(false);
-	let lotTitle = $state('');
-	let lotValue: number | null = $state(null);
-	let isValid = $derived(!!lotTitle && lotValue !== null);
-	let searchText = $state('');
-	let filteredLots = $derived(lots.searchItems(searchText));
+	let searchValue = $state('');
 	let isDonatorsShown = $state(false);
 
-	let searchInputRef: HTMLInputElement | null = $state(null);
-	let newLotTitleRef: HTMLInputElement | null = $state(null);
-
-	let searchTimeout: NodeJS.Timeout;
-	let newLotTimeout: NodeJS.Timeout;
-
-	$effect(() => {
-		if (isSearchVisible) {
-			isNewLotInputVisible = false;
-
-			clearTimeouts();
-			searchTimeout = setTimeout(() => searchInputRef?.focus(), 200);
-		} else {
-			searchText = '';
-		}
-	});
-
-	$effect(() => {
-		if (newLotTimeout) clearTimeout(newLotTimeout);
-		if (isNewLotInputVisible) {
-			isSearchVisible = false;
-
-			clearTimeouts();
-			newLotTimeout = setTimeout(() => newLotTitleRef?.focus(), 200);
-		} else {
-			clearNewLotInputs();
-		}
-	});
-
-	function clearTimeouts() {
-		clearTimeout(searchTimeout);
-		clearTimeout(newLotTimeout);
-	}
-
-	function clearNewLotInputs() {
-		lotTitle = '';
-		lotValue = null;
-	}
-
-	function addNewLot() {
-		if (!lotTitle || lotValue === null) return;
-
-		lots.add(lotTitle, lotValue);
-
-		clearNewLotInputs();
-		isNewLotInputVisible = false;
-	}
+	const filteredLots = $derived(lots.searchItems(searchValue));
 </script>
 
-<div class="flex h-full w-full flex-col overflow-hidden rounded-xl bg-card/40">
-	<div class="sticky top-0 z-50 flex w-full shrink-0 py-2 font-medium text-muted-foreground">
-		<div class="w-14 px-4 pl-4">ID</div>
-		<div class="w-full px-4">Название</div>
-		<div class="w-[8rem] px-4 pr-4 text-end">Сумма</div>
-		<div class="w-[3.25rem] px-4"></div>
+<div class="relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-card/40">
+	<div class="flex w-full shrink-0 py-2 font-medium text-muted-foreground">
+		<div class="w-14 shrink-0 px-4 pl-4 text-center">ID</div>
+		<div class="w-full px-3">Название</div>
+		<div class="w-[8rem] shrink-0 px-4 pr-2 text-end">Сумма</div>
+		<div class="w-[56px] shrink-0"></div>
 	</div>
 
 	{#if !lots.sortedItems}
@@ -99,10 +41,10 @@
 			{/each}
 		</div>
 	{:else}
-		<VirtualList items={filteredLots || lots.sortedItems}>
+		<VirtualList items={filteredLots || lots.sortedItems} isPadded={!compact}>
 			{#snippet children(lot)}
 				{@const percent = getPercentFromTotal(lot.value, lots.totalValue || 0)}
-				<Lot {...lot} {percent} itemHeight={lots.settings.itemHeight} {isDonatorsShown} />
+				<Lot {...lot} {percent} {isDonatorsShown} />
 			{/snippet}
 			{#snippet empty()}
 				<div class="text-lg font-medium text-muted-foreground">Список пуст</div>
@@ -111,72 +53,19 @@
 	{/if}
 
 	{#if !compact}
-		<div class="relative flex items-center justify-between p-4 font-medium">
-			<div class="flex">
-				<Toggle class="p-2" bind:pressed={isNewLotInputVisible}>
-					<PlusIcon />
-					Добавить
-				</Toggle>
-
-				<Toggle class="p-2" bind:pressed={isSearchVisible}>
-					<SearchIcon />
-					Поиск
-				</Toggle>
-			</div>
-
-			<div class="flex">
-				<Tooltip>
-					<TooltipTrigger
-						class={buttonVariants({ size: 'icon', variant: 'ghost' })}
-						onclick={() => (isDonatorsShown = !isDonatorsShown)}
-					>
-						<RepeatIcon />
-					</TooltipTrigger>
-					<TooltipContent>Ники донатеров вместо названия</TooltipContent>
-				</Tooltip>
-
-				<LotLoader />
-				<ClearActionDialog />
-				<ListInfo />
-			</div>
-
-			{#if isSearchVisible}
-				<div class={slideBarStyle} transition:fly={{ y: 50, duration: 200 }}>
-					<Input
-						id="search"
-						type="text"
-						class="w-[248px]"
-						placeholder="Поиск"
-						bind:value={searchText}
-						bind:ref={searchInputRef}
-					/>
+		<div
+			class="pointer-events-none absolute bottom-0 left-0 z-50 flex w-full items-center justify-between p-4 font-medium"
+		>
+			<AddLotPopover />
+			<BlurPanel class="pointer-events-auto flex py-0">
+				<Search bind:value={searchValue} />
+				<div class="flex py-1.5">
+					<TitleViewButton bind:isDonatorsShown />
+					<LotLoader />
+					<ClearActionDialog />
+					<ListInfo />
 				</div>
-			{:else if isNewLotInputVisible}
-				<div class={slideBarStyle} transition:fly={{ y: 50, duration: 200 }}>
-					<div class="flex flex-wrap justify-center gap-2 xl:w-max">
-						<Input
-							id="new-lot-title"
-							type="text"
-							placeholder="Название"
-							class="w-[248px]"
-							onenter={addNewLot}
-							bind:value={lotTitle}
-							bind:ref={newLotTitleRef}
-						/>
-						<Input
-							id="new-lot-value"
-							type="number"
-							placeholder="Сумма"
-							class="w-[248px] xl:w-32"
-							onenter={addNewLot}
-							bind:value={lotValue}
-						/>
-						<Button class="w-[248px] xl:w-auto" disabled={!isValid} onclick={addNewLot}>
-							Добавить
-						</Button>
-					</div>
-				</div>
-			{/if}
+			</BlurPanel>
 		</div>
 	{/if}
 </div>

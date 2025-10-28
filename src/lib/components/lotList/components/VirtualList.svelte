@@ -1,58 +1,69 @@
 <script lang="ts">
-	import { onMount, type Snippet } from 'svelte';
+	import { type Snippet } from 'svelte';
 	import type { ILot } from '$lib/interfaces';
 	import { flip } from 'svelte/animate';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 
 	interface Props {
 		items: ILot[];
+		isPadded?: boolean;
 		scrollElement?: HTMLDivElement | null;
-		noFlipMode?: boolean;
 		empty?: Snippet;
 		children: Snippet<[ILot & { position: number }]>;
 	}
 
 	const itemsBuffer = 10;
+	const itemHeight = 40;
+	const itemsBufferHeight = itemsBuffer * itemHeight;
+	const paddingBottom = 84;
 
-	let { items, scrollElement = $bindable(null), empty, children }: Props = $props();
+	let {
+		items,
+		isPadded = false,
+		scrollElement = $bindable(null),
+		empty,
+		children
+	}: Props = $props();
 
 	let scrollTop = $state(0);
-	let itemHeight = $state(40);
-	let itemsBufferHeight = $derived(itemsBuffer * itemHeight);
 	let minHeight = $state(0);
-	let visibleItems: (ILot & { position: number })[] = $state([]);
-	let mappedItems = $derived(items.map((l, idx) => ({ ...l, position: idx + 1 })));
-
-	onMount(() => {
-		if (scrollElement) {
-			minHeight = scrollElement.offsetHeight;
-		}
-	});
+	let itemsWithPosition = $derived.by(getItemsWithPosition);
+	let visibleItems = $derived.by(getVisibleItems);
 
 	$effect(() => {
-		if (scrollElement) {
-			// Position of the top of the viewport
-			const viewportTop = scrollTop - itemsBufferHeight;
-			// Index of the potential start item
-			const potentialStartIndex = Math.floor(viewportTop / itemHeight);
-			// Position of the bottom of the viewport
-			const viewportBottom = scrollTop + scrollElement.offsetHeight + itemsBufferHeight;
-			// Index of the potential end item
-			const potentialEndIndex = Math.floor(viewportBottom / itemHeight);
-			// Ensure potentialEndIndex does not exceed the length of the mappedItems
-			const clampedEndIndex = Math.min(mappedItems.length, potentialEndIndex);
-			const startIndex = Math.max(0, potentialStartIndex);
-			const endIndex = Math.max(startIndex, clampedEndIndex);
-
-			visibleItems = mappedItems.slice(startIndex, endIndex);
-			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedItems.length);
-		}
+		onresize();
 	});
 
+	function getItemsWithPosition() {
+		return items.map((l, idx) => ({ ...l, position: idx + 1 }));
+	}
+
+	function getVisibleItems() {
+		if (!scrollElement) return [];
+
+		const viewportTop = scrollTop - itemsBufferHeight;
+		// Index of the potential start item
+		const potentialStartIndex = Math.floor(viewportTop / itemHeight);
+		// Position of the bottom of the viewport
+		const viewportBottom = scrollTop + scrollElement.offsetHeight + itemsBufferHeight;
+		// Index of the potential end item
+		const potentialEndIndex = Math.floor(viewportBottom / itemHeight);
+		// Ensure potentialEndIndex does not exceed the length of the itemsWithPosition
+		const clampedEndIndex = Math.min(itemsWithPosition.length, potentialEndIndex);
+		const startIndex = Math.max(0, potentialStartIndex);
+		const endIndex = Math.max(startIndex, clampedEndIndex);
+
+		return itemsWithPosition.slice(startIndex, endIndex);
+	}
+
 	function onresize() {
-		if (scrollElement) {
-			minHeight = Math.max(scrollElement.offsetHeight, itemHeight * mappedItems.length);
-		}
+		if (!scrollElement) return;
+
+		const offsetHeight = scrollElement.offsetHeight;
+		const itemsHeight = itemHeight * itemsWithPosition.length;
+		const paddedHeight = isPadded ? itemsHeight + paddingBottom : itemsHeight;
+
+		minHeight = Math.max(offsetHeight, paddedHeight);
 	}
 
 	function onscroll(e: UIEvent) {
@@ -71,7 +82,7 @@
 	>
 		{#each visibleItems as item (item.id)}
 			<div
-				class="flex border-b"
+				class="flex border-input/30 even:bg-input/15"
 				style="grid-row: {item.position};"
 				animate:flip={{ duration: 400 }}
 			>

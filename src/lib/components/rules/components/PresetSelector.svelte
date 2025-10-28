@@ -8,6 +8,7 @@
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
+	import BlurPanel from '$lib/components/BlurPanel.svelte';
 
 	interface Props {
 		editor: Editor;
@@ -15,7 +16,7 @@
 
 	const { editor }: Props = $props();
 
-	let { rulePresets, background } = getAppManagerContext();
+	let { rulePresets } = getAppManagerContext();
 	let nameInputRef: HTMLInputElement | null = $state(null);
 	let isSelectOpen = $state(false);
 
@@ -51,12 +52,12 @@
 </script>
 
 <div class="relative flex items-center p-4">
-	<div class="flex w-full rounded-md border">
+	<BlurPanel class="flex w-full">
 		<Input
 			id="preset-name"
 			type="text"
 			placeholder="Название"
-			class="rounded-tr-none rounded-br-none border-transparent"
+			class="rounded-l-full rounded-r-none border-none border-transparent hover:bg-white/10"
 			bind:ref={nameInputRef}
 			bind:value={rulePresets.items[rulePresets.current].label}
 		/>
@@ -69,10 +70,10 @@
 			<SelectTrigger
 				class={cn(
 					buttonVariants({ variant: 'ghost', size: 'icon' }),
-					'rounded-l-none rounded-r-md border-none bg-transparent'
+					'rounded-l-none rounded-r-full border-none'
 				)}
 			/>
-			<SelectContent class="w-[384px]" align="end">
+			<SelectContent class="w-[366px]" align="end">
 				{#each rulePresets.items as { label }, idx}
 					<div class="flex">
 						<SelectItem value={String(idx)} {label} />
@@ -97,5 +98,5 @@
 				</Button>
 			</SelectContent>
 		</Select>
-	</div>
+	</BlurPanel>
 </div>

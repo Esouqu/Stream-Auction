@@ -79,9 +79,11 @@
 				<p>
 					Сумма: {winner?.value} ({(((winner?.value || 0) / lots.totalValue) * 100).toFixed(1)}%)
 				</p>
-				<p>
-					Заказавшие: {winner?.donators.join(', ')}
-				</p>
+				{#if winner && winner.donators.length > 0}
+					<p>
+						Заказавшие: {winner?.donators.join(', ')}
+					</p>
+				{/if}
 			</div>
 		{/if}
 		<div
