@@ -6,7 +6,7 @@
 	import DashedCircleIcon from '@lucide/svelte/icons/circle-dashed';
 	import CheckIcon from '@lucide/svelte/icons/circle-check';
 	import { fly } from 'svelte/transition';
-	import BlurPanel from './BlurPanel.svelte';
+	import { BLUR_PANEL_STYLES } from './BlurPanel.svelte';
 
 	const app = getAppManagerContext();
 
@@ -20,26 +20,25 @@
 	}
 </script>
 
-{#if app.donationSockets.length > 0}
-	<div in:fly={{ y: 200, duration: 500 }}>
-		<BlurPanel class="flex">
-			{#each app.donationSockets as socket}
-				<Toggle
-					class="rounded-full"
-					variant="ghost"
-					disabled={socket.isConnecting}
-					bind:pressed={() => isSocketOpen(socket), () => toggleConnection(socket)}
-				>
-					{#if socket.isConnecting}
-						<Spinner />
-					{:else if socket.isOpen}
-						<CheckIcon class="text-green-500" />
-					{:else}
-						<DashedCircleIcon />
-					{/if}
-					{socket.id}
-				</Toggle>
-			{/each}
-		</BlurPanel>
-	</div>
-{/if}
+<div
+	class={[BLUR_PANEL_STYLES, 'absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2']}
+	in:fly={{ y: 200, duration: 500 }}
+>
+	{#each app.donationSockets as socket}
+		<Toggle
+			class="rounded-full"
+			variant="ghost"
+			disabled={socket.isConnecting}
+			bind:pressed={() => isSocketOpen(socket), () => toggleConnection(socket)}
+		>
+			{#if socket.isConnecting}
+				<Spinner />
+			{:else if socket.isOpen}
+				<CheckIcon class="text-green-500" />
+			{:else}
+				<DashedCircleIcon />
+			{/if}
+			{socket.id}
+		</Toggle>
+	{/each}
+</div>

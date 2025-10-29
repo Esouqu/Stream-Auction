@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
-	import RefreshCwOffIcon from '@lucide/svelte/icons/refresh-cw-off';
 	import DicesIcon from '@lucide/svelte/icons/dices';
 	import Input from '$lib/components/Input.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
@@ -9,7 +8,8 @@
 	import { randomFromRange } from '$lib/utils';
 	import { Tween } from 'svelte/motion';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
-	import BlurPanel from '$lib/components/BlurPanel.svelte';
+	import { fade, fly } from 'svelte/transition';
+	import { BLUR_PANEL_STYLES } from '$lib/components/BlurPanel.svelte';
 
 	const app = getAppManagerContext();
 	const { wheel, lots } = app;
@@ -44,16 +44,14 @@
 	}
 </script>
 
-<!-- onclick={() => (isWheelActive ? app.stopSpinManually() : startSpin())} -->
-<BlurPanel class="flex gap-2">
+<div
+	class={[BLUR_PANEL_STYLES, 'absolute bottom-[5rem] left-1/2 z-10 flex -translate-x-1/2 gap-2']}
+	in:fly|global={{ y: 250, duration: 500 }}
+	out:fade
+>
 	<Button class="rounded-full" disabled={isWheelActive} onclick={startSpin}>
-		<!-- {#if !isWheelActive} -->
 		<RefreshCwIcon />
 		Крутить
-		<!-- {:else}
-			<RefreshCwOffIcon />
-			Остановить
-		{/if} -->
 	</Button>
 	<Tooltip>
 		<TooltipTrigger>
@@ -108,4 +106,4 @@
 			<TooltipContent>Сгенерировать новые цвета</TooltipContent>
 		</Tooltip>
 	</div>
-</BlurPanel>
+</div>

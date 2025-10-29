@@ -8,8 +8,7 @@
 	import Core from './components/Core.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import type { ILot } from '$lib/interfaces';
-	import { fade, fly, scale } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+	import { scale } from 'svelte/transition';
 	import WheelActionBar from './components/WheelActionBar.svelte';
 
 	interface ILotWithAngle extends ILot {
@@ -314,13 +313,7 @@
 			<Core {strokeColor} {winner} size={holeSize} {patternImage} />
 			<Outline {strokeColor} color={Color(winner?.color).hex()} />
 			{#if !wheel.isActive}
-				<div
-					class="absolute bottom-[5rem] left-1/2 z-10 -translate-x-1/2"
-					in:fly|global={{ y: 250, duration: 500 }}
-					out:fade
-				>
-					<WheelActionBar />
-				</div>
+				<WheelActionBar />
 			{/if}
 		{/if}
 		<div

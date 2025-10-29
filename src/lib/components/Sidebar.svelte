@@ -29,7 +29,7 @@
 	const currentRouteId = $derived(page.route.id);
 </script>
 
-<div class="flex w-[86px] shrink-0 flex-col items-center justify-between gap-4 pt-20 pb-8">
+<div class="flex w-[86px] shrink-0 flex-col items-center justify-between gap-4 pt-4 pb-8">
 	<Logo />
 
 	<div class="flex h-full flex-col justify-between py-5">

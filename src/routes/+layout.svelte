@@ -77,9 +77,9 @@
 			{/if}
 			<div class="relative flex h-full flex-col overflow-hidden rounded-2xl bg-card/40">
 				<DonationQueue />
-				<div class="absolute bottom-0 left-1/2 z-50 -translate-x-1/2 p-4">
+				{#if appManager.donationSockets.length > 0}
 					<SocketSelector />
-				</div>
+				{/if}
 			</div>
 		</div>
 	</main>

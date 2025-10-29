@@ -23,7 +23,6 @@
 
 		lots.add(lotTitle, lotValue);
 
-		clearInputs();
 		isOpen = false;
 	}
 </script>
