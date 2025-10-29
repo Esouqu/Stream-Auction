@@ -82,8 +82,9 @@
 	>
 		{#each visibleItems as item (item.id)}
 			<div
-				class="flex border-input/30 even:bg-input/15"
+				class="flex border-input/30 data-[even=true]:bg-input/15"
 				style="grid-row: {item.position};"
+				data-even={item.position % 2 === 0}
 				animate:flip={{ duration: 400 }}
 			>
 				{@render children(item)}
