@@ -11,6 +11,7 @@
 	import ListInfo from './components/ListInfo.svelte';
 	import LotLoader from './components/LotLoader.svelte';
 	import BlurPanel from '../BlurPanel.svelte';
+	import { slide } from 'svelte/transition';
 
 	interface Props {
 		compact?: boolean;
@@ -22,6 +23,7 @@
 
 	let searchValue = $state('');
 	let isDonatorsShown = $state(false);
+	let isSearchInputVisible = $state(false);
 
 	const filteredLots = $derived(lots.searchItems(searchValue));
 </script>
@@ -57,14 +59,16 @@
 			class="pointer-events-none absolute bottom-0 left-0 z-50 flex w-full items-center justify-between p-4 font-medium"
 		>
 			<AddLotPopover />
-			<BlurPanel class="pointer-events-auto flex py-0">
-				<Search bind:value={searchValue} />
-				<div class="flex py-1.5">
-					<TitleViewButton bind:isDonatorsShown />
-					<LotLoader />
-					<ClearActionDialog />
-					<ListInfo />
-				</div>
+			<BlurPanel class="pointer-events-auto flex px-0 py-0">
+				<Search bind:value={searchValue} bind:isInputVisible={isSearchInputVisible} />
+				{#if !isSearchInputVisible}
+					<div class="flex py-1.5 pr-1.5 pl-10" transition:slide={{ axis: 'x', duration: 400 }}>
+						<TitleViewButton bind:isDonatorsShown />
+						<LotLoader />
+						<ClearActionDialog />
+						<ListInfo />
+					</div>
+				{/if}
 			</BlurPanel>
 		</div>
 	{/if}

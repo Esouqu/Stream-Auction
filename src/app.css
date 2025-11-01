@@ -15,7 +15,7 @@
 	--popover-foreground: oklch(0.95 0 0);
 	--primary: oklch(0.922 0 0);
 	--primary-foreground: oklch(0.236 0.000 0.0);
-	--secondary: oklch(0.269 0 0);
+	--secondary: oklch(0.3 0 0);
 	--secondary-foreground: oklch(0.95 0 0);
 	--muted: oklch(0.269 0 0);
 	--muted-foreground: oklch(0.708 0 0);
@@ -131,16 +131,6 @@
 
 		100% {
 			transform: rotate(-5deg);
-		}
-	}
-
-	@keyframes tilt-alt {
-		0% {
-			transform: rotate(-5deg);
-		}
-
-		100% {
-			transform: rotate(5deg);
 		}
 	}
 }

@@ -15,7 +15,7 @@
 		{#snippet child({ props })}
 			<Toggle
 				{...props}
-				class="rounded-full data-[state=off]:text-foreground"
+				class="shrink-0 rounded-full data-[state=off]:text-foreground"
 				variant="ghost"
 				size="icon"
 				bind:pressed={isDonatorsShown}

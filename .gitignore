@@ -23,4 +23,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 src/lib/components/dev
+src/routes/test
 todo

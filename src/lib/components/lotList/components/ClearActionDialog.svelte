@@ -35,10 +35,12 @@
 		<TrashcanIcon />
 	</AlertDialogTrigger>
 
-	<AlertDialogContent>
+	<AlertDialogContent class="w-[452px]">
 		<AlertDialogHeader>
 			<AlertDialogTitle>{titleText}</AlertDialogTitle>
-			<AlertDialogDescription class="whitespace-pre-line">{warningText}</AlertDialogDescription>
+			<AlertDialogDescription class="whitespace-pre-line">
+				Нажимая «Удалить», вы <b>навсегда</b> удалите все лоты.
+			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel>Отмена</AlertDialogCancel>
