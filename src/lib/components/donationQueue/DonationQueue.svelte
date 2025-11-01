@@ -8,7 +8,7 @@
 </script>
 
 <ScrollArea class="h-full overflow-hidden" type="scroll">
-	<div class="space-y-2 p-4">
+	<div class="space-y-2 p-4 pb-[84px]">
 		{#each donations.items as donation (donation.id)}
 			<div class="w-full" animate:flip={{ duration: 200 }}>
 				<Donation {donation} />

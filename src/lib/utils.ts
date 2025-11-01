@@ -36,22 +36,6 @@ export function getShortenedText(str: string, fontStyle: string, maxWidth: numbe
 	return truncatedStr + (truncatedStr !== str ? '...' : '');
 }
 
-// function extractPattern(input) {
-// 	// Regular expression to match the pattern {number} на {string | number | special with #}
-// 	const regex = /(\d+)\s+на\s+([#\wА-Яа-яёЁ]+)/g;
-// 	const matches = [];
-// 	let match;
-
-// 	while ((match = regex.exec(input)) !== null) {
-// 		matches.push({
-// 			number: match[1], // The number part
-// 			value: match[2]   // The string, number, or special part
-// 		});
-// 	}
-
-// 	return matches;
-// }
-
 export function updateLocalStorageVersion(currentVersion: number) {
 	if (!browser) return;
 

@@ -30,7 +30,7 @@
 <BlurPanel class="pointer-events-auto relative flex">
 	<Popover bind:open={isOpen} onOpenChangeComplete={() => clearInputs()}>
 		<PopoverTrigger class={[buttonVariants({ variant: 'accent' }), 'rounded-full']}>
-			<ListAddIcon />
+			<ListAddIcon class="size-6" />
 			Новый лот
 		</PopoverTrigger>
 		<PopoverContent

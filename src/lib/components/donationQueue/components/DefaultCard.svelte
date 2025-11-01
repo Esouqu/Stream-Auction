@@ -49,7 +49,7 @@
 			class="w-full shrink rounded-r-none text-muted-foreground"
 			onclick={addNewLot}
 		>
-			<ListAddIcon />
+			<ListAddIcon class="size-6" />
 		</Button>
 
 		<Button
