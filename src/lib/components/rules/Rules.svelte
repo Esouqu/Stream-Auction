@@ -17,10 +17,9 @@
 	import TextStyle from '@tiptap/extension-text-style';
 	import Highlight from '@tiptap/extension-highlight';
 	import { FontSize } from '$lib/misc/FontSize';
-	import { getAppManagerContext } from '$lib/context/appManagerContext';
 
 	const editorStyles =
-		'h-full w-full ring-offset-background outline-none border border-transparent p-4 text-base text-foreground disabled:cursor-not-allowed disabled:opacity-50 [&_p]:min-w-1 prose lg:prose-xl prose-invert transition-colors [&_*]:leading-normal focus-visible:z-50 focus-visible:border-accent rounded-lg focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-accent/50';
+		'h-full w-full border-transparent p-4 text-base text-foreground disabled:cursor-not-allowed disabled:opacity-50 [&_p]:min-w-1 prose lg:prose-xl prose-invert transition-colors [&_*]:leading-normal focus-visible:z-50 rounded-lg focus-visible:bg-elevation-1 focus-visible:outline-input/30 border-0 outline-[2px] outline-transparent';
 	const tipTapConfig = {
 		editorProps: {
 			attributes: {
@@ -38,8 +37,6 @@
 		]
 	};
 
-	const { background } = getAppManagerContext();
-
 	let editor = $state() as Readable<Editor> | undefined;
 
 	onMount(() => {
@@ -49,8 +46,11 @@
 
 <div class="relative flex w-full flex-col rounded-xl bg-card/40">
 	{#if $editor}
-		<ScrollArea class="h-full overflow-hidden">
-			<EditorContent editor={$editor} class="relative flex h-full w-full" />
+		<ScrollArea class="relative h-full overflow-hidden">
+			<EditorContent editor={$editor} class="relative z-20 flex size-full p-0.5" />
+			{#if $editor.isFocused}
+				<div class="border-animation rounded-xl"></div>
+			{/if}
 		</ScrollArea>
 		<PresetSelector editor={$editor} />
 

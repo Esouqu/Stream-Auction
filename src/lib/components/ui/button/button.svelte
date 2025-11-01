@@ -4,7 +4,7 @@
 	import { type VariantProps, tv } from 'tailwind-variants';
 
 	export const buttonVariants = tv({
-		base: "aria-invalid:ring-destructive/20 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium outline-2 outline-transparent transition-[color,background-color,outline-color] duration-[0.3s,0.3s,0.15s] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-5 [&_svg]:pointer-events-none [&_svg]:shrink-0 cursor-pointer ",
+		base: "aria-invalid:ring-destructive/20 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium outline-2 outline-transparent transition-[color,background-color,outline-color] duration-[0.3s,0.3s,0.15s] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-5 [&_svg]:pointer-events-none [&_svg]:shrink-0 cursor-pointer rounded-full",
 		variants: {
 			variant: {
 				default:
@@ -21,10 +21,10 @@
 				icon: 'text-muted-foreground hover:text-foreground'
 			},
 			size: {
-				default: 'h-10 px-4 py-2 has-[>svg]:px-3',
-				sm: 'h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5',
-				lg: 'h-12 rounded-md px-6 has-[>svg]:px-4',
-				icon: 'size-10',
+				default: 'h-11 px-4 py-2 has-[>svg]:px-3',
+				sm: 'h-8 gap-1.5 px-3 has-[>svg]:px-2.5',
+				lg: 'h-12 px-6 has-[>svg]:px-4',
+				icon: 'size-11',
 				sidebar: "[&_svg:not([class*='size-'])]:!size-8 py-1 px-5"
 			}
 		},

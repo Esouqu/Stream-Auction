@@ -14,10 +14,10 @@
 					'bg-accent hover:bg-accent/90 data-[state=off]:text-foreground active:bg-accent active:outline-accent'
 			},
 			size: {
-				default: 'h-10 px-4 py-2',
+				default: 'h-11 px-4 py-2',
 				sm: 'h-8 min-w-8 px-1.5',
-				lg: 'h-10 min-w-10 px-2.5',
-				icon: 'size-10'
+				lg: 'h-11 min-w-11 px-2.5',
+				icon: 'size-11'
 			}
 		},
 		defaultVariants: {

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
 	import SettingWrapper from './SettingWrapper.svelte';
 	import SettingSection from './SettingSection.svelte';
 	import SettingCard from './SettingCard.svelte';
@@ -7,6 +6,7 @@
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import DonatePayIntegration from '$lib/components/DonatePayIntegration.svelte';
 	import DonationAlertsIntegration from '$lib/components/DonationAlertsIntegration.svelte';
+	import { Input } from '$lib/components/ui/input';
 
 	const app = getAppManagerContext();
 </script>

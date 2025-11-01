@@ -4,7 +4,6 @@
 	import DonatePayCentrifuge from '$lib/stores/DonatePayCentrifuge.svelte';
 	import { cn } from '$lib/utils';
 	import DonatePayIcon from './icons/DonatePayIcon.svelte';
-	import Input from './Input.svelte';
 	import Integration from './Integration.svelte';
 	import { badgeVariants } from './ui/badge';
 	import { Button } from './ui/button';
@@ -16,6 +15,7 @@
 		DialogTitle,
 		DialogTrigger
 	} from './ui/dialog';
+	import { Input } from './ui/input';
 
 	const app = getAppManagerContext();
 
@@ -95,6 +95,7 @@
 					<Input
 						id="donatepay-api-key"
 						type="password"
+						class="w-full"
 						placeholder="Введите API ключ"
 						maxlength={60}
 						oninput={() => (error = '')}

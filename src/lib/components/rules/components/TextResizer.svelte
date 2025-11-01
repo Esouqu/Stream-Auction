@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import MinusIcon from '@lucide/svelte/icons/minus';
 	import type { Editor } from 'svelte-tiptap';
+	import { Input } from '$lib/components/ui/input';
 
 	interface Props {
 		editor: Editor;
@@ -44,7 +44,7 @@
 		type="number"
 		class="w-[56px] bg-transparent text-center hover:bg-white/10"
 		value={fontSize}
-		onConfirmation={(value) => setFontSize(value as number)}
+		onblur={(e) => setFontSize(Number(e.currentTarget.value))}
 	/>
 	<Button
 		variant="ghost"

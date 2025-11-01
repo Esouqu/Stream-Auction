@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import XIcon from '@lucide/svelte/icons/x';
@@ -9,6 +8,7 @@
 	import { cn } from '$lib/utils';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import BlurPanel from '$lib/components/BlurPanel.svelte';
+	import { Input } from '$lib/components/ui/input';
 
 	interface Props {
 		editor: Editor;
@@ -51,13 +51,15 @@
 	}
 </script>
 
-<div class="relative flex items-center p-4">
-	<BlurPanel class="flex w-full">
+<div class="absolute bottom-0 left-0 z-20 flex w-full items-center p-4">
+	<BlurPanel class="flex w-full items-center">
 		<Input
 			id="preset-name"
 			type="text"
+			variant="ghost"
 			placeholder="Название"
-			class="rounded-l-full rounded-r-none border-none border-transparent hover:bg-white/10"
+			class="w-full rounded-r-none"
+			borderClass="!rounded-r-none"
 			bind:ref={nameInputRef}
 			bind:value={rulePresets.items[rulePresets.current].label}
 		/>
@@ -69,8 +71,8 @@
 		>
 			<SelectTrigger
 				class={cn(
-					buttonVariants({ variant: 'ghost', size: 'icon' }),
-					'rounded-l-none rounded-r-full border-none'
+					buttonVariants({ variant: 'ghost' }),
+					'h-[44px] rounded-l-none rounded-r-full border-none'
 				)}
 			/>
 			<SelectContent class="w-[366px]" align="end">

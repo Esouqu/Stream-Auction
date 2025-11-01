@@ -117,7 +117,8 @@ export function formatNumberWithSuffix(number: number): string {
 }
 
 export function getPercentFromTotal(value: number, total: number, decimals: number = 1) {
-	return ((value / total) * 100).toFixed(decimals) + '%';
+	const percent = (value / total) * 100;
+	return percent >= 100 ? `${percent.toFixed(0)}%` : `${percent.toFixed(decimals)}%`;
 }
 
 export function remToPx(rem: number) {

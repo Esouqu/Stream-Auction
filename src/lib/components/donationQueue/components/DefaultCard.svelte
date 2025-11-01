@@ -46,7 +46,7 @@
 		<Button
 			variant="ghost"
 			size="icon"
-			class="w-full shrink rounded-l-lg rounded-r-none text-muted-foreground"
+			class="w-full shrink rounded-r-none text-muted-foreground"
 			onclick={addNewLot}
 		>
 			<ListAddIcon />
@@ -55,7 +55,7 @@
 		<Button
 			variant="ghost"
 			size="icon"
-			class="w-full shrink rounded-l-none rounded-r-lg text-muted-foreground"
+			class="w-full shrink rounded-l-none text-muted-foreground"
 			onclick={removeDonation}
 		>
 			<XIcon />

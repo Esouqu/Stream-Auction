@@ -13,7 +13,7 @@
 	}
 
 	const itemsBuffer = 10;
-	const itemHeight = 40;
+	const itemHeight = 44;
 	const itemsBufferHeight = itemsBuffer * itemHeight;
 	const paddingBottom = 84;
 

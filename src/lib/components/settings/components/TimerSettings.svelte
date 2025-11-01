@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
+	import { Input } from '$lib/components/ui/input';
 	import { Switch } from '$lib/components/ui/switch';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import SettingCard from './SettingCard.svelte';

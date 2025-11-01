@@ -22,7 +22,7 @@
 			{title}
 		</span>
 		{#if description}
-			<span class="text-sm leading-snug whitespace-break-spaces text-muted-foreground">
+			<span class="text-sm leading-[18px] whitespace-break-spaces text-muted-foreground">
 				{@html description}
 			</span>
 		{/if}

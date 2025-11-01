@@ -5,13 +5,13 @@
 	import ResetIcon from '@lucide/svelte/icons/timer-reset';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import MinusIcon from '@lucide/svelte/icons/minus';
-	import Input from './Input.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import { fade } from 'svelte/transition';
 	import BlurPanel from './BlurPanel.svelte';
+	import { Input } from './ui/input';
 
 	const inputStyle =
-		'h-[4rem] leading-none border-none p-0 text-center tabular-nums read-only:hover:bg-transparent read-only:focus-visible:ring-transparent w-[6.25rem] md:text-7xl disabled:opacity-100 disabled:cursor-default transition-none hover:bg-white/10';
+		'h-[4rem] leading-none p-0 text-center tabular-nums read-only:hover:bg-transparent read-only:focus-visible:ring-transparent w-[6.25rem] md:text-7xl disabled:opacity-100 disabled:cursor-default transition-none hover:bg-white/10';
 
 	const { timer, wheel } = getAppManagerContext();
 
@@ -77,22 +77,31 @@
 			<Input
 				id="timer-min"
 				type="number"
+				variant="ghost"
 				class={inputStyle}
 				disabled={isInputDisabled}
-				onConfirmation={(v) => setMinutes(Number(v))}
+				onblur={(e) => setMinutes(Number(e.currentTarget.value))}
 				value={paddedMinutes}
 			/>
 			:
 			<Input
 				id="timer-sec"
 				type="number"
+				variant="ghost"
 				class={inputStyle}
 				disabled={isInputDisabled}
-				onConfirmation={(v) => setSeconds(Number(v))}
+				onblur={(e) => setSeconds(Number(e.currentTarget.value))}
 				value={paddedSeconds}
 			/>
 			:
-			<Input id="timer-ms" type="number" class={inputStyle} disabled value={paddedMs} />
+			<Input
+				id="timer-ms"
+				type="number"
+				variant="ghost"
+				class={inputStyle}
+				disabled
+				value={paddedMs}
+			/>
 		</div>
 
 		<BlurPanel class="flex w-full">
@@ -110,7 +119,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="w-full shrink rounded-full"
+					class="w-full shrink"
 					onclick={() => timer.reset()}
 					disabled={timer.target === timer.baseTime || wheel.isActive}
 				>
@@ -119,7 +128,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="w-full shrink rounded-full"
+					class="w-full shrink"
 					onclick={() => (timer.isActive ? timer.pause() : timer.start())}
 					disabled={timer.isActive
 						? timer.isProcessingQueue || wheel.isActive
@@ -135,7 +144,7 @@
 					variant="ghost"
 					size="icon"
 					disabled={wheel.isActive}
-					class="relative w-full shrink rounded-full text-base"
+					class="relative w-full shrink text-base"
 					onclick={onMinusClick}
 				>
 					<MinusIcon />
@@ -148,7 +157,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="relative w-full shrink rounded-full text-base"
+					class="relative w-full shrink text-base"
 					disabled={wheel.isActive}
 					onclick={onPlusClick}
 				>

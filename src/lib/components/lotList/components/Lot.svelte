@@ -4,12 +4,11 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import type { ILot } from '$lib/interfaces';
 	import { fade, slide } from 'svelte/transition';
-	import { cn } from '$lib/utils';
-	import Input from '$lib/components/Input.svelte';
 	import DropdownMenu, { type IDropdownItem } from '$lib/components/DropdownMenu.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import { Tween } from 'svelte/motion';
 	import { expoOut } from 'svelte/easing';
+	import { Input } from '$lib/components/ui/input';
 
 	interface Props extends ILot {
 		percent: string;
@@ -21,7 +20,6 @@
 
 	const app = getAppManagerContext();
 	const { lots } = app;
-	const sharedInputStyle = 'border-none hover:bg-primary/10 focus-visible:bg-background';
 	const actionItems: IDropdownItem[] = [
 		{
 			label: 'Прибавить',
@@ -188,9 +186,11 @@
 					<Input
 						id="lot-title-{id}"
 						type="text"
-						class={cn(sharedInputStyle, 'text-ellipsis')}
+						variant="ghost"
+						class="w-full text-ellipsis"
+						gradientColor="rgb({color.r} {color.g} {color.b})"
 						placeholder="Название лота"
-						onConfirmation={setTitle}
+						onblur={(e) => setTitle(e.currentTarget.value)}
 						value={title}
 					/>
 				{/if}
@@ -211,11 +211,13 @@
 				<Input
 					id="lot-value-{id}"
 					type="number"
-					class={cn(sharedInputStyle, 'pr-14 text-end tabular-nums')}
-					placeholder="Сумма"
-					onConfirmation={setValue}
+					variant="ghost"
+					class="pr-14 text-end tabular-nums"
+					gradientColor="rgb({color.r} {color.g} {color.b})"
 					suffix={percent}
 					suffixSize="sm"
+					placeholder="Сумма"
+					onblur={(e) => setValue(Number(e.currentTarget.value))}
 					{value}
 				/>
 			</div>
@@ -226,16 +228,17 @@
 						<Input
 							id="lot-add-value-{id}"
 							type="number"
-							class={cn(sharedInputStyle, 'w-24')}
+							variant="ghost"
+							class="w-24"
 							placeholder="Сумма"
+							onblur={addValue}
 							bind:ref={additionalInputRef}
 							bind:value={valueToAdd}
-							onConfirmation={addValue}
 						/>
 					</div>
 				{/if}
 
-				<DropdownMenu items={actionItems} class={sharedInputStyle}>
+				<DropdownMenu items={actionItems}>
 					{#snippet trigger()}
 						<EllipsisIcon />
 					{/snippet}

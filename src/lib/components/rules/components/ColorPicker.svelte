@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 
@@ -20,7 +20,7 @@
 		'relative flex flex-col items-center justify-center p-0 hover:bg-white/10'
 	)}
 >
-	<div class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+	<div class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 		{@render children()}
 	</div>
 	<div class="relative flex h-full w-full">

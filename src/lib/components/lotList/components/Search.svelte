@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
+	import { Input } from '$lib/components/ui/input';
 	import { Toggle } from '$lib/components/ui/toggle';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 	import SearchIcon from '@lucide/svelte/icons/search';
@@ -46,7 +46,7 @@
 					{...props}
 					size="icon"
 					variant="ghost"
-					class="absolute z-10 shrink-0 rounded-full data-[state=off]:text-foreground"
+					class="absolute top-1/2 z-30 shrink-0 -translate-y-1/2 rounded-full data-[state=off]:text-foreground data-[state=on]:text-muted-foreground"
 					bind:pressed={isInputVisible}
 				>
 					<SearchIcon />
@@ -61,9 +61,10 @@
 			<Input
 				id="search"
 				type="text"
+				variant="ghost"
 				class="w-full rounded-full border-none pl-10"
 				placeholder="Название"
-				onConfirmation={onblur}
+				{onblur}
 				bind:ref={inputRef}
 				bind:value
 			/>

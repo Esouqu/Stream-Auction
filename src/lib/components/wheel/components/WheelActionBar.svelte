@@ -2,7 +2,6 @@
 	import { Button } from '$lib/components/ui/button';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
 	import DicesIcon from '@lucide/svelte/icons/dices';
-	import Input from '$lib/components/Input.svelte';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 	import { randomFromRange } from '$lib/utils';
@@ -10,6 +9,7 @@
 	import PaletteIcon from '@lucide/svelte/icons/palette';
 	import { fade, fly } from 'svelte/transition';
 	import { BLUR_PANEL_STYLES } from '$lib/components/BlurPanel.svelte';
+	import { Input } from '$lib/components/ui/input';
 
 	const app = getAppManagerContext();
 	const { wheel, lots } = app;
@@ -49,7 +49,7 @@
 	in:fly|global={{ y: 250, duration: 500 }}
 	out:fade
 >
-	<Button class="rounded-full" disabled={isWheelActive} onclick={startSpin}>
+	<Button disabled={isWheelActive} onclick={startSpin}>
 		<RefreshCwIcon />
 		Крутить
 	</Button>
@@ -58,10 +58,10 @@
 			<Input
 				id="wheel-spin"
 				type="number"
-				class="w-[6rem] rounded-full"
+				class="w-[6rem]"
 				suffix="сек."
 				disabled={isWheelActive}
-				onConfirmation={setDuration}
+				onblur={(e) => setDuration(Number(e.currentTarget.value))}
 				value={Math.round(duration.current)}
 			/>
 		</TooltipTrigger>
@@ -74,7 +74,6 @@
 				{#snippet child({ props })}
 					<Button
 						{...props}
-						class="rounded-full"
 						variant="ghost"
 						size="icon"
 						disabled={isWheelActive}
@@ -93,7 +92,6 @@
 				{#snippet child({ props })}
 					<Button
 						{...props}
-						class="rounded-full"
 						variant="ghost"
 						size="icon"
 						disabled={isWheelActive}

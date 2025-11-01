@@ -31,7 +31,7 @@
 <div class="relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-card/40">
 	<div class="flex w-full shrink-0 py-2 font-medium text-muted-foreground">
 		<div class="w-14 shrink-0 px-4 pl-4 text-center">ID</div>
-		<div class="w-full px-3">Название</div>
+		<div class="w-full px-4">Название</div>
 		<div class="w-[8rem] shrink-0 px-4 pr-2 text-end">Сумма</div>
 		<div class="w-[56px] shrink-0"></div>
 	</div>

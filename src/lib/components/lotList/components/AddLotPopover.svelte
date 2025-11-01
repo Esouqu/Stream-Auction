@@ -1,8 +1,8 @@
 <script lang="ts">
 	import BlurPanel from '$lib/components/BlurPanel.svelte';
 	import ListAddIcon from '$lib/components/icons/ListAddIcon.svelte';
-	import Input from '$lib/components/Input.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 

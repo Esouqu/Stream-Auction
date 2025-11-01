@@ -10,6 +10,8 @@
 	import PieIcon from './icons/PieIcon.svelte';
 	import PieFillIcon from './icons/PieFillIcon.svelte';
 	import { fade } from 'svelte/transition';
+	import DevToolkit from './dev/DevToolkit.svelte';
+	import { dev } from '$app/environment';
 
 	const items = [
 		{
@@ -65,5 +67,8 @@
 		</div>
 		<Links />
 	</div>
+	{#if dev}
+		<DevToolkit />
+	{/if}
 	<Settings />
 </div>

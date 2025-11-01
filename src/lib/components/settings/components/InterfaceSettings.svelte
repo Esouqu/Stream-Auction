@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Input from '$lib/components/Input.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 	import { Slider } from '$lib/components/ui/slider';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import SettingCard from './SettingCard.svelte';
@@ -42,6 +42,7 @@
 				<Input
 					id="bg"
 					type="text"
+					class="w-full"
 					placeholder=".jpg, .png, .mp4, .webm ..."
 					bind:value={getBackground, setBackground}
 				/>

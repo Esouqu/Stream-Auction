@@ -62,13 +62,7 @@
 <Tooltip>
 	<TooltipTrigger>
 		{#snippet child({ props })}
-			<Button
-				{...props}
-				class="rounded-full"
-				variant="ghost"
-				size="icon"
-				onclick={() => fileImportRef?.click()}
-			>
+			<Button {...props} variant="ghost" size="icon" onclick={() => fileImportRef?.click()}>
 				<UploadIcon />
 			</Button>
 		{/snippet}
@@ -80,7 +74,6 @@
 		{#snippet child({ props })}
 			<Button
 				{...props}
-				class="rounded-full"
 				variant="ghost"
 				size="icon"
 				disabled={!lots.items?.length}

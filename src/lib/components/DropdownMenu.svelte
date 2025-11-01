@@ -25,7 +25,11 @@
 <Popover bind:open>
 	<PopoverTrigger
 		bind:ref={triggerRef}
-		class={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'cursor-default', className)}
+		class={cn(
+			buttonVariants({ variant: 'ghost', size: 'icon' }),
+			'rounded-full text-muted-foreground hover:text-foreground',
+			className
+		)}
 	>
 		{@render trigger()}
 	</PopoverTrigger>
