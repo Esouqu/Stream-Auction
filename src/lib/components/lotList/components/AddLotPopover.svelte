@@ -10,7 +10,7 @@
 
 	let lotTitle = $state('');
 	let lotValue: number | null = $state(null);
-	let isOpen = $state(false);
+	let open = $state(false);
 	const isValid = $derived(!!lotTitle && lotValue !== null);
 
 	function clearInputs() {
@@ -23,12 +23,12 @@
 
 		lots.add(lotTitle, lotValue);
 
-		isOpen = false;
+		open = false;
 	}
 </script>
 
 <BlurPanel class="pointer-events-auto relative flex">
-	<Popover bind:open={isOpen} onOpenChangeComplete={() => clearInputs()}>
+	<Popover bind:open onOpenChangeComplete={clearInputs}>
 		<PopoverTrigger class={[buttonVariants({ variant: 'accent' }), 'rounded-full']}>
 			<ListAddIcon class="size-6" />
 			Новый лот
@@ -37,6 +37,7 @@
 			class="pointer-events-auto w-min space-y-3 p-3 xl:w-max"
 			sideOffset={16}
 			align="start"
+			onCloseAutoFocus={(e) => e.preventDefault()}
 		>
 			<h3 class="text-lg leading-none font-medium tracking-tight">Новый лот</h3>
 			<div class="flex flex-wrap justify-center gap-2">
