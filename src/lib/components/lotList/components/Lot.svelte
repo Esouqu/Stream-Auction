@@ -185,6 +185,7 @@
 				{:else}
 					<Input
 						id="lot-title-{id}"
+						{title}
 						type="text"
 						variant="ghost"
 						class="w-full text-ellipsis"
