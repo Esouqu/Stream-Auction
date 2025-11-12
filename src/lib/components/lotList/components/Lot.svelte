@@ -139,11 +139,12 @@
 			style="background-color: rgb({color.r} {color.g} {color.b}); color: {isDarkColor
 				? 'white'
 				: 'black'}"
-			transition:slide|global={{ axis: 'x', easing: expoOut }}
 			onmouseenter={() => (isDirty = true)}
 			onfocus={() => (isDirty = true)}
 			role="button"
 			tabindex={0}
+			in:slide|global={{ axis: 'x', duration: 600, easing: expoOut }}
+			out:slide={{ axis: 'x', duration: 600, easing: expoOut }}
 		>
 			<div class="max-w-[50%] overflow-hidden text-ellipsis whitespace-nowrap">
 				{title}
@@ -155,7 +156,7 @@
 		</div>
 	{:else}
 		<div
-			class="relative grid w-full grid-cols-[3.5rem_1fr_8rem_auto] outline-2 transition-colors duration-200"
+			class="relative grid w-full grid-cols-[3.5rem_1fr_136px_auto] outline-2 transition-colors duration-200"
 			style="outline-color: rgb({color.r} {color.g} {color.b} / {isDraggedOver
 				? '70%'
 				: '0%'}); background-color: rgb({color.r} {color.g} {color.b} / {isDraggedOver
@@ -165,6 +166,7 @@
 			{ondragover}
 			{ondragleave}
 			{ondrop}
+			in:fade={{ delay: 200 }}
 		>
 			<div
 				class="bg-opacity-50 sticky top-0 left-0 flex items-center justify-center rounded-r-full px-4 font-semibold"
@@ -200,7 +202,7 @@
 			<div class="relative">
 				{#if shouldAnimateAddedValue}
 					<div
-						class="absolute z-50 flex h-full w-full items-center justify-center rounded font-medium"
+						class="absolute z-50 flex h-full w-full items-center justify-center rounded-full font-medium"
 						style="background-color: rgb({color.r} {color.g} {color.b}); color: {isDarkColor
 							? 'white'
 							: 'black'}"
@@ -225,7 +227,7 @@
 
 			<div class="flex items-center pr-4">
 				{#if isAddInputVisible}
-					<div class="h-full" transition:slide={{ axis: 'x', duration: 200 }}>
+					<div class="h-full" transition:slide={{ axis: 'x' }}>
 						<Input
 							id="lot-add-value-{id}"
 							type="number"

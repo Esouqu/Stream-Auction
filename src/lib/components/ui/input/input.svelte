@@ -107,7 +107,7 @@
 
 		{#if suffix}
 			<span
-				class="pointer-events-none absolute top-1/2 right-3 z-20 -translate-y-1/2 text-muted-foreground data-[suffix-size=sm]:right-2 data-[suffix-size=sm]:text-sm"
+				class="pointer-events-none absolute top-1/2 right-3 z-20 -translate-y-1/2 text-muted-foreground data-[suffix-size=sm]:right-3 data-[suffix-size=sm]:text-sm"
 				data-suffix-size={suffixSize}
 			>
 				{suffix}
