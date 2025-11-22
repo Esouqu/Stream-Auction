@@ -3,7 +3,6 @@
 	import RemoveFormattingIcon from '@lucide/svelte/icons/remove-formatting';
 	import type { Editor } from 'svelte-tiptap';
 	import MenuButton from './MenuButton.svelte';
-	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 
 	interface Props {
 		editor: Editor;
@@ -13,11 +12,11 @@
 	const { editor, class: className }: Props = $props();
 
 	const buttons = [
-		{
-			tooltip: 'Разделитель',
-			Icon: SeparatorIcon,
-			onclick: () => editor.chain().focus().setHorizontalRule().run()
-		},
+		// {
+		// 	tooltip: 'Разделитель',
+		// 	Icon: SeparatorIcon,
+		// 	onclick: () => editor.chain().focus().setHorizontalRule().run()
+		// },
 		{
 			tooltip: 'Очистить форматирование',
 			Icon: RemoveFormattingIcon,

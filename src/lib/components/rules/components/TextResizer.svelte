@@ -31,27 +31,17 @@
 </script>
 
 <div class={className}>
-	<Button
-		variant="ghost"
-		size="icon"
-		class="hover:bg-white/10"
-		onclick={() => setFontSize(fontSize - incrementValue)}
-	>
+	<Button variant="ghost" size="icon" onclick={() => setFontSize(fontSize - incrementValue)}>
 		<MinusIcon />
 	</Button>
 	<Input
 		id="editor-menu-text-size"
 		type="number"
-		class="w-[56px] bg-transparent text-center hover:bg-white/10"
+		class="w-[52px] bg-transparent px-3 text-center"
 		value={fontSize}
 		onblur={(e) => setFontSize(Number(e.currentTarget.value))}
 	/>
-	<Button
-		variant="ghost"
-		size="icon"
-		class="hover:bg-white/10"
-		onclick={() => setFontSize(fontSize + incrementValue)}
-	>
+	<Button variant="ghost" size="icon" onclick={() => setFontSize(fontSize + incrementValue)}>
 		<PlusIcon />
 	</Button>
 </div>

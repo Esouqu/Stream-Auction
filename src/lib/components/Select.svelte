@@ -77,7 +77,7 @@
 								{#if label}
 									{label}
 								{:else if Icon}
-									<Icon />
+									<Icon class="text-foreground" />
 								{/if}
 							</CommandItem>
 						{/each}

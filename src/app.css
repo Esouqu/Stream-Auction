@@ -187,6 +187,10 @@
 		}
 	}
 
+	.swatch {
+		border-radius: 999px;
+	}
+
 	.border-animation {
 		position: absolute;
 		top: 0;

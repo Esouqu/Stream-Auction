@@ -56,7 +56,7 @@
 
 <Popover>
 	<PopoverTrigger class={buttonVariants({ variant: 'ghost', size: 'icon' })}>
-		<HammerIcon />
+		<HammerIcon class="text-muted-foreground" />
 	</PopoverTrigger>
 	<PopoverContent class="w-fit bg-elevation-1" side="right" align="end" sideOffset={32}>
 		<Card class="bg-transparent">
