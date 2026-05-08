@@ -32,7 +32,7 @@
 	<Tooltip>
 		<TooltipTrigger>
 			{#snippet child({ props })}
-				<PopoverTrigger {...props} class={cn(buttonVariants(), 'size-14')}>
+				<PopoverTrigger {...props} class={cn(buttonVariants(), 'mx-2 size-14')}>
 					<ListAddIcon class="size-6" />
 				</PopoverTrigger>
 			{/snippet}

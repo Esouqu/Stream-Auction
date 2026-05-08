@@ -60,9 +60,12 @@
 			appManager.addSocket(donatePaySocket);
 		}
 
-		await donatexApi.getToken();
-		const donateXSocket = new DonateXSocket();
-		appManager.addSocket(donateXSocket);
+		const donatexToken = await donatexApi.getToken();
+
+		if (donatexToken) {
+			const donateXSocket = new DonateXSocket();
+			appManager.addSocket(donateXSocket);
+		}
 	}
 </script>
 
