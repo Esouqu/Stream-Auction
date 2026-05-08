@@ -3,14 +3,19 @@
 	import { Select as SelectPrimitive } from 'bits-ui';
 	import { cn, type WithoutChild } from '$lib/utils.js';
 
+	type Props = WithoutChild<SelectPrimitive.ItemProps> & {
+		noCheckmark?: boolean;
+	};
+
 	let {
 		ref = $bindable(null),
 		class: className,
 		value,
 		label,
 		children: childrenProp,
+		noCheckmark = false,
 		...restProps
-	}: WithoutChild<SelectPrimitive.ItemProps> = $props();
+	}: Props = $props();
 </script>
 
 <SelectPrimitive.Item
@@ -18,14 +23,14 @@
 	{value}
 	data-slot="select-item"
 	class={cn(
-		"relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+		"relative flex w-full cursor-default items-center gap-2 rounded-md py-1.5 pr-8 pl-2 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-primary/10 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
 		className
 	)}
 	{...restProps}
 >
 	{#snippet children({ selected, highlighted })}
 		<span class="absolute right-3 flex items-center justify-center">
-			{#if selected}
+			{#if selected && !noCheckmark}
 				<CheckIcon class="stroke-3" />
 			{/if}
 		</span>

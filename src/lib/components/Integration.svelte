@@ -1,34 +1,25 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { Button } from './ui/button';
-	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 	interface Props {
 		title: string;
-		username?: string;
+		isLoggedIn: boolean;
 		icon: Snippet;
 		onAuth?: () => void;
 		onLogout?: () => void;
 	}
 
-	const { title, username, icon, onAuth, onLogout }: Props = $props();
+	const { title, isLoggedIn, icon, onAuth, onLogout }: Props = $props();
 </script>
 
 <div class="flex w-full items-center">
-	{#if !username}
-		<Button variant="outline" size="lg" class="w-full" onclick={onAuth}>
-			{@render icon()}
-			Авторизоваться
-		</Button>
-	{:else}
-		<Card class="flex w-full flex-row justify-between">
-			<CardHeader class="grow gap-0">
-				<CardTitle>{title}</CardTitle>
-				<CardDescription class="text-sm">{username}</CardDescription>
-			</CardHeader>
-			<CardContent class="flex items-center">
-				<Button variant="ghost" onclick={onLogout}>Выйти</Button>
-			</CardContent>
-		</Card>
-	{/if}
+	<div class="flex w-full flex-col gap-2 rounded-xl bg-card p-4 text-card-foreground shadow-md">
+		<div class="flex items-center justify-center gap-2">{@render icon()} {title}</div>
+		{#if isLoggedIn}
+			<Button size="sm" variant="ghost" onclick={onLogout}>Выйти</Button>
+		{:else}
+			<Button size="sm" class="w-full" onclick={onAuth}>Подключить</Button>
+		{/if}
+	</div>
 </div>

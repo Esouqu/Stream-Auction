@@ -54,7 +54,9 @@
 							in:fly={{ x: 100 }}
 							out:fly={{ x: -100 }}
 						>
-							<span class="text-muted-foreground">{app.previousSpinExtendPrice} RUB</span>
+							<span class="text-muted-foreground"
+								>{app.spinExtendPrice - app.settings.spinExtendPriceGain} RUB</span
+							>
 							<ArrowIcon />
 							{app.spinExtendPrice} RUB
 						</div>

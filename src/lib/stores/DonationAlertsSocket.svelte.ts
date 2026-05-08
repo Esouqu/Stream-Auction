@@ -1,6 +1,7 @@
 import { toast } from 'svelte-sonner';
-import { SOCKET_STATE, type IDonationSocket, type IDonationSocketData, type ISocketConnectionData } from '../interfaces';
+import { SOCKET_STATE, type ISocketConnectionData } from '../interfaces';
 import donationAlertsApi from '$lib/api/donationalertsApi.svelte';
+import DonationSocket from './DonationSocket.svelte';
 
 interface DonationAlertsDonationMessage {
 	id: number;
@@ -20,17 +21,14 @@ interface DonationAlertsDonationMessage {
 	reason: string;
 }
 
-class DonationAlertsSocket implements IDonationSocket {
-	readonly id = 'DonationAlerts';
-	readonly color = 'bg-orange-500/50';
-	private _state: SOCKET_STATE = $state(SOCKET_STATE.CLOSED);
+class DonationAlertsSocket extends DonationSocket {
 	private _socket: WebSocket | undefined;
 	private _roomId: string;
 	private _socketToken: string | undefined;
-	public onDonation: ((donation: IDonationSocketData) => void) | undefined;
 
-	constructor({ id, socketToken }: ISocketConnectionData) {
-		this._roomId = `$alerts:donation_${id}`;
+	constructor({ roomId, socketToken }: ISocketConnectionData) {
+		super('DonationAlerts', 'bg-amber-500');
+		this._roomId = `$alerts:donation_${roomId}`;
 		this._socketToken = socketToken;
 	}
 
@@ -91,15 +89,16 @@ class DonationAlertsSocket implements IDonationSocket {
 			if (!message.result.type && message.result.channel === this._roomId) {
 				const donation: DonationAlertsDonationMessage = message.result.data.data;
 				const username = donation.username ?? 'Аноним';
-				const roundedAmount = Math.round(donation.amount_in_user_currency);
+				const amount = Math.round(donation.amount_in_user_currency);
 
-				this.onDonation?.({
-					username,
-					amount: roundedAmount,
-					currency: 'RUB',
-					message: donation.message,
-					source: 'DonationAlerts'
-				});
+				for (const handler of this._donationListeners) {
+					handler({
+						username,
+						amount,
+						message: donation.message,
+						source: 'DonationAlerts'
+					});
+				}
 			}
 		});
 

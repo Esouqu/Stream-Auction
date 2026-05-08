@@ -1,9 +1,11 @@
 <script lang="ts">
+	import BlurPanel from '$lib/components/BlurPanel.svelte';
 	import ListAddIcon from '$lib/components/icons/ListAddIcon.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import type { FlyDirection } from '$lib/interfaces';
 	import type { IDonation } from '$lib/stores/DonationStore.svelte';
+	import { formatCurrencyNumber } from '$lib/utils';
 	import XIcon from '@lucide/svelte/icons/x';
 	import type { Snippet } from 'svelte';
 
@@ -15,7 +17,7 @@
 	};
 
 	const { donation, icon, onRemove, onAdd }: Props = $props();
-	const { id, message, username, amount, currency } = donation;
+	const { id, message, username, amount } = donation;
 
 	const { lots, donations } = getAppManagerContext();
 
@@ -37,15 +39,15 @@
 			{@render icon()}
 			<div class="truncate" title={username}>{username}</div>
 		</div>
-		<div class="whitespace-nowrap">{amount} {currency}</div>
+		<div class="whitespace-nowrap">{formatCurrencyNumber(amount)}</div>
 	</div>
 	<div class="overflow-hidden break-words text-muted-foreground">
 		{message}
 	</div>
-	<div class="flex w-full">
+	<BlurPanel class="flex w-full p-1!">
 		<Button
 			variant="ghost"
-			size="icon"
+			size="sm"
 			class="w-full shrink rounded-r-none text-muted-foreground"
 			onclick={addNewLot}
 		>
@@ -54,11 +56,11 @@
 
 		<Button
 			variant="ghost"
-			size="icon"
+			size="sm"
 			class="w-full shrink rounded-l-none text-muted-foreground"
 			onclick={removeDonation}
 		>
 			<XIcon />
 		</Button>
-	</div>
+	</BlurPanel>
 </div>

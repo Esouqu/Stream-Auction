@@ -88,16 +88,17 @@ export function formatTime(ms: number) {
 	}
 }
 
-export function formatNumberWithSuffix(number: number): string {
+export function formatCurrencyNumber(number: number): string {
 	if (number === 0) return "0";
 
-	const suffixes = ['', ' тыс.', ' млн', ' млрд'];
-	const exp = Math.floor(Math.log10(number) / 3);
-	const suffix = suffixes[exp];
-	const num = number / 10 ** (exp * 3);
+	const formatter = Intl.NumberFormat("ru-RU", {
+		style: "currency",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+		currency: "RUB",
+	});
 
-	const formattedNumber = num.toFixed(1);
-	return (formattedNumber.endsWith('.0') ? num.toFixed(0) : formattedNumber) + suffix;
+	return formatter.format(number);
 }
 
 export function getPercentFromTotal(value: number, total: number, decimals: number = 1) {

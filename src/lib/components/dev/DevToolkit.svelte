@@ -39,7 +39,6 @@
 			id: crypto.randomUUID(),
 			username: 'dev',
 			amount: 100,
-			currency: 'RUB',
 			message: donationMessage || 'Тестовое сообщение в пять слов',
 			source: 'DonationAlerts',
 			isInstant: false

@@ -1,4 +1,4 @@
-export type DonationSource = 'DonationAlerts' | 'DonatePay';
+export type DonationSource = 'DonationAlerts' | 'DonatePay' | 'DonateX';
 export type FlyDirection = 1 | -1;
 
 export enum SOCKET_STATE {
@@ -8,22 +8,10 @@ export enum SOCKET_STATE {
 }
 
 export interface ISocketConnectionData {
-	id: number;
+	roomId: number;
 	socketToken?: string;
 }
 
-export interface IDonationSocket {
-	id: DonationSource;
-	color: string;
-	state: SOCKET_STATE;
-	isOpen: boolean;
-	isConnecting: boolean;
-	isClosed: boolean;
-	socket?: WebSocket;
-	onDonation?: ((donation: IDonationSocketData) => void);
-	connect: () => void;
-	disconnect: () => void;
-}
 export interface ILot {
 	id: number;
 	title: string;
@@ -40,7 +28,6 @@ export interface ILot {
 export interface IDonationSocketData {
 	username: string;
 	amount: number;
-	currency: string;
 	message: string;
 	source: DonationSource;
 }
@@ -81,16 +68,16 @@ export interface IDonationAlertsUserData {
 	socket_connection_token: string;
 }
 
-export interface ITwitchUserData {
+export interface IDonateXDonationData {
 	id: string;
-	login: string;
-	display_name: string;
-	type: string;
-	broadcaster_type: string;
-	description: string;
-	profile_image_url: string;
-	offline_image_url: string;
-	view_count: number;
-	email: string;
-	created_at: Date;
+	username: string;
+	message: string;
+	currency: string;
+	amount: number;
+	amountInRub: number;
+	timestamp: string;
+	isTest: boolean;
+	isPotentiallyUnsafe: boolean;
+	isFeePaidByUser: boolean;
+	voiceFilePath: "https://cdn.donatex.gg/donation-voices/voice.mp3";
 }

@@ -9,6 +9,4 @@
 	const { class: className }: Props = $props();
 </script>
 
-<div class={'flex h-full w-full items-center justify-center'}>
-	<SpinnerIcon class={cn(className, 'animate-spin text-foreground')} />
-</div>
+<SpinnerIcon class={cn('animate-spin text-foreground', className)} />

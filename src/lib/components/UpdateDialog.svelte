@@ -13,7 +13,7 @@
 	import XIcon from '@lucide/svelte/icons/x';
 
 	const lastSeenUpdates = storable<number | null>(null, 'lastSeenUpdates');
-	const lastUpdateDate = new Date('2025-08-26 11:00:00');
+	const lastUpdateDate = new Date('2026-05-08 20:10:00');
 
 	let haveSeenUpdates = $derived(
 		lastSeenUpdates.value ? new Date(lastSeenUpdates.value) > lastUpdateDate : false
@@ -44,23 +44,29 @@
 
 		<div class="space-y-4 p-6 pt-0">
 			<div>
-				<div class="text-lg leading-10 font-semibold">Страница аукциона</div>
+				<div class="text-lg leading-10 font-semibold">Общее</div>
 				<ul class="space-y-2">
-					<li>Добавлена кнопка для смены отображения названия лота на никнеймы донатеров</li>
-					<li>Добавлена возможность скрыть анимацию добавления нового лота по наведению на него</li>
-				</ul>
-			</div>
-			<div>
-				<div class="text-lg leading-10 font-semibold">Страница колеса</div>
-				<ul class="space-y-2">
-					<li>Добавлена кнопка для генерации новых случайных цветов</li>
 					<li>
-						Добавлен таймаут в 10 секунд после завершения кручения, в течение которого донаты не
-						добавляются к лотам автоматически
+						Добавлена интеграция с <b>DonateX</b>.
 					</li>
 				</ul>
 			</div>
 			<div>
+				<div class="text-lg leading-10 font-semibold">Страница аукциона</div>
+				<ul class="space-y-2">
+					<li>
+						Количество лотов и общая сумма теперь находятся в подсказке на кнопке нового лота.
+					</li>
+					<li>Загрузка/сохранение лотов объеденено в одну кнопку.</li>
+				</ul>
+			</div>
+			<div>
+				<div class="text-lg leading-10 font-semibold">Колесо</div>
+				<ul class="space-y-2">
+					<li>Возвращена кнопка ручной остановки.</li>
+				</ul>
+			</div>
+			<!-- <div>
 				<div class="text-lg leading-10 font-semibold">Таймер</div>
 				<ul class="space-y-2">
 					<li>Формат таймера теперь — мин:сек:мс</li>
@@ -75,7 +81,7 @@
 					<li>Добавлена возможность менять размытие фона</li>
 					<li>Убран выбор основного цвета</li>
 				</ul>
-			</div>
+			</div> -->
 		</div>
 	</DialogContent>
 </Dialog>

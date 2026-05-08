@@ -15,7 +15,7 @@
 		{#snippet child({ props })}
 			<Toggle
 				{...props}
-				class="shrink-0 rounded-full data-[state=off]:text-foreground"
+				class="shrink-0 rounded-full"
 				variant="ghost"
 				size="icon"
 				bind:pressed={isDonatorsShown}
@@ -24,5 +24,5 @@
 			</Toggle>
 		{/snippet}
 	</TooltipTrigger>
-	<TooltipContent>Ники донатеров вместо названия</TooltipContent>
+	<TooltipContent>Ники вместо названия</TooltipContent>
 </Tooltip>

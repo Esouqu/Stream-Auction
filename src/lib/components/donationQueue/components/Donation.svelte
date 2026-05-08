@@ -7,6 +7,7 @@
 	import InstantCard from './InstantCard.svelte';
 	import DefaultCard from './DefaultCard.svelte';
 	import type { FlyDirection } from '$lib/interfaces';
+	import DonateXIcon from '$lib/components/icons/DonateXIcon.svelte';
 
 	type Props = {
 		donation: IDonation;
@@ -31,6 +32,12 @@
 					gradient: 'bg-gradient-to-b from-[#5db180] to-[#44AB4F]',
 					Icon: DonatePayIcon
 				};
+			case 'DonateX':
+				return {
+					gradient: 'bg-gradient-to-tr from-purple-500 to-blue-500',
+					Icon: DonateXIcon
+				};
+
 			default:
 				return {
 					gradient: 'bg-none',

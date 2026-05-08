@@ -8,7 +8,6 @@
 	import Search from './components/Search.svelte';
 	import TitleViewButton from './components/TitleViewButton.svelte';
 	import ClearActionDialog from './components/ClearActionDialog.svelte';
-	import ListInfo from './components/ListInfo.svelte';
 	import LotLoader from './components/LotLoader.svelte';
 	import BlurPanel from '../BlurPanel.svelte';
 	import { slide } from 'svelte/transition';
@@ -32,13 +31,13 @@
 	<div class="flex w-full shrink-0 py-2 font-medium text-muted-foreground">
 		<div class="w-14 shrink-0 px-4 pl-4 text-center">ID</div>
 		<div class="w-full px-4">Название</div>
-		<div class="w-[8rem] shrink-0 px-4 pr-2 text-end">Сумма</div>
+		<div class="w-[9rem] shrink-0 px-4 pr-14 text-end">Сумма</div>
 		<div class="w-[56px] shrink-0"></div>
 	</div>
 
 	{#if !lots.sortedItems}
 		<div class="flex h-full flex-col space-y-1">
-			{#each { length: 17 } as _}
+			{#each { length: 17 } as _, idx (idx)}
 				<Skeleton class="h-10 w-full" />
 			{/each}
 		</div>
@@ -56,17 +55,19 @@
 
 	{#if !compact}
 		<div
-			class="pointer-events-none absolute bottom-0 left-0 z-50 flex w-full items-center justify-between p-4 font-medium"
+			class="pointer-events-none absolute right-4 bottom-4 left-4 z-50 mx-auto flex w-fit flex-col gap-2"
 		>
-			<AddLotPopover />
-			<BlurPanel class="pointer-events-auto flex px-0 py-0">
+			<BlurPanel class="pointer-events-auto flex items-center overflow-hidden px-0 py-0">
 				<Search bind:value={searchValue} bind:isInputVisible={isSearchInputVisible} />
 				{#if !isSearchInputVisible}
-					<div class="flex py-1.5 pr-1.5 pl-10" transition:slide={{ axis: 'x', duration: 400 }}>
+					<div
+						class="flex items-center gap-2 pr-1.5 pl-12"
+						transition:slide={{ axis: 'x', duration: 400 }}
+					>
 						<TitleViewButton bind:isDonatorsShown />
+						<AddLotPopover />
 						<LotLoader />
 						<ClearActionDialog />
-						<ListInfo />
 					</div>
 				{/if}
 			</BlurPanel>

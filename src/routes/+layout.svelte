@@ -21,16 +21,25 @@
 	import SpinExtendInfo from '$lib/components/SpinExtendInfo.svelte';
 	import { page } from '$app/state';
 	import { MediaQuery } from 'svelte/reactivity';
+	import DonateXSocket from '$lib/stores/DonateXSocket.svelte';
+	import donatexApi from '$lib/api/donatexApi.svelte';
 
 	const { children } = $props();
 
+	const large = new MediaQuery('(min-width: 1536px)');
 	const isWheelPage = $derived(page.route.id === '/wheel');
 
 	setAppManagerContext(appManager);
 
-	onMount(async () => {
+	onMount(() => {
 		updateLocalStorageVersion(1);
 		addSockets();
+
+		return () => {
+			for (const socket of appManager.donationSockets) {
+				socket.disconnect();
+			}
+		};
 	});
 
 	async function addSockets() {
@@ -38,7 +47,7 @@
 
 		if (user) {
 			const donationAlertsSocket = new DonationAlertsSocket({
-				id: user.id,
+				roomId: user.id,
 				socketToken: user.socket_connection_token
 			});
 
@@ -47,17 +56,17 @@
 		}
 
 		if (donatePayApi.user?.id) {
-			const donatePaySocket = new DonatePayCentrifuge({ id: donatePayApi.user.id });
-
+			const donatePaySocket = new DonatePayCentrifuge({ roomId: donatePayApi.user.id });
 			appManager.addSocket(donatePaySocket);
 		}
-	}
 
-	const large = new MediaQuery('(min-width: 1536px)');
+		await donatexApi.getToken();
+		const donateXSocket = new DonateXSocket();
+		appManager.addSocket(donateXSocket);
+	}
 </script>
 
-<!-- <div class="flex h-full max-h-[1080px] w-full max-w-[1920px]"> -->
-<TooltipProvider disableHoverableContent delayDuration={100}>
+<TooltipProvider disableHoverableContent ignoreNonKeyboardFocus delayDuration={100}>
 	<UpdateDialog />
 	<Sidebar />
 
@@ -84,4 +93,3 @@
 		</div>
 	</main>
 </TooltipProvider>
-<!-- </div> -->

@@ -53,7 +53,9 @@
 				<div class="border-animation rounded-xl"></div>
 			{/if}
 		</ScrollArea>
-		<PresetSelector editor={$editor} />
+		<div class="absolute right-4 bottom-4 left-4 z-20 flex items-center">
+			<PresetSelector editor={$editor} />
+		</div>
 
 		<BubbleMenu
 			editor={$editor}
@@ -75,7 +77,7 @@
 		</BubbleMenu>
 	{:else}
 		<div class="flex flex-col space-y-2 p-4">
-			{#each { length: 5 } as _}
+			{#each { length: 5 } as _, idx (idx)}
 				<Skeleton class="h-5 w-1/3"></Skeleton>
 				<Skeleton class="h-5 w-full"></Skeleton>
 				<Skeleton class="h-5 w-2/3"></Skeleton>

@@ -14,7 +14,7 @@
 				outline: 'bg-elevation-2 hover:bg-primary/10 hover:text-accent-foreground border',
 				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				ghost:
-					'hover:bg-primary/10 hover:text-foreground active:bg-primary/30 active:outline-primary/30',
+					'text-muted-foreground hover:bg-primary/10 hover:text-foreground active:bg-primary/30 active:outline-primary/30',
 				accent:
 					'bg-accent text-accent-foreground hover:bg-accent/90 active:bg-accent/80 active:outline-accent',
 				link: 'text-primary underline-offset-4 hover:underline',

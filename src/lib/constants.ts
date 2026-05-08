@@ -1,4 +1,8 @@
 import Color from "color";
+import pattern1 from "$lib/assets/patterns/pattern1.png";
+import pattern3 from "$lib/assets/patterns/pattern3.jpg";
+import pattern4 from "$lib/assets/patterns/pattern4.png";
+import pattern5 from "$lib/assets/patterns/pattern5.png";
 
 export const degreesToRadians = Math.PI / 180;
 export const radiansToDegrees = 180 / Math.PI;
@@ -24,9 +28,8 @@ export const colors: Color[] = [
 
 export const patterns = [
 	null,
-	'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern4-1ebz6SrCw4YRKgnnBJlXeH8otyvYj4.png',
-	'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern2-bfr6Ttl1bIbY5kw1HPQBIQHOU9Mrk9.png',
-	'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern3-Q16PlIdpKAdJsblTsmHV1PNvPBz8YP.jpg',
-	// 'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern1-sapVQisWvjlVCqek9okbLPEM4oNtU3.png',
-	'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/patterns/pattern5-uXZwvagY0f8JbfVStCN3Nhkw3mjON8.png',
+	pattern1,
+	pattern3,
+	pattern4,
+	pattern5,
 ];

@@ -18,15 +18,15 @@
 		{#snippet header()}
 			<SettingWrapper title="Паттерн" isHeader>
 				<div class="flex">
-					{#each patterns as pattern, i}
+					{#each patterns as pattern, i (pattern)}
 						<Button
 							onclick={() => (wheel.settings.patternId = i)}
 							variant="ghost"
-							class="h-20 w-20 p-1 hover:bg-primary/10 data-[selected=true]:bg-accent"
+							class="size-20 p-1.5 opacity-50 hover:bg-primary/10 data-[selected=true]:bg-accent data-[selected=true]:opacity-100"
 							data-selected={wheel.settings.patternId === i}
 						>
 							{#if pattern}
-								<ImageLoader src={pattern} alt="wheel pattern" />
+								<ImageLoader class="[&_img]:rounded-full" src={pattern} alt="wheel pattern" />
 							{:else}
 								<CircleOffIcon />
 							{/if}

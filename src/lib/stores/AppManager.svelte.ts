@@ -1,4 +1,4 @@
-import type { IDonationSocket, IDonationSocketData, ILot } from "$lib/interfaces";
+import type { IDonationSocketData, ILot } from "$lib/interfaces";
 import { untrack } from "svelte";
 import DonationStore, { type IDonation } from "./DonationStore.svelte";
 import LotStore from "./LotStore.svelte";
@@ -11,6 +11,7 @@ import { browser } from "$app/environment";
 import confetti from "canvas-confetti";
 import { colors } from "$lib/constants";
 import { SvelteMap } from "svelte/reactivity";
+import type DonationSocket from "./DonationSocket.svelte";
 
 const sounds = [
 	'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/sounds/anime-wow-sound-effect-u7tZ2gnHM8AdJGrbu2Z2TEDWc1zYLy.mp3',
@@ -41,10 +42,9 @@ export class AppManager {
 		newLotBonusSec: 30,
 		newDonationBonusSec: 60,
 	}, 'appSettings');
-	private _previousSpinExtendPrice = $state(this.settings.spinExtendBasePrice);
 	private _spinExtendPrice = $state(this.settings.spinExtendBasePrice);
 	private _spinExtends = $state(0);
-	private _donationSockets = new SvelteMap<string, IDonationSocket>();
+	private _donationSockets = new SvelteMap<string, DonationSocket>();
 
 	private _timeoutId: NodeJS.Timeout | undefined;
 	private _extendMultiplierWindowMs = 7000;
@@ -78,12 +78,20 @@ export class AppManager {
 		});
 	}
 
+	public updateBasePrice(value: number) {
+		this._spinExtendPrice = value;
+		this.settings.spinExtendBasePrice = value;
+	}
+
 	public removeSocket(socketId: string) {
+		const socket = this._donationSockets.get(socketId);
+		socket?.disconnect();
+
 		this._donationSockets.delete(socketId);
 	}
 
-	public addSocket(socket: IDonationSocket) {
-		socket.onDonation = this.onDonation.bind(this);
+	public addSocket(socket: DonationSocket) {
+		socket.onDonation(this._onDonation.bind(this));
 		this._donationSockets.set(socket.id, socket);
 	}
 
@@ -132,13 +140,12 @@ export class AppManager {
 	}
 
 	public splitDonation(id: string, donations: Omit<IDonation, 'id' | 'isInstant'>[]) {
-		for (const { message, amount, username, currency, source } of donations) {
+		for (const { message, amount, username, source } of donations) {
 			appManager.donations.add({
 				id: crypto.randomUUID(),
 				message,
 				amount,
 				username,
-				currency,
 				source,
 				isInstant: false
 			});
@@ -282,7 +289,6 @@ export class AppManager {
 				this._addDonation(donation);
 			}
 
-			this._previousSpinExtendPrice = this._spinExtendPrice;
 			this._spinExtendPrice += this.settings.spinExtendPriceGain;
 			this._addSpinMultiplier();
 			this._dingAudio?.load();
@@ -307,14 +313,13 @@ export class AppManager {
 			id: crypto.randomUUID(),
 			username: donation.username,
 			amount: donation.amount,
-			currency: donation.currency,
 			message: donation.message,
 			source: donation.source,
 			isInstant
 		});
 	}
 
-	public onDonation(donation: IDonationSocketData) {
+	private _onDonation(donation: IDonationSocketData) {
 		const lot = this.lots.getLotFromString(donation.message);
 
 		if (this.settings.isSpinExtendEnabled && this.wheel.isActive) {
@@ -337,9 +342,9 @@ export class AppManager {
 	get settings() { return this._settings.value; }
 	get spinExtends() { return this._spinExtends; }
 	get spinExtendPrice() { return this._spinExtendPrice; }
-	get previousSpinExtendPrice() { return this._previousSpinExtendPrice; }
 	get donatePaySocket() { return this._donationSockets.get('DonatePay'); }
 	get donationAlertsSocket() { return this._donationSockets.get('DonationAlerts'); }
+	get donatexSocket() { return this._donationSockets.get('DonateX'); }
 	get donationSockets() { return Array.from(this._donationSockets.values()); }
 }
 

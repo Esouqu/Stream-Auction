@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { IDonation } from '$lib/stores/DonationStore.svelte';
+	import { formatCurrencyNumber } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 
 	type Props = {
@@ -8,7 +9,7 @@
 	};
 
 	const { donation, icon }: Props = $props();
-	const { amount, currency, message } = donation;
+	const { amount, message } = donation;
 </script>
 
 <div class="flex w-full items-center justify-between gap-4 p-4">
@@ -16,5 +17,5 @@
 		{@render icon()}
 		<div>{message}</div>
 	</div>
-	<div class="min-w-fit">+{amount} {currency}</div>
+	<div class="min-w-fit">+{formatCurrencyNumber(amount)}</div>
 </div>

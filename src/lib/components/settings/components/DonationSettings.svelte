@@ -4,17 +4,85 @@
 	import SettingCard from './SettingCard.svelte';
 	import { Switch } from '$lib/components/ui/switch';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
-	import DonatePayIntegration from '$lib/components/DonatePayIntegration.svelte';
-	import DonationAlertsIntegration from '$lib/components/DonationAlertsIntegration.svelte';
 	import { Input } from '$lib/components/ui/input';
+	import { goto } from '$app/navigation';
+	import donationAlertsApi from '$lib/api/donationalertsApi.svelte';
+	import DonationAlertsIcon from '$lib/components/icons/DonationAlertsIcon.svelte';
+	import DonateXIcon from '$lib/components/icons/DonateXIcon.svelte';
+	import DonatePayIcon from '$lib/components/icons/DonatePayIcon.svelte';
+	import donatexApi from '$lib/api/donatexApi.svelte';
+	import donatePayApi from '$lib/api/donatePayApi.svelte';
+	import Integration from '$lib/components/Integration.svelte';
+	import DonatePayApiDialog from '$lib/components/DonatePayApiDialog.svelte';
 
 	const app = getAppManagerContext();
+
+	let isDialogOpen = $state(false);
+
+	const integrations = $derived([
+		{
+			title: 'DonationAlerts',
+			Icon: DonationAlertsIcon,
+			isLoggedIn: !!donationAlertsApi.user,
+			socket: app.donationAlertsSocket,
+			onLogout: () => {
+				donationAlertsApi.logout();
+
+				if (app.donationAlertsSocket) {
+					app.removeSocket(app.donationAlertsSocket.id);
+				}
+			},
+			onAuth: () => goto('/api/donationalerts/auth')
+		},
+		{
+			title: 'DonateX',
+			Icon: DonateXIcon,
+			isLoggedIn: donatexApi.isLoggedIn,
+			onLogout: () => {
+				donatexApi.logout();
+
+				if (app.donatexSocket) {
+					app.removeSocket(app.donatexSocket.id);
+				}
+			},
+			onAuth: () => goto('/api/donatex/auth')
+		},
+		{
+			title: 'DonatePay',
+			Icon: DonatePayIcon,
+			isLoggedIn: !!donatePayApi.user,
+			onLogout: () => {
+				donatePayApi.logout();
+
+				if (app.donatePaySocket) {
+					app.removeSocket(app.donatePaySocket.id);
+				}
+			},
+			onAuth: () => {
+				isDialogOpen = true;
+			}
+		}
+	]);
 </script>
 
+<DonatePayApiDialog isOpen={isDialogOpen} />
+
 <SettingSection>
-	<div class="flex gap-4">
-		<DonationAlertsIntegration />
-		<DonatePayIntegration />
+	<div class="grid grid-cols-3 gap-4">
+		{#each integrations as integration (integration.title)}
+			<Integration {...integration}>
+				{#snippet icon()}
+					<integration.Icon
+						class="inline size-6"
+						color={integration.title === 'DonatePay'
+							? '#44AB4F'
+							: integration.title === 'DonationAlerts'
+								? '#f57507'
+								: ''}
+					/>
+				{/snippet}
+			</Integration>
+		{/each}
 	</div>
 	<SettingCard isExtended={app.settings.isSpinExtendEnabled}>
 		{#snippet header()}
@@ -29,7 +97,7 @@
 					type="number"
 					suffix="руб."
 					placeholder="Значение"
-					bind:value={app.settings.spinExtendBasePrice}
+					bind:value={() => app.settings.spinExtendBasePrice, (value) => app.updateBasePrice(value)}
 				/>
 			</SettingWrapper>
 			<SettingWrapper

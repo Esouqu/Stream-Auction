@@ -16,13 +16,13 @@
 
 	let inputRef: HTMLInputElement | null = $state(null);
 
-	let focusTimeout: NodeJS.Timeout;
-	let blurTimeout: NodeJS.Timeout;
+	let focusTimeout: number;
+	let blurTimeout: number;
 
 	$effect(() => {
 		if (isInputVisible) {
 			clearTimeout(focusTimeout);
-			focusTimeout = setTimeout(() => inputRef?.focus(), SLIDE_DURATION);
+			focusTimeout = window.setTimeout(() => inputRef?.focus(), SLIDE_DURATION);
 		} else {
 			value = '';
 		}
@@ -30,7 +30,7 @@
 
 	function onblur() {
 		clearTimeout(blurTimeout);
-		blurTimeout = setTimeout(() => {
+		blurTimeout = window.setTimeout(() => {
 			if (!value && isInputVisible) {
 				isInputVisible = false;
 			}
@@ -46,7 +46,7 @@
 					{...props}
 					size="icon"
 					variant="ghost"
-					class="absolute top-1/2 z-30 shrink-0 -translate-y-1/2 rounded-full data-[state=off]:text-foreground data-[state=on]:text-muted-foreground"
+					class="absolute top-1/2 z-30 shrink-0 -translate-y-1/2 rounded-full"
 					bind:pressed={isInputVisible}
 				>
 					<SearchIcon />

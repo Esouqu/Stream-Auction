@@ -1,18 +1,19 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
+	import RefreshCwOffIcon from '@lucide/svelte/icons/refresh-cw-off';
 	import DicesIcon from '@lucide/svelte/icons/dices';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
 	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 	import { randomFromRange } from '$lib/utils';
 	import { Tween } from 'svelte/motion';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
-	import { fade, fly } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import { BLUR_PANEL_STYLES } from '$lib/components/BlurPanel.svelte';
 	import { Input } from '$lib/components/ui/input';
 
 	const app = getAppManagerContext();
-	const { wheel, lots } = app;
+	const { wheel, lots, timer } = app;
 	const minDuration = 1;
 	const maxDuration = 999;
 
@@ -20,6 +21,12 @@
 	let isWheelActive = $derived(wheel.isPreparing || wheel.isDelayed || wheel.isSpinning);
 
 	function startSpin() {
+		if (wheel.isActive) {
+			timer.stop();
+			wheel.stop(true);
+			return;
+		}
+
 		wheel.spinDuration = duration.target;
 		wheel.spin();
 	}
@@ -45,63 +52,70 @@
 </script>
 
 <div
-	class={[BLUR_PANEL_STYLES, 'absolute bottom-[5rem] left-1/2 z-10 flex -translate-x-1/2 gap-2']}
+	class={[BLUR_PANEL_STYLES, 'absolute bottom-[5rem] left-1/2 z-10 flex -translate-x-1/2']}
 	in:fly|global={{ y: 250, duration: 500 }}
 	out:fade
 >
-	<Button disabled={isWheelActive} onclick={startSpin}>
-		<RefreshCwIcon />
-		Крутить
+	<Button onclick={startSpin}>
+		{#if wheel.isActive}
+			<RefreshCwOffIcon />
+			Остановить
+		{:else}
+			<RefreshCwIcon />
+			Крутить
+		{/if}
 	</Button>
-	<Tooltip>
-		<TooltipTrigger>
-			<Input
-				id="wheel-spin"
-				type="number"
-				class="w-[6rem]"
-				suffix="сек."
-				disabled={isWheelActive}
-				onblur={(e) => setDuration(Number(e.currentTarget.value))}
-				value={Math.round(duration.current)}
-			/>
-		</TooltipTrigger>
-		<TooltipContent>Длительность</TooltipContent>
-	</Tooltip>
 
-	<div class="flex">
-		<Tooltip>
-			<TooltipTrigger>
-				{#snippet child({ props })}
-					<Button
-						{...props}
-						variant="ghost"
-						size="icon"
+	{#if !wheel.isActive}
+		<div class="ml-2 flex" transition:slide={{ axis: 'x' }}>
+			<Tooltip>
+				<TooltipTrigger>
+					<Input
+						id="wheel-spin"
+						type="number"
+						class="w-[6rem]"
+						suffix="сек."
 						disabled={isWheelActive}
-						onclick={setRandomDuration}
-					>
-						<DicesIcon />
-					</Button>
-				{/snippet}
-			</TooltipTrigger>
-			<TooltipContent>
-				Случайное число от {wheel.settings.durationRange[0]} до {wheel.settings.durationRange[1]}
-			</TooltipContent>
-		</Tooltip>
-		<Tooltip>
-			<TooltipTrigger>
-				{#snippet child({ props })}
-					<Button
-						{...props}
-						variant="ghost"
-						size="icon"
-						disabled={isWheelActive}
-						onclick={() => lots.randomizeColors()}
-					>
-						<PaletteIcon />
-					</Button>
-				{/snippet}
-			</TooltipTrigger>
-			<TooltipContent>Сгенерировать новые цвета</TooltipContent>
-		</Tooltip>
-	</div>
+						onblur={(e) => setDuration(Number(e.currentTarget.value))}
+						value={Math.round(duration.current)}
+					/>
+				</TooltipTrigger>
+				<TooltipContent>Длительность</TooltipContent>
+			</Tooltip>
+			<Tooltip>
+				<TooltipTrigger>
+					{#snippet child({ props })}
+						<Button
+							{...props}
+							variant="ghost"
+							size="icon"
+							disabled={isWheelActive}
+							onclick={setRandomDuration}
+						>
+							<DicesIcon />
+						</Button>
+					{/snippet}
+				</TooltipTrigger>
+				<TooltipContent>
+					Случайное число от {wheel.settings.durationRange[0]} до {wheel.settings.durationRange[1]}
+				</TooltipContent>
+			</Tooltip>
+			<Tooltip>
+				<TooltipTrigger>
+					{#snippet child({ props })}
+						<Button
+							{...props}
+							variant="ghost"
+							size="icon"
+							disabled={isWheelActive}
+							onclick={() => lots.randomizeColors()}
+						>
+							<PaletteIcon />
+						</Button>
+					{/snippet}
+				</TooltipTrigger>
+				<TooltipContent>Сгенерировать новые цвета</TooltipContent>
+			</Tooltip>
+		</div>
+	{/if}
 </div>

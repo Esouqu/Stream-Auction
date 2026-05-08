@@ -312,9 +312,7 @@
 			<Pointer trigger={winner?.id} />
 			<Core {strokeColor} {winner} size={holeSize} {patternImage} />
 			<Outline {strokeColor} color={Color(winner?.color).hex()} />
-			{#if !wheel.isActive}
-				<WheelActionBar />
-			{/if}
+			<WheelActionBar />
 		{/if}
 		<div
 			class="cursor-grab select-none data-[grabbing=true]:cursor-grabbing data-[inactive=true]:pointer-events-none"

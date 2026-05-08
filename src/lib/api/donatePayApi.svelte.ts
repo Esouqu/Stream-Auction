@@ -2,66 +2,67 @@ import type { IDonatePayUserData } from "$lib/interfaces";
 import storable from "$lib/stores/LocalStore.svelte";
 
 interface DonatePayUser {
-  id: number;
-  username: string;
+	id: number;
+	username: string;
 }
 
 interface TokenResponse {
-  token?: string;
-  apiKey?: string;
-  error?: string;
+	token?: string;
+	apiKey?: string;
+	error?: string;
 }
 
 class DonatePayApi {
-  private _user = storable<DonatePayUser | null>(null, 'donatePayUser');
+	private _user = storable<DonatePayUser | null>(null, 'donatePayUser');
 
-  public clearUser() {
-    this._user.value = null;
-  }
+	public clearUser() {
+		this._user.value = null;
+	}
 
-  public setUser(user: DonatePayUser) {
-    this._user.value = user;
-  }
+	public setUser(user: DonatePayUser) {
+		this._user.value = user;
+	}
 
-  public logout() {
-    fetch('/api/donatepay/key', { method: 'DELETE' });
-  }
+	public logout() {
+		fetch('/api/donatepay/key', { method: 'DELETE' });
+		this.clearUser();
+	}
 
-  public async getToken(): Promise<TokenResponse> {
-    const response = await fetch('/api/donatepay/token');
+	public async getToken(): Promise<TokenResponse> {
+		const response = await fetch('/api/donatepay/token');
 
-    if (response.ok) {
-      return await response.json() as { token: string, apiKey: string };
-    } else {
-      const error = await response.text();
-      return { error };
-    }
-  };
+		if (response.ok) {
+			return await response.json() as { token: string, apiKey: string };
+		} else {
+			const error = await response.text();
+			return { error };
+		}
+	};
 
-  public async getApiKey() {
-    const response = await fetch('/api/donatepay/key');
+	public async getApiKey() {
+		const response = await fetch('/api/donatepay/key');
 
-    if (response.ok) {
-      return await response.json() as string;
-    }
-  }
+		if (response.ok) {
+			return await response.json() as string;
+		}
+	}
 
-  public setApiKey(token: string) {
-    fetch('/api/donatepay/key', {
-      method: 'POST',
-      body: JSON.stringify({ access_token: token })
-    })
-  }
+	public setApiKey(token: string) {
+		fetch('/api/donatepay/key', {
+			method: 'POST',
+			body: JSON.stringify({ access_token: token })
+		})
+	}
 
-  public async getUser(accessToken = '') {
-    const response = await fetch(`/api/donatepay/user?access_token=${accessToken}`);
+	public async getUser(accessToken = '') {
+		const response = await fetch(`/api/donatepay/user?access_token=${accessToken}`);
 
-    if (response.ok) {
-      return (await response.json()) as { data: IDonatePayUserData };
-    }
-  }
+		if (response.ok) {
+			return (await response.json()) as { data: IDonatePayUserData };
+		}
+	}
 
-  get user() { return this._user.value; }
+	get user() { return this._user.value; }
 }
 
 const donatePayApi = new DonatePayApi();
