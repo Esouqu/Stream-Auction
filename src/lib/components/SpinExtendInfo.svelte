@@ -21,7 +21,7 @@
 {#if isShown}
 	<div class="flex shrink-0 gap-2" transition:slide>
 		<div class="flex w-full flex-col justify-center rounded-xl bg-card/40 p-4">
-			<div>Вклин</div>
+			<div class="font-semibold text-muted-foreground">Вклин</div>
 			<div class="flex justify-between gap-1 text-xl font-bold">
 				<div>{extendPrice}</div>
 				<div class="inline-flex items-center gap-1 text-base font-medium text-green-400">
@@ -31,7 +31,7 @@
 			</div>
 		</div>
 		<div class="flex w-full flex-col justify-center rounded-xl bg-card/40 p-4">
-			<div>Стоп Колесо</div>
+			<div class="font-semibold text-muted-foreground">Стоп Колесо</div>
 			<div class="text-xl font-bold">{spinStopPrice}</div>
 		</div>
 	</div>

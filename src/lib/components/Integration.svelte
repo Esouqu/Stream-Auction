@@ -15,7 +15,7 @@
 
 <div class="flex w-full items-center">
 	<div class="flex w-full flex-col gap-2 rounded-xl bg-card p-4 text-card-foreground shadow-md">
-		<div class="flex items-center justify-center gap-2">{@render icon()} {title}</div>
+		<div class="flex items-center justify-center gap-2 font-semibold">{@render icon()} {title}</div>
 		{#if isLoggedIn}
 			<Button size="sm" variant="ghost" onclick={onLogout}>Выйти</Button>
 		{:else}

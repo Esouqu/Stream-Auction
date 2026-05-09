@@ -73,7 +73,7 @@
 			<Integration {...integration}>
 				{#snippet icon()}
 					<integration.Icon
-						class="inline size-6"
+						class="inline size-5"
 						color={integration.title === 'DonatePay'
 							? '#44AB4F'
 							: integration.title === 'DonationAlerts'

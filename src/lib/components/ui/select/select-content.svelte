@@ -23,7 +23,7 @@
 		{sideOffset}
 		data-slot="select-content"
 		class={cn(
-			'relative z-50 max-h-(--bits-select-content-available-height) min-w-[8rem] origin-(--bits-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-xl border text-popover-foreground data-[state=open]:rounded-b-none',
+			'relative z-50 max-h-(--bits-select-content-available-height) min-w-[8rem] origin-(--bits-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-xl rounded-b-none text-popover-foreground',
 			'border border-input/15 bg-stone-700/40 backdrop-blur-md',
 			className
 		)}
