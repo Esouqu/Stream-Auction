@@ -55,9 +55,12 @@
 
 	{#if !compact}
 		<div
-			class="pointer-events-none absolute right-4 bottom-4 left-4 z-50 mx-auto flex w-fit flex-col gap-2"
+			class="group pointer-events-none absolute right-4 bottom-4 left-4 z-50 mx-auto flex w-fit flex-col gap-2"
+			data-search-open={isSearchInputVisible}
 		>
-			<BlurPanel class="pointer-events-auto flex items-center overflow-hidden px-0 py-0">
+			<BlurPanel
+				class="pointer-events-auto flex items-center px-0 py-0 group-data-[search-open=true]:overflow-hidden"
+			>
 				<Search bind:value={searchValue} bind:isInputVisible={isSearchInputVisible} />
 				{#if !isSearchInputVisible}
 					<div

@@ -1,50 +1,39 @@
 <script lang="ts">
-	import { fly, scale } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import ArrowIcon from '@lucide/svelte/icons/arrow-right';
 	import type { ILot } from '$lib/interfaces';
-	import Color from 'color';
 	import { getAppManagerContext } from '$lib/context/appManagerContext';
+	import { cn, formatCurrencyNumber } from '$lib/utils';
+	import { BLUR_PANEL_STYLES } from '$lib/components/BlurPanel.svelte';
 
-	interface Props {
+	type Props = {
 		winner: (ILot & { startAngle: number; endAngle: number }) | null;
-		size: number;
-		patternImage: string | null;
-		strokeColor: string;
-	}
+	};
 
-	const { winner, size, patternImage, strokeColor }: Props = $props();
+	const { winner }: Props = $props();
 
 	const app = getAppManagerContext();
 	const { wheel, lots } = app;
-	const backgroundColor = $derived(winner && Color(winner.color).hex());
-	const holeSize = $derived(wheel.isFinished ? '95%' : `${Math.round(size)}px`);
+	const winnerPercent = $derived(
+		winner ? `${((winner.value / lots.totalValue) * 100).toFixed(1)}%` : 0
+	);
+	const additionalDonators = $derived(winner ? winner.donators.slice(1) : []);
 </script>
 
 <div
-	class="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[0.2rem] bg-background shadow-[0_0_1rem_transparent] transition-all duration-500 data-[enlarged=true]:h-[60%] data-[enlarged=true]:w-[60%] data-[glow=true]:shadow-white"
-	data-glow={app.spinExtends > 0}
-	data-enlarged={wheel.isFinished}
-	style="height: {holeSize}; width: {holeSize}; border-color: {strokeColor};"
+	class="absolute top-1/2 left-1/2 z-10 flex size-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full data-[finished=true]:bg-black/50"
+	data-finished={wheel.isFinished}
 >
 	<div
-		class="relative grid h-full w-full items-center justify-center text-center text-base font-semibold transition-colors duration-300"
-		style="
-			text-shadow:
-			-0.125rem -0.125rem 0 black,
-			-0.125rem  0   0 black,
-			-0.125rem  0.125rem 0 black,
-			0   -0.125rem 0 black,
-			0    0.125rem 0 black,
-			0.125rem -0.125rem 0 black,
-			0.125rem  0   0 black,
-			0.125rem  0.125rem 0 black;
-			background-color: {app.spinExtends > 0 ? strokeColor : backgroundColor};
-		"
+		class={cn(
+			BLUR_PANEL_STYLES,
+			'relative grid h-fit w-full items-center justify-center mask-[linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] text-center text-base font-semibold transition-colors duration-300'
+		)}
 	>
 		{#if app.spinExtends > 0}
 			<div
-				class="relative col-start-1 row-start-1 flex h-full w-full flex-col items-center justify-center gap-2 text-center text-base font-semibold text-foreground transition-colors duration-300 text-shadow-none"
-				in:scale
+				class="relative col-start-1 row-start-1 flex h-full w-full flex-col items-center justify-center text-center text-base font-semibold text-foreground transition-colors duration-300 text-shadow-none"
+				transition:slide
 			>
 				<h2 class="text-2xl">{app.spinExtends > 1 ? 'Вклин x' + app.spinExtends : 'Вклин'}</h2>
 				<div class="grid">
@@ -54,43 +43,42 @@
 							in:fly={{ x: 100 }}
 							out:fly={{ x: -100 }}
 						>
-							<span class="text-muted-foreground"
-								>{app.spinExtendPrice - app.settings.spinExtendPriceGain} RUB</span
-							>
+							<span class="text-muted-foreground">
+								{app.spinExtendPrice - app.settings.spinExtendPriceGain} RUB
+							</span>
 							<ArrowIcon />
 							{app.spinExtendPrice} RUB
 						</div>
 					{/key}
 				</div>
 			</div>
-		{:else if !wheel.isFinished}
-			<p
-				class="col-start-1 row-start-1 line-clamp-5 overflow-hidden px-8 text-center text-xl break-words overflow-ellipsis"
-				in:scale
-			>
-				{winner?.title}
-			</p>
-		{:else}
-			<div class="z-20 col-start-1 row-start-1 w-full" in:scale>
-				<p
-					class="line-clamp-5 overflow-hidden px-8 text-center text-2xl break-normal overflow-ellipsis"
-				>
-					{winner?.title}
+		{:else if winner}
+			<div class="z-20 col-start-1 row-start-1 w-full px-20" transition:slide>
+				<p class="line-clamp-1 overflow-hidden text-center text-2xl overflow-ellipsis">
+					{winner.title}
 				</p>
-				<br />
-				<p>
-					Сумма: {winner?.value} ({(((winner?.value || 0) / lots.totalValue) * 100).toFixed(1)}%)
-				</p>
-				{#if winner && winner.donators.length > 0}
-					<p>
-						Заказавшие: {winner?.donators.join(', ')}
-					</p>
+
+				{#if wheel.isFinished}
+					<div class="flex flex-col justify-center" transition:slide>
+						<div>
+							<span class="text-muted-foreground">за</span>
+							{formatCurrencyNumber(winner.value)}
+							<span class="text-muted-foreground">({winnerPercent})</span>
+						</div>
+						{#if winner.donators.length > 0}
+							<div>
+								<span class="text-muted-foreground">от</span>
+								{winner.donators[0]}
+								{#if additionalDonators.length > 0}
+									<span class="text-muted-foreground" title={additionalDonators.join(', ')}
+										>+{additionalDonators.length}</span
+									>
+								{/if}
+							</div>
+						{/if}
+					</div>
 				{/if}
 			</div>
 		{/if}
-		<div
-			class="pointer-events-none absolute h-full w-full bg-[length:17rem_17rem] bg-center opacity-10"
-			style="background-image: url({patternImage || ''});"
-		></div>
 	</div>
 </div>

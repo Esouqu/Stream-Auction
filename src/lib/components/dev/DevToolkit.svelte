@@ -33,15 +33,15 @@
 	];
 
 	let donationMessage = $state('');
+	let donationAmount = $state(100);
+	let donationName = $state('dev');
 
 	function addDonation() {
-		app.donations.add({
-			id: crypto.randomUUID(),
-			username: 'dev',
-			amount: 100,
+		app.onDonation({
+			username: donationName,
+			amount: donationAmount,
 			message: donationMessage || 'Тестовое сообщение в пять слов',
-			source: 'DonationAlerts',
-			isInstant: false
+			source: 'DonatePay'
 		});
 	}
 
@@ -67,6 +67,20 @@
 		<Card class="bg-transparent">
 			<CardTitle class="px-2">Донат</CardTitle>
 			<CardContent class="flex gap-2 px-2">
+				<Input
+					id="donation-name"
+					type="string"
+					class="w-[90px]"
+					placeholder="Имя"
+					bind:value={donationName}
+				/>
+				<Input
+					id="donation-amount"
+					type="number"
+					class="w-[90px]"
+					placeholder="Сумма"
+					bind:value={donationAmount}
+				/>
 				<Input
 					id="donation-message"
 					type="string"

@@ -107,7 +107,7 @@
 		<BlurPanel class="flex w-full">
 			{#if wheel.isActive}
 				<div
-					class="flex h-10 w-full items-center justify-center text-base font-medium text-muted-foreground"
+					class="flex h-11 w-full items-center justify-center text-base font-medium text-muted-foreground"
 				>
 					{#if wheel.isSpinning || wheel.isPreparing}
 						<div class="flex items-center">Кручение колеса...</div>

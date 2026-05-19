@@ -10,6 +10,7 @@
 	import type { ILot } from '$lib/interfaces';
 	import { scale } from 'svelte/transition';
 	import WheelActionBar from './components/WheelActionBar.svelte';
+	import gsap from 'gsap';
 
 	interface ILotWithAngle extends ILot {
 		startAngle: number;
@@ -30,30 +31,34 @@
 	let containerRef: HTMLDivElement | undefined = $state();
 	let canvasContainerRef: HTMLDivElement | undefined = $state();
 	let canvasRef: HTMLCanvasElement | undefined = $state();
-	let ctx = $derived(canvasRef?.getContext('2d'));
+	let pattern = $state<CanvasPattern>();
 
 	let resizeWidth = $state(0);
 	let resizeHeight = $state(0);
 	let isDragging = $state(false);
-	let lotsWithAngles = $derived.by(getLotsWithAngles);
-	let winner = $derived.by(getWinner);
-	let radius = $derived(Math.floor(Math.min(resizeHeight, resizeWidth) / 2.25));
-	let holeSize = $derived(radius / 1.5);
-	let textOffsetFromCenter = $derived(Math.min(1, Math.max(0, (radius * 0.38) / radius)));
-	let textSize = $derived((radius / 100) * 5);
-	let fontStyle = $derived(`700 ${textSize}px Geist`);
-	let maxSliceTextWidth = $derived(radius / 2);
-	let lineWidth = $derived(lotsWithAngles.length > 300 ? 1 : 3);
+
+	const ctx = $derived(canvasRef?.getContext('2d'));
+	const lotsWithAngles = $derived.by(getLotsWithAngles);
+	const winner = $derived.by(getWinner);
+	const radius = $derived(Math.floor(Math.min(resizeHeight, resizeWidth) / 2.25));
+	const textOffsetFromCenter = $derived(Math.min(1, Math.max(0, (radius * 0.38) / radius)));
+	const textSize = $derived((radius / 100) * 5);
+	const fontStyle = $derived(`700 ${textSize}px Geist`);
+	const maxSliceTextWidth = $derived(radius / 2);
+	const lineWidth = $derived(lotsWithAngles.length > 300 ? 1 : 3);
 
 	let wheelWidth: number;
 	let wheelHeight: number;
 	let wheelX: number;
 	let wheelY: number;
 	let draggingStartAngle: number;
-	let pattern: CanvasPattern | undefined = $state();
 
 	onMount(() => {
 		onresize();
+
+		if (containerRef) {
+			app.setWheelContainer(containerRef);
+		}
 
 		return () => {
 			if (patternImage) {
@@ -63,16 +68,6 @@
 	});
 
 	$effect(() => {
-		if (ctx) {
-			ctx.font = fontStyle;
-			ctx.textBaseline = 'middle';
-			ctx.textAlign = 'start';
-		}
-	});
-
-	$effect(() => {
-		patternImage;
-
 		loadPattern();
 	});
 
@@ -102,6 +97,23 @@
 				resolve();
 			}
 		});
+	}
+
+	function drawPatternCircle() {
+		if (!ctx || !pattern) return;
+
+		ctx.globalCompositeOperation = 'destination-out';
+
+		ctx.beginPath();
+		ctx.arc(radius, radius, radius / 3, 0, 2 * Math.PI);
+		ctx.fill();
+		ctx.closePath();
+
+		ctx.globalCompositeOperation = 'source-over';
+
+		ctx.strokeStyle = strokeColor;
+		ctx.lineWidth = lineWidth;
+		ctx.stroke();
 	}
 
 	function drawStroke(centerX: number, centerY: number) {
@@ -137,9 +149,10 @@
 		const textX = radius + radius * textOffsetFromCenter * cosMidAngle;
 		const textY = radius + radius * textOffsetFromCenter * sinMidAngle;
 
-		ctx.fillStyle = 'white'; // white
+		ctx.fillStyle = 'white';
 		ctx.strokeStyle = 'black';
 		ctx.lineWidth = 4;
+		ctx.lineJoin = 'round';
 
 		ctx.save();
 		ctx.translate(textX, textY);
@@ -175,19 +188,25 @@
 
 		ctx.clearRect(0, 0, canvasRef.width, canvasRef.height);
 
+		ctx.font = fontStyle;
+		ctx.textBaseline = 'middle';
+		ctx.textAlign = 'start';
+
+		for (const lot of lotsWithAngles) {
+			drawBody(lot, centerX, centerY);
+		}
+
+		drawStroke(centerX, centerY);
+
 		for (const lot of lotsWithAngles) {
 			const { startAngle, endAngle } = lot;
 			const angleDiff = endAngle - startAngle;
-
-			drawBody(lot, centerX, centerY);
 			if (angleDiff >= textMinAngleCap) {
 				drawText(lot);
 			}
 		}
 
-		ctx.globalAlpha = 1;
-
-		drawStroke(centerX, centerY);
+		drawPatternCircle();
 	}
 
 	function getWinner() {
@@ -200,17 +219,17 @@
 			const targetRotation = wheel.normalizedRotation;
 
 			if (item.startAngle <= targetRotation && item.endAngle >= targetRotation) {
-				return item; // Return the item found
+				return item;
 			}
 
 			if (targetRotation < item.startAngle) {
-				right = mid - 1; // Search in the left half
+				right = mid - 1;
 			} else {
-				left = mid + 1; // Search in the right half
+				left = mid + 1;
 			}
 		}
 
-		return null; // If not found, return null or appropriate value
+		return null;
 	}
 
 	function getLotsWithAngles() {
@@ -264,40 +283,41 @@
 		draggingStartAngle = Math.atan2(e.clientY - wheelY, e.clientX - wheelX);
 	}
 
-	// function onwheel(e: WheelEvent) {
-	// 	e.preventDefault();
+	function onwheel(e: WheelEvent) {
+		e.preventDefault();
+		if (!winner || !lotsWithAngles.length) return;
 
-	// 	if (!winner) return;
+		const direction = e.deltaY > 0 ? 1 : -1;
+		const len = lotsWithAngles.length;
+		const idx = lotsWithAngles.findIndex((item) => item.id === winner.id);
+		const nextIdx = (idx + direction + len) % len;
+		const next = lotsWithAngles[nextIdx];
+		const nextAngle = (next.startAngle + next.endAngle) / 2;
 
-	// 	const direction = e.deltaY > 0 ? 1 : -1;
-	// 	const idx = lotsWithAngles.findIndex((item) => item.id === winner.id);
-	// 	let next = lotsWithAngles[(idx + direction) % lotsWithAngles.length];
+		let rotation = wheel.rotation;
 
-	// 	if (!next) {
-	// 		if (direction === 1) {
-	// 			next = lotsWithAngles[0];
-	// 		} else {
-	// 			next = lotsWithAngles[lotsWithAngles.length - 1];
-	// 		}
-	// 	}
+		if (direction === -1) {
+			rotation = wheel.rotation - ((wheel.rotation + nextAngle) % 360) + 360;
+		} else {
+			rotation = wheel.rotation - ((wheel.rotation + nextAngle) % 360) - 360;
+		}
 
-	// 	console.log(next.title);
+		const currentDiff = Math.abs(rotation - wheel.rotation);
 
-	// 	const nextAngle = (next.startAngle + next.endAngle) / 2;
-	// 	let rotation = wheel.rotation;
+		if (currentDiff > 180) {
+			if (direction === 1) {
+				rotation += 360;
+			} else {
+				rotation -= 360;
+			}
+		}
 
-	// 	if (direction === -1) {
-	// 		rotation = wheel.rotation - ((wheel.rotation + nextAngle) % 360) + 360;
-	// 	} else {
-	// 		rotation = wheel.rotation - ((wheel.rotation + nextAngle) % 360) - 360;
-	// 	}
-
-	// 	gsap.to(wheel, {
-	// 		rotation: rotation,
-	// 		duration: 0.2,
-	// 		ease: 'power1.out'
-	// 	});
-	// }
+		gsap.to(wheel, {
+			rotation,
+			duration: 0.5,
+			ease: 'expo.out'
+		});
+	}
 </script>
 
 <svelte:window {onresize} {onmousemove} {onmouseup} />
@@ -310,12 +330,12 @@
 	<div class="relative flex">
 		{#if radius > 0}
 			<Pointer trigger={winner?.id} />
-			<Core {strokeColor} {winner} size={holeSize} {patternImage} />
+			<Core {winner} />
 			<Outline {strokeColor} color={Color(winner?.color).hex()} />
 			<WheelActionBar />
 		{/if}
 		<div
-			class="cursor-grab select-none data-[grabbing=true]:cursor-grabbing data-[inactive=true]:pointer-events-none"
+			class="cursor-grab rounded-full select-none data-[grabbing=true]:cursor-grabbing data-[inactive=true]:pointer-events-none"
 			data-grabbing={isDragging}
 			data-inactive={wheel.isSpinning || wheel.isDelayed}
 			style="transform: rotate({wheel.rotation}deg);"
@@ -323,6 +343,7 @@
 			aria-hidden="true"
 			bind:this={canvasContainerRef}
 			{onmousedown}
+			{onwheel}
 		>
 			<canvas
 				bind:this={canvasRef}

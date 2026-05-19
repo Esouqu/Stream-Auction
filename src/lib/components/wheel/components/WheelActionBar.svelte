@@ -56,7 +56,7 @@
 	in:fly|global={{ y: 250, duration: 500 }}
 	out:fade
 >
-	<Button onclick={startSpin}>
+	<Button variant={wheel.isActive ? 'ghost' : 'default'} onclick={startSpin}>
 		{#if wheel.isActive}
 			<RefreshCwOffIcon />
 			Остановить

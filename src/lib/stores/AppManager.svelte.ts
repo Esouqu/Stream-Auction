@@ -12,6 +12,7 @@ import confetti from "canvas-confetti";
 import { colors } from "$lib/constants";
 import { SvelteMap } from "svelte/reactivity";
 import type DonationSocket from "./DonationSocket.svelte";
+import gsap from 'gsap';
 
 const sounds = [
 	'https://vl7xhhuughjqjft6.public.blob.vercel-storage.com/sounds/anime-wow-sound-effect-u7tZ2gnHM8AdJGrbu2Z2TEDWc1zYLy.mp3',
@@ -52,6 +53,7 @@ export class AppManager {
 	private _celebrationAudios: HTMLAudioElement[] = [];
 	private _dingAudio: HTMLAudioElement | undefined;
 	private _IsInstantDonationCooldown = false;
+	private _wheelContainerRef?: HTMLElement;
 
 	constructor() {
 		if (browser) {
@@ -67,7 +69,7 @@ export class AppManager {
 				// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 				this.wheel.state;
 
-				untrack(() => this.onWheelStateChange(this.wheel.state))
+				untrack(() => this._onWheelStateChange(this.wheel.state))
 			});
 
 			$effect(() => {
@@ -76,6 +78,10 @@ export class AppManager {
 				}
 			});
 		});
+	}
+
+	public setWheelContainer(ref: HTMLElement) {
+		this._wheelContainerRef = ref;
 	}
 
 	public updateBasePrice(value: number) {
@@ -91,8 +97,27 @@ export class AppManager {
 	}
 
 	public addSocket(socket: DonationSocket) {
-		socket.onDonation(this._onDonation.bind(this));
+		socket.onDonation(this.onDonation.bind(this));
 		this._donationSockets.set(socket.id, socket);
+	}
+
+	public transferDonation(donation: IDonation, lotId: number) {
+		this.lots.addValue(lotId, donation.amount, donation.username);
+		this.donations.remove(donation.id);
+	}
+
+	public stopSpinManually() {
+		this.wheel.stop(true);
+		this.timer.stop();
+		this._spinExtendPrice = this.settings.spinExtendBasePrice;
+	}
+
+	public extendSpin() {
+		const baseExtensionMs = this.settings.spinExtendSec * 1000;
+		const timerTweenMs = 500;
+
+		this.timer.add(baseExtensionMs - timerTweenMs);
+		this.wheel.extendSpin(this.settings.spinExtendSec);
 	}
 
 	private _playAudio(index?: number) {
@@ -131,34 +156,6 @@ export class AppManager {
 		}
 	}
 
-	public splitDonationAndAddLots(id: string, donations: Omit<IDonation, 'id' | 'isInstant'>[]) {
-		for (const { message, amount, username } of donations) {
-			appManager.lots.add(message, amount, [username]);
-		}
-
-		appManager.donations.remove(id);
-	}
-
-	public splitDonation(id: string, donations: Omit<IDonation, 'id' | 'isInstant'>[]) {
-		for (const { message, amount, username, source } of donations) {
-			appManager.donations.add({
-				id: crypto.randomUUID(),
-				message,
-				amount,
-				username,
-				source,
-				isInstant: false
-			});
-		}
-
-		appManager.donations.remove(id);
-	}
-
-	public transferDonation(donation: IDonation, lotId: number) {
-		this.lots.addValue(lotId, donation.amount, donation.username);
-		this.donations.remove(donation.id);
-	}
-
 	private _addSpinMultiplier() {
 		this._spinExtends = 1;
 
@@ -169,38 +166,28 @@ export class AppManager {
 		}, this._extendMultiplierWindowMs);
 	}
 
-	public stopSpinManually() {
-		this.wheel.stop(true);
-		this.timer.stop();
-		this._spinExtendPrice = this.settings.spinExtendBasePrice;
-	}
-
-	public extendSpin() {
-		const baseExtensionMs = this.settings.spinExtendSec * 1000;
-		const timerTweenMs = 500;
-
-		this.timer.add(baseExtensionMs - timerTweenMs);
-		this.wheel.extendSpin(this.settings.spinExtendSec);
-	}
-
-	public onWheelStateChange(state: WHEEL_STATE) {
-		const spinDurationMs = this.wheel.spinDuration * 1000;
-
+	private _onWheelStateChange(state: WHEEL_STATE) {
 		switch (state) {
-			case WHEEL_STATE.PREPARING:
+			case WHEEL_STATE.PREPARING: {
+				const spinDurationMs = this.wheel.spinDuration * 1000;
 				this.timer.stop();
 				this.timer.start(spinDurationMs);
 				break;
-			case WHEEL_STATE.DELAYED:
+			}
+			case WHEEL_STATE.DELAYED: {
 				if (this.settings.isSpinExtendEnabled) {
 					this.timer.stop();
 					this.timer.start(this.settings.spinStopDelaySec * 1000);
 				}
 				break;
-			case WHEEL_STATE.FINISHED:
+			}
+			case WHEEL_STATE.FINISHED: {
 				this.timer.stop();
 				this._spinExtendPrice = this.settings.spinExtendBasePrice;
-				this._fireConfetti();
+				if (this._wheelContainerRef) {
+					this._animateWheelPop(this._wheelContainerRef);
+					this._fireConfetti(this._wheelContainerRef);
+				}
 
 				this._IsInstantDonationCooldown = true;
 
@@ -208,19 +195,34 @@ export class AppManager {
 					this._IsInstantDonationCooldown = false;
 				}, 10000);
 
-				setTimeout(() => {
-					this._playAudio();
-				}, 50);
+				this._playAudio();
 
 				break;
+			}
 		}
 	}
 
-	private _fireConfetti() {
+	private _animateWheelPop(containerRef: HTMLElement) {
+		gsap.to(containerRef, {
+			scale: 1.05,
+			yoyo: true,
+			duration: 0.3,
+			ease: 'power2.out',
+			repeat: 1
+		});
+	}
+
+	private _fireConfetti(containerRef: HTMLElement) {
+		const rect = containerRef.getBoundingClientRect();
+		const centerX = rect.left + rect.width / 2;
+		const centerY = rect.top + rect.height / 2;
+		const originX = centerX / window.innerWidth;
+		const originY = centerY / window.innerHeight;
+
 		const defaults = {
 			origin: {
-				x: 0.51,
-				y: 0.44
+				x: originX,
+				y: originY
 			},
 			spread: 360,
 			ticks: 100,
@@ -319,7 +321,7 @@ export class AppManager {
 		});
 	}
 
-	private _onDonation(donation: IDonationSocketData) {
+	public onDonation(donation: IDonationSocketData) {
 		const lot = this.lots.getLotFromString(donation.message);
 
 		if (this.settings.isSpinExtendEnabled && this.wheel.isActive) {
