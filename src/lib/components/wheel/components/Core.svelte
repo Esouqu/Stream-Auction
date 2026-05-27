@@ -21,7 +21,7 @@
 </script>
 
 <div
-	class="absolute top-1/2 left-1/2 z-10 flex size-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full data-[finished=true]:bg-black/50"
+	class="pointer-events-none absolute top-1/2 left-1/2 z-10 flex size-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full data-[finished=true]:bg-black/50"
 	data-finished={wheel.isFinished}
 >
 	<div
@@ -39,7 +39,7 @@
 				<div class="grid">
 					{#key app.spinExtendPrice}
 						<div
-							class="col-start-1 row-start-1 flex gap-1"
+							class="pointer-events-auto col-start-1 row-start-1 flex gap-1"
 							in:fly={{ x: 100 }}
 							out:fly={{ x: -100 }}
 						>
